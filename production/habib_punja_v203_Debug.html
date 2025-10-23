@@ -1370,6 +1370,39 @@ game.debugFix6Test()       - FIX 6: Ambiguous Card Assignment
                 return false;
             }
 
+            canAddToPublishedSequence(card, publishedSequence) {
+                // Check if card can be added to this published sequence
+                const seq = publishedSequence.cards || publishedSequence;
+
+                // For triples/quads - check if same rank
+                if (seq.length >= 3 && seq.every(c => c.rank === seq[0].rank)) {
+                    return card.rank === seq[0].rank;
+                }
+
+                // For runs - check if can extend at either end
+                if (seq.length >= 3) {
+                    const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+                    const seqSuit = seq[0].suit;
+
+                    if (card.suit !== seqSuit) return false;
+
+                    const seqRanks = seq.map(c => c.rank);
+                    const firstRank = seqRanks[0];
+                    const lastRank = seqRanks[seqRanks.length - 1];
+
+                    const firstIdx = ranks.indexOf(firstRank);
+                    const lastIdx = ranks.lastIndexOf(lastRank);
+
+                    // Can add before first card?
+                    if (firstIdx > 0 && ranks[firstIdx - 1] === card.rank) return true;
+
+                    // Can add after last card?
+                    if (lastIdx < ranks.length - 1 && ranks[lastIdx + 1] === card.rank) return true;
+                }
+
+                return false;
+            }
+
             evaluateCard(card, pIdx) {
                 const hand = this.playerHands[pIdx];
                 let val = 0;
@@ -1419,16 +1452,64 @@ game.debugFix6Test()       - FIX 6: Ambiguous Card Assignment
 
             findWorstCard(pIdx) {
                 const hand = this.playerHands[pIdx];
-                console.log(`  → v2.0.1 FIX 4: Checking critical danger protection`);
+
+                // [Keep existing ladder deadlock code here...]
+
+                // ✅ NEW: Check if card can be added to MY OWN published sequences
+                console.log(`  → FIX 4A: Checking cards that extend my published sequences`);
+                const myPublished = this.publishedSequences[pIdx];
+                if (myPublished && myPublished.length > 0) {
+                    const cardsExtendingMyPublished = hand.filter(c => {
+                        return myPublished.some(pubSeq => this.canAddToPublishedSequence(c, pubSeq));
+                    });
+
+                    if (cardsExtendingMyPublished.length > 0) {
+                        console.log(`  → FIX 4A: Found ${cardsExtendingMyPublished.length} card(s) that can extend my published sequences - keeping them`);
+                        // Filter these out from consideration for discard
+                        const cardsNotExtendingMine = hand.filter(c =>
+                            !cardsExtendingMyPublished.includes(c)
+                        );
+                        if (cardsNotExtendingMine.length > 0) {
+                            // Continue with remaining cards only
+                            hand = cardsNotExtendingMine;
+                        }
+                    }
+                }
+
+                // ✅ UPDATED FIX 4: Check critical danger with PUBLISHED SEQUENCES
+                console.log(`  → FIX 4B: Checking critical danger with published sequences`);
                 for (let p = 0; p < this.players; p++) {
-                    if (p === pIdx) continue;
+                    if (p === pIdx) continue; // Skip self
                     const opponentCards = this.playerHands[p].length;
                     const opponentPublished = this.publishedSequences[p].length > 0;
+
+                    // If opponent has published and has ≤2 cards, they're in endgame
                     if (opponentPublished && opponentCards <= 2) {
                         const playerName = p === 0 ? 'Human' : (p === 1 ? 'Habot' : 'Jabot');
-                        console.log(`  → v2.0.1 FIX 4: CRITICAL - ${playerName} has ${opponentCards} card(s) and published!`);
-                        const safeCards = hand.filter(c => !this.couldExtendSequence(c, p));
+                        console.log(`  → FIX 4B: CRITICAL - ${playerName} has ${opponentCards} card(s) and published!`);
+
+                        // Filter out cards that help them (including via ANY published sequences)
+                        const safeCards = hand.filter(c => {
+                            // Check if extends opponent's hand
+                            if (this.couldExtendSequence(c, p)) return false;
+
+                            // ✅ NEW: Check if can be added to ANY published sequence (any player)
+                            for (let player = 0; player < this.players; player++) {
+                                const published = this.publishedSequences[player];
+                                if (published && published.length > 0) {
+                                    for (let pubSeq of published) {
+                                        if (this.canAddToPublishedSequence(c, pubSeq)) {
+                                            console.log(`  → FIX 4B: ${c.toString()} can add to published sequence - NOT SAFE`);
+                                            return false; // Not safe - can extend published
+                                        }
+                                    }
+                                }
+                            }
+                            return true; // Safe - doesn't help via hand or published
+                        });
+
                         if (safeCards.length > 0) {
+                            // Discard highest penalty from safe cards
                             const worst = safeCards.reduce((max, c) =>
                                 c.getPenaltyValue() > max.getPenaltyValue() ? c : max
                             );
@@ -1436,6 +1517,7 @@ game.debugFix6Test()       - FIX 6: Ambiguous Card Assignment
                             return worst;
                         } else {
                             console.log(`  → v2.0.1 FIX 4: WARNING - ALL cards help ${playerName}! Using least valuable...`);
+                            // If all cards help, pick the least strategically valuable
                             let minValue = this.evaluateCard(hand[0], pIdx);
                             let worst = hand[0];
                             hand.forEach(c => {
@@ -1449,6 +1531,8 @@ game.debugFix6Test()       - FIX 6: Ambiguous Card Assignment
                         }
                     }
                 }
+
+
                 const isLadderOnlyHand = this.handReqs[this.currentHand].seqs.every(seq => seq === 'ladder');
                 if (isLadderOnlyHand && this.turnCounter > 80 && hand.length >= 15) {
                     const potentialLadders = {};
