@@ -1530,21 +1530,33 @@
                 if (pendingDraw && (reason === 'expired' || reason === 'bought')) {
                     const { ai, statusId } = pendingDraw;
                     const aiName = ai === 1 ? 'Habot' : 'Jabot';
+
                     console.log(`%c▶️ Resuming ${aiName}'s turn after buy window`, 'color: #4a90e2; font-weight: bold;');
                     setTimeout(() => {
+                        // PATCH 1: Try auto-publish before drawing
+                        const published = this.autoPublish(ai);
+                        if (published) {
+                            console.log(`✅ PATCH 1: ${aiName} auto-published sequences after buy window!`);
+                        }
                         this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
                     }, 500);
+
                 } else if (pendingDraw && reason === 'ai-bought') {
                     const { ai, statusId } = pendingDraw;
                     const aiName = ai === 1 ? 'Habot' : 'Jabot';
+
                     console.log(`%c▶️ Resuming ${aiName}'s turn (AI bought, skipping duplicate draw)`, 'color: #4a90e2; font-weight: bold;');
                     setTimeout(() => {
-
-                        this.drawDeckCardForAI(ai, statusId);           // ← ADD THIS LINE
+                        // PATCH 1: Try auto-publish before continuing
+                        const published = this.autoPublish(ai);
+                        if (published) {
+                            console.log(`✅ PATCH 1: ${aiName} auto-published after AI bought!`);
+                        }
+                        this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
-
                     }, 500);
+
                 }
                 // ✅ NEW: Handle pendingNextPlayer (buy window opened after AI discarded from discard pile)
                 else if (pendingNextPlayer !== null && pendingNextPlayer !== undefined) {
@@ -1557,6 +1569,7 @@
                             this.aiTurn();
                         }
                     }, 500);
+
                 }
             }
 
@@ -1659,6 +1672,29 @@
                 setTimeout(() => {
                     this.turnCounter++;
                     console.log(`%c  Turn ${this.turnCounter}`, 'color: #3498db;');
+
+                    // PATCH 2: Check hand size - block buying if 13+ cards
+                    const currentHandSize = this.playerHands[ai].length;
+                    if (currentHandSize >= 13) {
+                        console.log(`%c⛔ PATCH 2: ${aiName} has ${currentHandSize} cards - must reduce hand`, 'color: #e74c3c; font-weight: bold;');
+                        // Force draw from deck instead of evaluating discard
+                        console.log(`%c  ${aiName} drawing from deck (hand too large)...`, 'color: #3498db;');
+                        this.setAIStatus(statusId, `Drawing from deck...`);
+                        this.handleDeckDraw(ai, statusId);
+                        return;
+                    }
+
+                    // PATCH 3: Try to auto-publish at turn start if hand is large
+                    if (currentHandSize >= 12 && this.publishedSequences[ai].length === 0) {
+                        console.log(`%c🚨 PATCH 3: ${aiName} has ${currentHandSize} cards and hasn't published - forcing publish check`, 'color: #e74c3c; font-weight: bold;');
+                        const published = this.autoPublish(ai);
+                        if (published) {
+                            console.log(`%c✅ PATCH 3: ${aiName} emergency published!`, 'color: #27ae60; font-weight: bold;');
+                            // Update hand size after publishing
+                            const newHandSize = this.playerHands[ai].length;
+                            console.log(`%c   Hand size reduced from ${currentHandSize} to ${newHandSize}`, 'color: #27ae60;');
+                        }
+                    }
 
                     let discardCard = null;
                     let discardScore = 0;
@@ -1781,7 +1817,25 @@
 
             continueAITurnAfterDraw(ai, statusId) {
                 const aiName = ai === 1 ? 'Habot' : 'Jabot';
+
+                // PATCH 4: Emergency publish if hand is too large
+                const currentHandSize = this.playerHands[ai].length;
+                if (currentHandSize >= 13 && this.publishedSequences[ai].length === 0 && this.canPublish(ai)) {
+                    console.log(`%c🚨 PATCH 4: ${aiName} has ${currentHandSize} cards - FORCING publish!`, 'color: #e74c3c; font-weight: bold;');
+                    const publishSuccess = this.autoPublish(ai);
+                    if (publishSuccess) {
+                        this.aiJustPublished[ai] = true;
+                        this.setAIStatus(statusId, `Emergency Published!`);
+                        console.log(`%c✅ PATCH 4: ${aiName} emergency publish SUCCESS!`, 'color: #27ae60; font-weight: bold;');
+                        const newHandSize = this.playerHands[ai].length;
+                        console.log(`%c   Hand reduced from ${currentHandSize} to ${newHandSize}`, 'color: #27ae60;');
+                    } else {
+                        console.log(`%c⚠️ PATCH 4: ${aiName} emergency publish FAILED - no valid sequences`, 'color: #f39c12; font-weight: bold;');
+                    }
+                }
+
                 const canPublishNow = this.canPublish(ai) && this.publishedSequences[ai].length === 0;
+
                 if (canPublishNow) {
                     let shouldPublish = false;
                     const opponentDanger = this.publishedSequences.some((seq, idx) => idx !== ai && seq.length > 0 && this.playerHands[idx].length <= 3);
@@ -1824,8 +1878,18 @@
                     }
                 }
 
+                // PATCH 5: Try to publish again if still holding 12+ cards after first publish
+                if (this.playerHands[ai].length >= 12 && this.publishedSequences[ai].length > 0 && this.canPublish(ai)) {
+                    console.log(`%c🚨 PATCH 5: ${aiName} still has ${this.playerHands[ai].length} cards after publishing - checking for more sequences`, 'color: #e74c3c; font-weight: bold;');
+                    const additionalPublish = this.autoPublish(ai);
+                    if (additionalPublish) {
+                        console.log(`%c✅ PATCH 5: ${aiName} published additional sequences!`, 'color: #27ae60; font-weight: bold;');
+                    }
+                }
+
                 if (!this.aiJustPublished[ai] && this.playerHands[ai].length > 0 && this.publishedSequences[ai].length > 0) {
                     const addResult = this.tryAddToPublished(ai);
+
                     if (addResult === 'win') {
                         this.setAIStatus(statusId, `Added and WINS!`);
                         this.updateUI();
