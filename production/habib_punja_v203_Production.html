@@ -212,6 +212,112 @@
             margin-bottom: 4px
         }
 
+
+        /* ============================================
+   🎨 FIX 7B: Custom Confirmation Modal
+   ============================================ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .modal-overlay.active {
+                display: flex;
+            }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--bg-2) 100%);
+            border: 2px solid var(--gold);
+            border-radius: var(--radius);
+            padding: 32px;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), var(--ring);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px) scale(0.95);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-message {
+            font-size: 16px;
+            color: var(--muted);
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 700;
+            border: 2px solid;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+            .modal-btn.cancel {
+                background: linear-gradient(180deg, var(--accent), var(--accent-2));
+                border-color: var(--accent);
+                color: #052e1a;
+            }
+
+                .modal-btn.cancel:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
+                }
+
+            .modal-btn.confirm {
+                background: linear-gradient(180deg, var(--danger), #dc2626);
+                border-color: var(--danger);
+                color: white;
+            }
+
+                .modal-btn.confirm:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+                }
+
         .center-area {
             display: flex;
             flex-direction: column;
@@ -640,6 +746,22 @@
             <button class="btn" onclick="newGame()">New Game</button>
         </div>
     </div>
+
+    <!-- ============================================
+     🎨 FIX 7B: Custom Confirmation Modal
+     ============================================ -->
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon">⚠️</div>
+            <div class="modal-title" id="modalTitle">Confirm Action</div>
+            <div class="modal-message" id="modalMessage">Are you sure?</div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="modalCancel">Continue Playing</button>
+                <button class="modal-btn confirm" id="modalConfirm">Start New Game</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Add this at the very top of your <script> section, before game code
         window.addEventListener('error', function (e) {
@@ -907,9 +1029,16 @@
             }
 
             autoPublish(pIdx) {
+                // 🛡️ FIX 6: CRITICAL - Block republishing!
+                if (this.publishedSequences[pIdx].length > 0) {
+                    console.log(`⏭️ FIX 6: Player ${pIdx} already has ${this.publishedSequences[pIdx].length} published cards - blocking republish`);
+                    return false;
+                }
+
                 const req = this.handReqs[this.currentHand].seqs;
                 const hand = this.playerHands[pIdx];
                 const opponentRanks = new Set();
+
                 const opponentSuits = new Set();
                 for (let i = 0; i < this.players; i++) {
                     if (i !== pIdx) {
@@ -1424,8 +1553,9 @@
                 if (this.buyWindow.active) this.closeBuyWindow();
 
                 // ✅ FIX 3: Use 5 seconds if human just published, 10 seconds otherwise
-                const duration = this.justPublished ? 5000 : 10000;
-                console.log(`%c⏱️ FIX 3: Buy window duration: ${duration/1000}s (justPublished: ${this.justPublished})`, 'color: #ffc107; font-weight: bold;');
+                // Nash: Changed values 3 seconds and 7 seconds to make game faster
+                const duration = this.justPublished ? 3000 : 7000;
+                console.log(`%c⏱️ FIX 3: Buy window duration: ${duration / 1000}s (justPublished: ${this.justPublished})`, 'color: #ffc107; font-weight: bold;');
 
                 this.buyWindow.active = true;
                 this.buyWindow.card = card;
@@ -1434,7 +1564,7 @@
                 this.buyWindow.expiresAt = Date.now() + duration; // ✅ FIX 3: Variable duration
 
                 const playerNames = ['Human', 'Habot', 'Jabot'];
-                console.log(`%c🔔 Buy window opened for ${playerNames[buyWindowPlayer]} (${card.toString()}) - ${duration/1000}s`, 'color: #ffc107; font-weight: bold;');
+                console.log(`%c🔔 Buy window opened for ${playerNames[buyWindowPlayer]} (${card.toString()}) - ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
                 if (buyWindowPlayer === 0) document.getElementById('buyBtn').disabled = false;
                 this.updateBuyTimer();
             }
@@ -1705,7 +1835,9 @@
                             discardScore = -999;
                         }
                     }
-                    let threshold = 15;
+
+                    //Nash: Changed threshold from 15 to  11 to make the game faster
+                    let threshold = 11;
                     if (this.publishedSequences[ai].length === 0) {
                         const seqs = this.findSequences(this.playerHands[ai]);
                         const req = this.handReqs[this.currentHand].seqs;
@@ -1841,7 +1973,9 @@
                     const opponentDanger = this.publishedSequences.some((seq, idx) => idx !== ai && seq.length > 0 && this.playerHands[idx].length <= 3);
                     if (opponentDanger) shouldPublish = true;
                     const personality = this.getAIPersonality(ai);
-                    const turnLimit = personality === 'rabbit' ? 22 : 30;
+
+                    //Nash: changed it from 22 : 30 to make the game faster
+                    const turnLimit = personality === 'rabbit' ? 15 : 20;
                     if (this.turnCounter >= turnLimit) shouldPublish = true;
                     else {
                         let optimalSize = this.currentHand <= 3 ? 7 : 6;
@@ -2103,10 +2237,10 @@
                 const modal = document.createElement('div');
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;';
                 modal.innerHTML = `<div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;">
-                    <h2 style="color:#ffd700;margin-bottom:15px;">${title}</h2>
-                    <p style="color:white;margin-bottom:20px;white-space:pre-line;">${msg}</p>
-                    <button onclick="this.closest('div').parentElement.remove();" style="padding:12px 30px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">OK</button>
-                </div>`;
+                        <h2 style="color:#ffd700;margin-bottom:15px;">${title}</h2>
+                        <p style="color:white;margin-bottom:20px;white-space:pre-line;">${msg}</p>
+                        <button onclick="this.closest('div').parentElement.remove();" style="padding:12px 30px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">OK</button>
+                    </div>`;
                 document.body.appendChild(modal);
             }
 
@@ -2114,25 +2248,25 @@
                 const modal = document.createElement('div');
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:10000;';
                 modal.innerHTML = `
-            <div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;max-width:500px;">
-                <h2 style="color:#ffd700;margin-bottom:15px;">🎯 Choose Sequence</h2>
-                <p style="color:white;margin-bottom:20px;">
-                    ${card.toString()} can extend BOTH your triple and your ladder.<br><br>
-                    Which sequence do you want to add it to?
-                </p>
-                <div style="display:flex;gap:15px;justify-content:center;">
-                    <button id="chooseTriple" style="padding:12px 24px;background:#e74c3c;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
-                        Add to Triple
-                    </button>
-                    <button id="chooseLadder" style="padding:12px 24px;background:#3498db;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
-                        Add to Ladder
+                <div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;max-width:500px;">
+                    <h2 style="color:#ffd700;margin-bottom:15px;">🎯 Choose Sequence</h2>
+                    <p style="color:white;margin-bottom:20px;">
+                        ${card.toString()} can extend BOTH your triple and your ladder.<br><br>
+                        Which sequence do you want to add it to?
+                    </p>
+                    <div style="display:flex;gap:15px;justify-content:center;">
+                        <button id="chooseTriple" style="padding:12px 24px;background:#e74c3c;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
+                            Add to Triple
+                        </button>
+                        <button id="chooseLadder" style="padding:12px 24px;background:#3498db;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
+                            Add to Ladder
+                        </button>
+                    </div>
+                    <button id="cancelChoice" style="margin-top:15px;padding:8px 20px;background:#6b7280;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">
+                        Cancel
                     </button>
                 </div>
-                <button id="cancelChoice" style="margin-top:15px;padding:8px 20px;background:#6b7280;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">
-                    Cancel
-                </button>
-            </div>
-                `;
+                    `;
                 document.body.appendChild(modal);
                 document.getElementById('chooseTriple').onclick = () => {
                     console.log(`%c✅ FIX 6: User chose TRIPLE for ${card.toString()}`, 'color:#28a745;font-weight:bold');
@@ -2502,10 +2636,10 @@
                         }
 
                         cardEl.innerHTML = `
-                    <div class="card-rank">${card.rank}</div>
-                    <div class="card-suit">${card.suit}</div>
-                    ${duplicateLabel}
-                `;
+                        <div class="card-rank">${card.rank}</div>
+                        <div class="card-suit">${card.suit}</div>
+                        ${duplicateLabel}
+                    `;
                         optDiv.appendChild(cardEl);
                     });
 
@@ -2542,10 +2676,10 @@
                         }
 
                         cardEl.innerHTML = `
-                    <div class="card-rank">${card.rank}</div>
-                    <div class="card-suit">${card.suit}</div>
-                    ${duplicateLabel}
-                `;
+                        <div class="card-rank">${card.rank}</div>
+                        <div class="card-suit">${card.suit}</div>
+                        ${duplicateLabel}
+                    `;
                         optDiv.appendChild(cardEl);
                     });
 
@@ -2762,7 +2896,80 @@
 
         window.onload = () => newGame();
 
-        function newGame() { persistentScores = [0, 0, 0]; game = new GameState(false) }
+        // ============================================
+        // 🎨 FIX 7B: Custom Confirmation Modal
+        // ============================================
+        function showConfirmModal(title, message, confirmText = 'Confirm', cancelText = 'Cancel') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirmModal');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalMessage = document.getElementById('modalMessage');
+                const confirmBtn = document.getElementById('modalConfirm');
+                const cancelBtn = document.getElementById('modalCancel');
+
+                // Set content
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+                confirmBtn.textContent = confirmText;
+                cancelBtn.textContent = cancelText;
+
+                // Show modal
+                modal.classList.add('active');
+
+                // Handle confirm
+                const handleConfirm = () => {
+                    modal.classList.remove('active');
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                    resolve(true);
+                };
+
+                // Handle cancel
+                const handleCancel = () => {
+                    modal.classList.remove('active');
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                    resolve(false);
+                };
+
+                confirmBtn.addEventListener('click', handleConfirm);
+                cancelBtn.addEventListener('click', handleCancel);
+
+                // Close on overlay click
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        handleCancel();
+                    }
+                });
+
+                // Close on ESC key
+                const handleEscape = (e) => {
+                    if (e.key === 'Escape') {
+                        handleCancel();
+                        document.removeEventListener('keydown', handleEscape);
+                    }
+                };
+                document.addEventListener('keydown', handleEscape);
+            });
+        }
+
+        async function newGame() {
+            // ✅ FIX 7B: Custom confirmation modal (no "This page says"!)
+            if (game && game.gamePhase !== 'end') {
+                const confirmed = await showConfirmModal(
+                    'Start New Game?',
+                    'This will end the current game and reset all scores.\n\nAre you sure you want to continue?',
+                    'Start New Game',
+                    'Continue Playing'
+                );
+
+                if (!confirmed) {
+                    return; // User cancelled
+                }
+            }
+            persistentScores = [0, 0, 0];
+            game = new GameState(false);
+        }
 
         function drawFromDeck() {
             if (!game || game.currentPlayer !== 0 || game.gamePhase !== 'draw') return;
@@ -2915,7 +3122,7 @@
         }
 
         function showBuyToast(aiName, card) { showToast(`${aiName} BOUGHT ${card.toString()}!`, 'buy') }
-        
+
         // ✅ FIX 2: New toast function for AI taking card during buy window
         function showAITookCardToast(aiName, card) {
             console.log(`%c🚨 FIX 2: Showing AI took card toast`, 'color: #ff6b35; font-weight: bold;');
