@@ -804,10 +804,10 @@
     </style>
 </head>
 <body>
-    <div class="debug-ribbon">DEBUG v2.0.2</div>
-    <div class="fix-badge">🔧 DEBUG v2.0.2 Upated Buying Window </div>
+    <div class="debug-ribbon">DEBUG v2.5.0</div>
+    <div class="fix-badge">🔧 DEBUG v2.5.0 Upated Buying Window </div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v2.0.1 DEBUG</h1></div>
+        <div class="game-header"><h1>Habib Punja v2.5.0 DEBUG</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -889,9 +889,9 @@
     </div>
 
     <details class="debug-cheatsheet">
-        <summary>🔧 Debug Cheatsheet v2.0.1</summary>
+        <summary>🔧 Debug Cheatsheet v2.5.0</summary>
         <pre>game.debugHelp()           - Full command list
-game.debugEndgameTest()    - v2.0.1 endgame test
+game.debugEndgameTest()    - v2.5.0 endgame test
 game.debugAceLadderTest()  - FIX 1: Both ends test
 game.debug1CardTest()      - 1-card rule test
 game.debugSetHand(3)       - Jump to hand 3
@@ -915,7 +915,7 @@ game.debugFix6Test()       - FIX 6: Ambiguous Card Assignment
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c✅ v2.0.1 DEBUG', 'color:#f97316;font-size:18px;font-weight:bold');
+        console.log('%c✅ v2.5.0 DEBUG', 'color:#f97316;font-size:18px;font-weight:bold');
         console.log('%c🎮 HABIB PUNJA v2.5.0', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -975,18 +975,18 @@ game.debugFix6Test()       - FIX 6: Ambiguous Card Assignment
                     7: { name: "Three Ladders", seqs: ["ladder", "ladder", "ladder"], cards: 10 }
                 };
                 this.initDeck(); this.deal(); this.updateUI();
-                console.log('%c====== GAME STARTED (v2.0.1 DEBUG) ======', 'color:#28a745;font-size:14px;font-weight:bold');
+                console.log('%c====== GAME STARTED (v2.5.0 DEBUG) ======', 'color:#28a745;font-size:14px;font-weight:bold');
             }
 
             debugHelp() {
-                console.log('%c\n🛠️ DEBUG COMMAND REFERENCE v2.0.1', 'color:#ff6b35;font-size:18px;font-weight:bold');
+                console.log('%c\n🛠️ DEBUG COMMAND REFERENCE v2.5.0', 'color:#ff6b35;font-size:18px;font-weight:bold');
                 console.log('%c\n📋 QUICK TESTS:', 'color:#ffd700;font-weight:bold');
-                console.log('  game.debugFix4Test()       - v2.0.1 FIX 4: Endgame protection');  // ✅ ADD THIS
-                console.log('  game.debugEndgameTest()    - v2.0.0 FIX: AI protects dangerous cards');
-                console.log('  game.debugAceLadderTest()  - v2.0.1 FIX 1: Both ends ladder extension');
+                console.log('  game.debugFix4Test()       - v2.5.0 FIX 4: Endgame protection');  // ✅ ADD THIS
+                console.log('  game.debugEndgameTest()    - v2.5.0.0 FIX: AI protects dangerous cards');
+                console.log('  game.debugAceLadderTest()  - v2.5.0.1 FIX 1: Both ends ladder extension');
                 console.log('  game.debug1CardTest()      - 1-card rule enforcement');
-                console.log('  game.debugFix5Test()       - v2.0.1 FIX 5: Duplicate card selection');
-                console.log('  game.debugFix6Test()       - v2.0.2 FIX 6: Ambiguous Card Assignment');
+                console.log('  game.debugFix5Test()       - v2.5.0 FIX 5: Duplicate card selection');
+                console.log('  game.debugFix6Test()       - v2.5.0 FIX 6: Ambiguous Card Assignment');
                 console.log('%c\n🎮 HAND CONTROL:', 'color:#ffd700;font-weight:bold');
                 console.log('  game.debugSetHand(3)       - Jump to hand 3');
                 console.log('  game.debugNextHand()       - Next hand');
@@ -1001,7 +1001,7 @@ game.debugFix6Test()       - FIX 6: Ambiguous Card Assignment
             }
 
             debugEndgameTest() {
-                console.log('%c🧪 v2.0.1 ENDGAME TEST (FIX 4)', 'color:#ff6b35;font-weight:bold');
+                console.log('%c🧪 v2.5.0 ENDGAME TEST (FIX 4)', 'color:#ff6b35;font-weight:bold');
                 this.playerHands[0] = [new Card('K', '♠'), new Card('Q', '♠'), new Card('J', '♠')];
                 this.publishedSequences[0] = [new Card('5', '♥'), new Card('6', '♥'), new Card('7', '♥'), new Card('8', '♥')];
                 this.playerHands[1] = [new Card('9', '♥'), new Card('10', '♥')];
