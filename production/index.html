@@ -1,11 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--
+  Habib Punja - Strategic AI Card Game
+  Version: 2.5.0
+  Release Date: October 27, 2025
+  Developer: AgeOfBotsGames LLC
+  Website: https://ageofbotsgames.com
+  Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
+  This game features AI opponents powered by strategic decision-making algorithms.
+  Compete against Habot (the Rabbit) and Jabot (the Tortoise) across 7 challenging hands!
+-->
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <title>Habib Punja v2.0.2</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Primary Meta Tags -->
+    <title>Habib Punja - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja - Strategic AI Card Game | AgeOfBotsGames">
+    <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
+    <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
+    <meta name="author" content="AgeOfBotsGames LLC">
+    <meta name="version" content="2.5.0">
+    <meta name="copyright" content="Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ageofbotsgames.com/">
+    <meta property="og:title" content="Habib Punja - Strategic AI Card Game">
+    <meta property="og:description" content="Challenge AI opponents in this strategic Liverpool Rummy variant. Can you outsmart Habot and Jabot?">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://ageofbotsgames.com/">
+    <meta property="twitter:title" content="Habib Punja - Strategic AI Card Game">
+    <meta property="twitter:description" content="Challenge AI opponents in this strategic Liverpool Rummy variant. Can you outsmart Habot and Jabot?">
 
     <style>
         /* [Previous CSS remains exactly the same - keeping it brief for space] */
@@ -214,8 +243,8 @@
 
 
         /* ============================================
-   🎨 FIX 7B: Custom Confirmation Modal
-   ============================================ */
+        🎨 FIX 7B: Custom Confirmation Modal
+        ============================================ */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -257,8 +286,8 @@
         }
 
         /* ============================================
-           🎨 FIX 7D: Auto-Fade Modal Animations
-           ============================================ */
+                🎨 FIX 7D: Auto-Fade Modal Animations
+                ============================================ */
         @keyframes modalFadeOut {
             from {
                 opacity: 1;
@@ -813,6 +842,8 @@
         </div>
     </div>
 
+
+
     <script>
         // Add this at the very top of your <script> section, before game code
         window.addEventListener('error', function (e) {
@@ -823,10 +854,22 @@
                 return false;
             }
         });
-        console.log('%c✅ v2.0.2', 'color:#28a745;font-size:18px;font-weight:bold');
-        console.log('%c  FIX 1: Ladder Extension - Explicit LOW + HIGH support', 'color:#4ade80');
-        console.log('%c  FIX 2: AI Takes Card Toast - Shows AI name + card', 'color:#4ade80');
-        console.log('%c  FIX 3: Reduced Buy Window - 5s after publishing', 'color:#4ade80');
+
+        // ============================================================================
+        // GAME METADATA & BRANDING
+        // ============================================================================
+        console.log('%c🎮 HABIB PUNJA v2.5.0', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
+        console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
+        console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #999;');
+        console.log('%c⚠️ Game code is protected by copyright.', 'color: #FF9800; font-weight: bold;');
+        console.log('%c⚠️ Unauthorized copying or distribution is prohibited.', 'color: #FF9800; font-weight: bold;');
+        console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #999;');
+        console.log(' ');
+
+        // Game state
+        let deck = [];
+        let players = [];
 
         class Card {
             constructor(rank, suit) { this.rank = rank; this.suit = suit; this.id = Math.random().toString(36).substr(2, 9) }
@@ -841,7 +884,14 @@
 
         class GameState {
             constructor(carryOverScores = false) {
-                this.currentHand = 1; this.players = 3; this.currentPlayer = 0;
+                this.currentHand = 1; this.players = 3;
+
+                this.startingPlayer = null;  // Will be set by draw
+                this.currentPlayer = 0;      // Temporary, will be updated after draw
+
+                // 🎯 v2.5.0: Track last card alerts to show only once per player
+                this.lastCardAlertShown = [false, false, false];  // ← ADD THIS LINE
+
                 this.deck = []; this.discardPile = [];
                 this.playerHands = [[], [], []]; this.playerBuys = [3, 3, 3];
                 this.publishedSequences = [[], [], []]; this.gamePhase = 'draw';
@@ -878,6 +928,190 @@
                 return this.aiPersonality[aiIdx] || 'neutral';
             }
 
+            // ============================================
+            // 🎴 v2.5.0: DRAW FOR FIRST TURN (Bridge Style)
+            // ============================================
+            async drawForFirstTurn() {
+                console.log(`%c🎴 DRAW FOR FIRST TURN`, 'color: #9c27b0; font-weight: bold; font-size: 16px;');
+                console.log(`%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'color: #9c27b0;');
+
+                // ═══════════════════════════════════════
+                // PHASE 1: Opening Banter
+                // ═══════════════════════════════════════
+                const banter = getOpeningBanter();
+
+                // Habot speaks first (aggressive/eager)
+                await showInfoModal(
+                    '💬 Habot',
+                    banter[0].text,
+                    'Continue',
+                    '🐇',
+                    true,   // Auto-fade
+                    2000    // 2 seconds
+                );
+
+                // Jabot responds (calm/measured)
+                await showInfoModal(
+                    '💬 Jabot',
+                    banter[1].text,
+                    'Continue',
+                    '🐢',
+                    true,   // Auto-fade
+                    2000    // 2 seconds
+                );
+
+                // ═══════════════════════════════════════
+                // PHASE 2: The Draw
+                // ═══════════════════════════════════════
+                this.initDeck();
+
+                const drawnCards = [
+                    this.deck.pop(),  // Human (Player 0)
+                    this.deck.pop(),  // Habot (Player 1)
+                    this.deck.pop()   // Jabot (Player 2)
+                ];
+
+                console.log(`%c  Cards drawn:`, 'color: #9c27b0; font-weight: bold;');
+                console.log(`    Human: ${drawnCards[0].toString()}`);
+                console.log(`    Habot: ${drawnCards[1].toString()}`);
+                console.log(`    Jabot: ${drawnCards[2].toString()}`);
+
+                // Show draws with dramatic timing
+                await showInfoModal(
+                    '🎴 Habot Draws',
+                    `Habot draws...\n\n${drawnCards[1].toString()}`,
+                    'Continue',
+                    '🐇',
+                    true,
+                    1800
+                );
+
+                await showInfoModal(
+                    '🎴 Jabot Draws',
+                    `Jabot draws...\n\n${drawnCards[2].toString()}`,
+                    'Continue',
+                    '🐢',
+                    true,
+                    1800
+                );
+
+                await showInfoModal(
+                    '🎴 Your Draw',
+                    `You draw...\n\n${drawnCards[0].toString()}`,
+                    'Got it!',
+                    '🃏',
+                    false  // Must acknowledge
+                );
+
+                // ═══════════════════════════════════════
+                // PHASE 3: Determine Winner
+                // ═══════════════════════════════════════
+                const suitOrder = { '♠': 4, '♥': 3, '♦': 2, '♣': 1 };
+
+                const cardValues = drawnCards.map((card, idx) => ({
+                    player: idx,
+                    card: card,
+                    value: card.getValue(),
+                    suitValue: suitOrder[card.suit]
+                }));
+
+                // Sort by rank first, then by suit
+                cardValues.sort((a, b) => {
+                    if (b.value !== a.value) return b.value - a.value;
+                    return b.suitValue - a.suitValue;
+                });
+
+                const winner = cardValues[0].player;
+                const highestValue = cardValues[0].value;
+                const tiedPlayers = cardValues.filter(cv => cv.value === highestValue);
+
+                // ═══════════════════════════════════════
+                // PHASE 4: Handle Ties (Show Hierarchy)
+                // ═══════════════════════════════════════
+                if (tiedPlayers.length > 1) {
+                    console.log(`%c  🔄 TIE DETECTED! Multiple ${cardValues[0].card.rank}s drawn`, 'color: #ff9800; font-weight: bold;');
+
+                    const tiedNames = tiedPlayers.map(cv => ['You', 'Habot', 'Jabot'][cv.player]).join(', ');
+                    const tiedCards = tiedPlayers.map(cv => `${['You', 'Habot', 'Jabot'][cv.player]}: ${cv.card.toString()}`).join('\n');
+
+                    // Show tie with suit hierarchy explanation
+                    const suitInfo = getSuitExplanation();
+                    await showInfoModal(
+                        '🔄 Tie Detected!',
+                        `${tiedNames} all drew ${cardValues[0].card.rank}!\n\n${tiedCards}\n\n${suitInfo.message}`,
+                        'Continue',
+                        '🎴',
+                        true,   // Auto-fade
+                        4000    // 4 seconds - enough time to read
+                    );
+
+                    console.log(`%c  ✅ Suit hierarchy: ${drawnCards[winner].suit} wins`, 'color: #4caf50; font-weight: bold;');
+                }
+
+                // ═══════════════════════════════════════
+                // PHASE 5: Announce Winner with Reactions
+                // ═══════════════════════════════════════
+                const playerNames = ['You', 'Habot', 'Jabot'];
+                const winnerName = playerNames[winner];
+                const winnerCard = drawnCards[winner];
+
+                const reactions = getWinReaction(winner, winnerCard, drawnCards);
+
+                console.log(`%c  🏆 WINNER: ${winnerName} (${winnerCard.toString()})`, 'color: #ffd700; font-weight: bold; font-size: 14px;');
+
+                // Show winner announcement
+                let winnerMessage = `${winnerName} drew the highest card!\n\n${winnerCard.toString()}\n\n`;
+
+                // Add summary of all draws
+                winnerMessage += `━━━━━━━━━━━━━━━\n`;
+                winnerMessage += `Habot: ${drawnCards[1].toString()}\n`;
+                winnerMessage += `Jabot: ${drawnCards[2].toString()}\n`;
+                winnerMessage += `You: ${drawnCards[0].toString()}\n`;
+                winnerMessage += `━━━━━━━━━━━━━━━\n\n`;
+                winnerMessage += `${winnerName} will start first!`;
+
+                await showInfoModal(
+                    '🏆 Starting Player',
+                    winnerMessage,
+                    'Continue',
+                    '👑',
+                    false  // Must acknowledge
+                );
+
+                // Show winner's reaction
+                await showInfoModal(
+                    winner === 0 ? '💬 The Table' : `💬 ${winnerName}`,
+                    reactions.winner,
+                    'Continue',
+                    winner === 1 ? '🐇' : (winner === 2 ? '🐢' : '🎴'),
+                    true,
+                    2500
+                );
+
+                // Show loser reactions (if any)
+                for (let loser of reactions.losers) {
+                    await showInfoModal(
+                        `💬 ${loser.speaker}`,
+                        loser.text,
+                        'Continue',
+                        loser.speaker === 'Habot' ? '🐇' : '🐢',
+                        true,
+                        2000
+                    );
+                }
+
+                // ═══════════════════════════════════════
+                // PHASE 6: Reshuffle & Ready to Play
+                // ═══════════════════════════════════════
+                drawnCards.forEach(card => this.deck.push(card));
+                this.initDeck();  // Fresh shuffle
+
+                console.log(`%c  ♻️  Cards returned to deck, reshuffled`, 'color: #9c27b0;');
+                console.log(`%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'color: #9c27b0;');
+
+                return winner;
+            }
+
             initDeck() {
                 const suits = ['♠', '♥', '♦', '♣'];
                 const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -903,37 +1137,104 @@
             }
 
             deal() {
+                // 🎯 v2.5.0: Reset last card alerts for new hand
+                this.lastCardAlertShown = [false, false, false];
+
                 const cards = this.handReqs[this.currentHand].cards;
                 for (let i = 0; i < cards; i++) {
                     for (let p = 0; p < this.players; p++) {
                         if (this.deck.length > 0) this.playerHands[p].push(this.deck.pop());
                     }
                 }
-                const isLadderOnlyHand = [3, 7].includes(this.currentHand);
-                const isTripleHeavy = this.isTripleHeavyHand();
-                if (isLadderOnlyHand) {
-                    const order = { '♠': 1, '♥': 2, '♦': 3, '♣': 4 };
-                    this.playerHands[0].sort((a, b) => {
-                        if (order[a.suit] !== order[b.suit]) return order[a.suit] - order[b.suit];
-                        return a.getValue() - b.getValue();
-                    });
-                } else if (isTripleHeavy) {
+
+                // 🎴 v2.5.0: Flip initial discard card with commentary
+                if (this.deck.length > 0) {
+                    const initialDiscard = this.deck.pop();
+                    this.discardPile.push(initialDiscard);
+
+                    console.log(`%c🎴 Initial discard card: ${initialDiscard.toString()}`, 'color: #ff9800; font-weight: bold;');
+
+                    // Add character commentary based on card value
+                    let commentary = '';
+                    const rank = initialDiscard.rank;
+
+                    if (['A', 'K', 'Q'].includes(rank)) {
+                        commentary = 'Habot: "Interesting start... that\'s a valuable card."\nJabot: "Indeed. The first player has a decision to make."';
+                    } else if (['J', '10', '9'].includes(rank)) {
+                        commentary = 'Jabot: "A reasonable starting card."\nHabot: "Could fit into several sequences."';
+                    } else {
+                        commentary = 'Habot: "Low card on the pile - probably not worth the buy."\nJabot: "We shall see. Every card has its place."';
+                    }
+
+                    showInfoModal(
+                        '🎴 Starting Card',
+                        `The discard pile begins with:\n\n${initialDiscard.toString()}\n\n━━━━━━━━━━━━━━━\n${commentary}\n━━━━━━━━━━━━━━━\n\nFirst player may take it or draw from deck.`,
+                        'Start Playing!',
+                        '🃏',
+                        true,
+                        4000  // 4 seconds
+                    );
+                }
+
+                // 🎯 v2.5.0: Smart initial sort based on game type
+                const currentReq = this.handReqs[this.currentHand].seqs;
+                const hasLadders = currentReq.some(seq => seq === 'ladder');
+                const hasOnlyTriples = currentReq.every(seq => seq === 'triple');
+
+                console.log(`%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'color: #2196f3;');
+                console.log(`%c🃏 SORTING Hand ${this.currentHand}`, 'color: #2196f3; font-weight: bold; font-size: 14px;');
+                console.log(`   Requirements: ${JSON.stringify(currentReq)}`);
+                console.log(`   Has ladders: ${hasLadders}`);
+                console.log(`   Only triples: ${hasOnlyTriples}`);
+                console.log(`   Cards before sort: ${this.playerHands[0].map(c => c.toString()).join(', ')}`);
+
+                // Sort player hand directly (don't call global functions during initialization)
+                if (hasOnlyTriples) {
+                    console.log(`%c   → Applying QUANTITY sort`, 'color: #4caf50; font-weight: bold;');
+
+                    // Count frequency of each rank
                     const counts = {};
-                    this.playerHands[0].forEach(card => { counts[card.rank] = (counts[card.rank] || 0) + 1 });
+                    this.playerHands[0].forEach(card => {
+                        counts[card.rank] = (counts[card.rank] || 0) + 1;
+                    });
+
+                    console.log(`   → Rank counts:`, counts);
+
+                    // Sort by quantity (descending), then by rank value
                     this.playerHands[0].sort((a, b) => {
                         const countDiff = counts[b.rank] - counts[a.rank];
                         if (countDiff !== 0) return countDiff;
                         if (a.getValue() !== b.getValue()) return a.getValue() - b.getValue();
                         return a.suit.localeCompare(b.suit);
                     });
+
+                } else if (hasLadders) {
+                    console.log(`%c   → Applying SUIT sort`, 'color: #4caf50; font-weight: bold;');
+
+                    // Sort by suit, then by rank
+                    const order = { '♠': 1, '♥': 2, '♦': 3, '♣': 4 };
+                    this.playerHands[0].sort((a, b) => {
+                        if (order[a.suit] !== order[b.suit]) return order[a.suit] - order[b.suit];
+                        return a.getValue() - b.getValue();
+                    });
+
                 } else {
+                    console.log(`%c   → Applying RANK sort`, 'color: #4caf50; font-weight: bold;');
+
+                    // Sort by rank value, then by suit
                     this.playerHands[0].sort((a, b) => {
                         if (a.getValue() !== b.getValue()) return a.getValue() - b.getValue();
                         return a.suit.localeCompare(b.suit);
                     });
                 }
-                if (this.deck.length > 0) this.discardPile.push(this.deck.pop());
+
+                console.log(`   Cards after sort: ${this.playerHands[0].map(c => c.toString()).join(', ')}`);
+                console.log(`%c✅ Sort complete!`, 'color: #00ff00; font-weight: bold;');
+                console.log(`%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'color: #2196f3;');
+
+                this.selectedCards = [];
             }
+
 
             reshuffleDeck() {
                 if (this.discardPile.length <= 1) { console.log('%cNo cards to reshuffle', 'color: #ffc107;'); return false }
@@ -1284,10 +1585,37 @@
             evaluateCard(card, pIdx) {
                 const hand = this.playerHands[pIdx];
                 let val = 0;
+
                 const sameRank = hand.filter(c => c.rank === card.rank).length;
                 const sameSuit = hand.filter(c => c.suit === card.suit);
-                if (sameRank >= 2) val += 20;
-                else if (sameRank === 1) val += 8;
+
+                // 🎯 PATCH L: Smart pair valuation based on game type
+                const req = this.handReqs[this.currentHand].seqs;
+                const hasOnlyTriples = req.every(s => s === 'triple');
+
+                // Count existing pairs in hand
+                const rankCounts = {};
+                hand.forEach(c => rankCounts[c.rank] = (rankCounts[c.rank] || 0) + 1);
+                const numPairs = Object.values(rankCounts).filter(count => count === 2).length;
+
+                if (sameRank >= 2) {
+                    // Already have 2+ of this rank - GREAT for triples!
+                    val += 20;
+                } else if (sameRank === 1) {
+                    // Would CREATE a new pair
+                    if (hasOnlyTriples && numPairs >= 4) {
+                        // Triple game with 4+ pairs already - PENALIZE new pairs
+                        console.log(`  → PATCH L: Penalizing ${card.toString()} - already have ${numPairs} pairs in triple game`);
+                        val -= 10;  // Negative value = don't want this card
+                    } else if (numPairs >= 2 && !hasOnlyTriples) {
+                        // Mixed game with 2+ pairs - slight penalty
+                        val += 3;  // Reduced from 8
+                    } else {
+                        // Normal pair value
+                        val += 8;
+                    }
+                }
+
                 if (sameSuit.length >= 3) {
                     const values = sameSuit.map(c => c.getValue());
                     const cardVal = card.getValue();
@@ -1331,53 +1659,59 @@
             findWorstCard(pIdx) {
                 const hand = this.playerHands[pIdx];
 
-                // [Keep existing ladder deadlock code here...]
+                // 🏆 PATCH G: CRITICAL - Check if AI can WIN by extending own sequences
+                console.log(`  🏆 PATCH G: Checking if AI can win this turn`);
 
-                // ✅ NEW: Check if card can be added to MY OWN published sequences
-                console.log(`  → FIX 4A: Checking cards that extend my published sequences`);
                 const myPublished = this.publishedSequences[pIdx];
-                if (myPublished && myPublished.length > 0) {
-                    const cardsExtendingMyPublished = hand.filter(c => {
-                        return myPublished.some(pubSeq => this.canAddToPublishedSequence(c, pubSeq));
-                    });
+                if (myPublished && myPublished.length > 0 && hand.length <= 3) {
+                    // Check if ANY card can extend my sequences and leave me with ≤1 cards
+                    for (let card of hand) {
+                        const canExtend = myPublished.some(pubSeq => this.canAddToPublishedSequence(card, pubSeq));
 
-                    if (cardsExtendingMyPublished.length > 0) {
-                        console.log(`  → FIX 4A: Found ${cardsExtendingMyPublished.length} card(s) that can extend my published sequences - keeping them`);
-                        // Filter these out from consideration for discard
-                        const cardsNotExtendingMine = hand.filter(c =>
-                            !cardsExtendingMyPublished.includes(c)
-                        );
-                        if (cardsNotExtendingMine.length > 0) {
-                            // Continue with remaining cards only
-                            hand = cardsNotExtendingMine;
+                        if (canExtend && hand.length === 2) {
+                            // Playing this card wins the game!
+                            console.log(`  🏆 CRITICAL: ${card.toString()} extends my sequence - WINNING MOVE! Keeping it!`);
+                            // Return a DIFFERENT card (not the winning one)
+                            const otherCards = hand.filter(c => c !== card);
+                            if (otherCards.length > 0) {
+                                console.log(`  🏆 Discarding ${otherCards[0].toString()} instead to keep winning card`);
+                                return otherCards[0];
+                            }
                         }
                     }
                 }
 
-                // ✅ UPDATED FIX 4: Check critical danger with PUBLISHED SEQUENCES
-                console.log(`  → FIX 4B: Checking critical danger with published sequences`);
+                // 🎯 PATCH K: Enhanced danger detection - protect before publishing too
+                console.log(`  → PATCH K: Checking danger with published sequences (expanded)`);
                 for (let p = 0; p < this.players; p++) {
                     if (p === pIdx) continue; // Skip self
                     const opponentCards = this.playerHands[p].length;
                     const opponentPublished = this.publishedSequences[p].length > 0;
+                    const iHavePublished = this.publishedSequences[pIdx].length > 0;
 
-                    // If opponent has published and has ≤2 cards, they're in endgame
-                    if (opponentPublished && opponentCards <= 2) {
+                    // SCENARIO 1: Critical endgame (original logic)
+                    const criticalEndgame = opponentPublished && opponentCards <= 2;
+
+                    // SCENARIO 2: I haven't published yet, opponent is mid-game threat
+                    const midGameThreat = !iHavePublished && opponentPublished && opponentCards <= 4;
+
+                    if (criticalEndgame || midGameThreat) {
                         const playerName = p === 0 ? 'Human' : (p === 1 ? 'Habot' : 'Jabot');
-                        console.log(`  → FIX 4B: CRITICAL - ${playerName} has ${opponentCards} card(s) and published!`);
+                        const scenario = criticalEndgame ? 'CRITICAL' : 'MID-GAME THREAT';
+                        console.log(`  → PATCH K: ${scenario} - ${playerName} has ${opponentCards} card(s)${opponentPublished ? ' and published' : ''}!`);
 
                         // Filter out cards that help them (including via ANY published sequences)
                         const safeCards = hand.filter(c => {
                             // Check if extends opponent's hand
                             if (this.couldExtendSequence(c, p)) return false;
 
-                            // ✅ NEW: Check if can be added to ANY published sequence (any player)
+                            // Check if can be added to ANY published sequence (any player)
                             for (let player = 0; player < this.players; player++) {
                                 const published = this.publishedSequences[player];
                                 if (published && published.length > 0) {
                                     for (let pubSeq of published) {
                                         if (this.canAddToPublishedSequence(c, pubSeq)) {
-                                            console.log(`  → FIX 4B: ${c.toString()} can add to published sequence - NOT SAFE`);
+                                            console.log(`  → PATCH K: ${c.toString()} can add to published sequence - NOT SAFE`);
                                             return false; // Not safe - can extend published
                                         }
                                     }
@@ -1391,10 +1725,10 @@
                             const worst = safeCards.reduce((max, c) =>
                                 c.getPenaltyValue() > max.getPenaltyValue() ? c : max
                             );
-                            console.log(`  → v2.0.1 FIX 4: Safe discard: ${worst.toString()} (doesn't help ${playerName})`);
+                            console.log(`  → PATCH K: Safe discard: ${worst.toString()} (doesn't help ${playerName})`);
                             return worst;
                         } else {
-                            console.log(`  → v2.0.1 FIX 4: WARNING - ALL cards help ${playerName}! Using least valuable...`);
+                            console.log(`  → PATCH K: WARNING - ALL cards help ${playerName}! Using least valuable...`);
                             // If all cards help, pick the least strategically valuable
                             let minValue = this.evaluateCard(hand[0], pIdx);
                             let worst = hand[0];
@@ -1603,10 +1937,9 @@
                 const buyWindowPlayer = (discardingPlayer + 2) % 3;
                 if (this.buyWindow.active) this.closeBuyWindow();
 
-                // ✅ FIX 3: Use 5 seconds if human just published, 10 seconds otherwise
-                // Nash: Changed values 3 seconds and 7 seconds to make game faster
-                const duration = this.justPublished ? 3000 : 7000;
-                console.log(`%c⏱️ FIX 3: Buy window duration: ${duration / 1000}s (justPublished: ${this.justPublished})`, 'color: #ffc107; font-weight: bold;');
+                // 🎯 v2.5.0: Consistent 3-second buy window for faster game pace
+                const duration = 3000;  // Always 3 seconds (removed conditional)
+                console.log(`%c⏱️ v2.5.0: Buy window duration: ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
 
                 this.buyWindow.active = true;
                 this.buyWindow.card = card;
@@ -1658,15 +1991,11 @@
 
                 // Clean up status after a delay
                 if (statusId) {
-                    setTimeout(() => {
-                        document.getElementById(`${statusId}-status`).classList.remove('active');
-                    }, 2000);
+                    setTimeout(() => { document.getElementById(`${statusId}-status`).classList.remove('active') }, 800);  // 🎯 v2.5.0: Faster (was 2000ms)
                 }
 
                 return true; // Buy window was opened
             }
-
-
 
             closeBuyWindow(reason = 'expired') {
                 if (!this.buyWindow.active) return;
@@ -1849,7 +2178,24 @@
 
                 document.getElementById(`${statusId}-status`).classList.add('active');
                 this.setAIStatus(statusId, 'Taking turn...');
-                const delay = this.aiInstant ? 0 : 1500;
+
+                // 🎯 v2.5.0: Dynamic AI speed based on decision complexity
+                const handSize = this.playerHands[ai].length;
+                const hasPublished = this.publishedSequences[ai].length > 0;
+
+                let delay = 0;
+                if (!this.aiInstant) {
+                    // Critical decisions = slower for realism
+                    if (handSize <= 3 || (!hasPublished && this.canPublish(ai))) {
+                        delay = 1000;  // Important moment - 1 second
+                    }
+                    // Routine play = faster
+                    else {
+                        delay = 500;  // Quick routine turn - 0.5 seconds
+                    }
+                }
+                console.log(`%c  ⏱️  AI delay: ${delay}ms (${handSize} cards, ${hasPublished ? 'published' : 'not published'})`, 'color: #9e9e9e;');
+
                 setTimeout(() => {
                     this.turnCounter++;
                     console.log(`%c  Turn ${this.turnCounter}`, 'color: #3498db;');
@@ -1902,14 +2248,64 @@
                     if (personality === 'rabbit') threshold -= 2;
                     else if (personality === 'tortoise') threshold += 2;
                     const forceBuy = discardCard && this.shouldAllowBuy(ai, discardCard);
-                    const shouldTake = forceBuy || (discardCard && discardScore >= threshold);
+                    let shouldTake = forceBuy || (discardCard && discardScore >= threshold);
+
+                    // 🎯 PATCH M: In triple games, only buy if completes a triple
+                    if (shouldTake && this.discardPile.length > 0) {
+                        const req = this.handReqs[this.currentHand].seqs;
+                        const hasOnlyTriples = req.every(s => s === 'triple');
+
+                        if (hasOnlyTriples && !forceBuy) {
+                            const topCard = this.discardPile[this.discardPile.length - 1];
+                            const matchingRank = this.playerHands[ai].filter(c => c.rank === topCard.rank).length;
+
+                            if (matchingRank < 2) {
+                                // This card won't complete a triple (need 2 existing + 1 buy = 3)
+                                console.log(`  → PATCH M: Blocking buy - ${topCard.toString()} won't complete triple (only ${matchingRank} in hand)`);
+                                shouldTake = false;
+                            } else {
+                                console.log(`  → PATCH M: Allowing buy - ${topCard.toString()} COMPLETES triple!`);
+                            }
+                        }
+                    }
+
+                    // 🎯 PATCH H: Block buying in endgame
+                    const aiHandSize = this.playerHands[ai].length;  // ← Changed name
+                    const anyPlayerNearWin = this.playerHands.some((h, idx) => h.length <= 3 && this.publishedSequences[idx].length > 0);
+
+                    if (shouldTake && aiHandSize <= 3 && this.publishedSequences[ai].length > 0) {
+                        console.log(`%c  🛑 PATCH H: Blocking buy - AI has ${aiHandSize} cards in endgame`, 'color: #e74c3c; font-weight: bold;');
+                        shouldTake = false;
+                    }
+
+                    if (shouldTake && anyPlayerNearWin) {
+                        console.log(`%c  🛑 PATCH H: Blocking buy - Someone near win (≤3 cards + published)`, 'color: #e74c3c; font-weight: bold;');
+                        shouldTake = false;
+                    }
 
                     console.log(`%c  🎯 ${aiName} evaluation:`, 'color: #e67e22; font-weight: bold;');
                     console.log(`     discardCard: ${discardCard ? discardCard.toString() : 'none'}`);
                     console.log(`     discardScore: ${discardScore}`);
                     console.log(`     threshold: ${threshold}`);
                     console.log(`     forceBuy: ${forceBuy}`);
-                    console.log(`     shouldTake: ${shouldTake}`);
+                    console.log(`     shouldTake: ${shouldTake} ${!shouldTake && (aiHandSize <= 3 || anyPlayerNearWin) ? '(BLOCKED - endgame)' : ''}`);
+
+                    // 🎯 PATCH I: Block buying after publishing all required sequences in triple games
+                    if (shouldTake && this.publishedSequences[ai].length > 0) {
+                        const req = this.handReqs[this.currentHand].seqs;
+                        const needTriples = req.filter(s => s === 'triple').length;
+                        const needLadders = req.filter(s => s === 'ladder').length;
+
+                        // Count what AI has published
+                        const publishedCards = this.publishedSequences[ai].flat();
+                        const hasPublishedEnough = publishedCards.length >= (needTriples * 3 + needLadders * 4);
+
+                        if (hasPublishedEnough && needLadders === 0) {
+                            // Triple-only game and AI has published all requirements
+                            console.log(`%c  🛑 PATCH I: Blocking buy - Already published all triples`, 'color: #ff9800; font-weight: bold;');
+                            shouldTake = false;
+                        }
+                    }
 
                     if (shouldTake && this.discardPile.length > 0) {
 
@@ -2000,7 +2396,6 @@
 
             continueAITurnAfterDraw(ai, statusId) {
                 const aiName = ai === 1 ? 'Habot' : 'Jabot';
-
                 // PATCH 4: Emergency publish if hand is too large
                 const currentHandSize = this.playerHands[ai].length;
                 if (currentHandSize >= 13 && this.publishedSequences[ai].length === 0 && this.canPublish(ai)) {
@@ -2014,6 +2409,51 @@
                         console.log(`%c   Hand reduced from ${currentHandSize} to ${newHandSize}`, 'color: #27ae60;');
                     } else {
                         console.log(`%c⚠️ PATCH 4: ${aiName} emergency publish FAILED - no valid sequences`, 'color: #f39c12; font-weight: bold;');
+                    }
+                }
+
+                // 🎯 PATCH L2: Auto-drop excess pairs in triple games
+                const req = this.handReqs[this.currentHand].seqs;
+                const hasOnlyTriples = req.every(s => s === 'triple');
+
+                if (hasOnlyTriples) {
+                    // Count pairs
+                    const rankCounts = {};
+                    this.playerHands[ai].forEach(c => {
+                        rankCounts[c.rank] = (rankCounts[c.rank] || 0) + 1;
+                    });
+
+                    const pairs = Object.entries(rankCounts).filter(([rank, count]) => count === 2);
+
+                    if (pairs.length > 4) {
+                        console.log(`%c  → PATCH L2: ${aiName} has ${pairs.length} pairs - dropping worst one`, 'color: #e67e22; font-weight: bold;');
+
+                        // Find highest-value pair to drop
+                        let worstPairRank = null;
+                        let highestValue = -1;
+
+                        pairs.forEach(([rank, count]) => {
+                            const cardValue = this.playerHands[ai].find(c => c.rank === rank).getValue();
+                            if (cardValue > highestValue) {
+                                highestValue = cardValue;
+                                worstPairRank = rank;
+                            }
+                        });
+
+                        // Drop one card from worst pair
+                        const cardToDrop = this.playerHands[ai].find(c => c.rank === worstPairRank);
+                        const dropIndex = this.playerHands[ai].indexOf(cardToDrop);
+                        this.playerHands[ai].splice(dropIndex, 1);
+                        this.discardPile.push(cardToDrop);
+
+                        console.log(`%c  → PATCH L2: Auto-dropped ${cardToDrop.toString()} (highest-value pair)`, 'color: #e67e22; font-weight: bold;');
+                        this.updateUI();
+
+                        // End turn - we already discarded
+                        this.setAIStatus(statusId, '');
+                        document.getElementById(`${statusId}-status`).classList.remove('active');
+                        this.nextPlayer();
+                        return;
                     }
                 }
 
@@ -2281,17 +2721,43 @@
                 persistentScores = [...this.playerScores];
                 const msg = `Game Complete!\n\n🏆 ${winner.name} wins with ${winner.score} points!\n🎃 ${loser.name} is the Habib Punja with ${loser.score} points!`;
                 this.showModal('Final Results', msg);
-                setTimeout(() => { game = new GameState(true) }, 5000);
+
+                setTimeout(async () => {
+                    console.log('%c🎮 Starting New Game...', 'color: #2196f3; font-weight: bold; font-size: 16px;');
+
+                    // Create game instance
+                    game = new GameState(true);
+
+                    // Draw for starting player
+                    const startingPlayer = await game.drawForFirstTurn();
+                    game.currentPlayer = startingPlayer;
+                    game.startingPlayer = startingPlayer;
+
+                    console.log(`%c🎯 Starting player set: ${['You', 'Habot', 'Jabot'][startingPlayer]}`, 'color: #e91e63; font-weight: bold;');
+
+                    // Initialize game
+                    game.initDeck();
+                    game.deal();
+                    game.updateUI();
+
+                    // If AI starts, begin their turn
+                    if (game.currentPlayer !== 0) {
+                        game.aiTurn();
+                    }
+
+                    console.log('%c✅ Game initialized!', 'color: #4caf50; font-weight: bold;');
+                }, 5000);
+
             }
 
             showModal(title, msg) {
                 const modal = document.createElement('div');
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;';
                 modal.innerHTML = `<div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;">
-                        <h2 style="color:#ffd700;margin-bottom:15px;">${title}</h2>
-                        <p style="color:white;margin-bottom:20px;white-space:pre-line;">${msg}</p>
-                        <button onclick="this.closest('div').parentElement.remove();" style="padding:12px 30px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">OK</button>
-                    </div>`;
+                                        <h2 style="color:#ffd700;margin-bottom:15px;">${title}</h2>
+                                        <p style="color:white;margin-bottom:20px;white-space:pre-line;">${msg}</p>
+                                        <button onclick="this.closest('div').parentElement.remove();" style="padding:12px 30px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">OK</button>
+                                    </div>`;
                 document.body.appendChild(modal);
             }
 
@@ -2299,25 +2765,25 @@
                 const modal = document.createElement('div');
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:10000;';
                 modal.innerHTML = `
-                <div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;max-width:500px;">
-                    <h2 style="color:#ffd700;margin-bottom:15px;">🎯 Choose Sequence</h2>
-                    <p style="color:white;margin-bottom:20px;">
-                        ${card.toString()} can extend BOTH your triple and your ladder.<br><br>
-                        Which sequence do you want to add it to?
-                    </p>
-                    <div style="display:flex;gap:15px;justify-content:center;">
-                        <button id="chooseTriple" style="padding:12px 24px;background:#e74c3c;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
-                            Add to Triple
-                        </button>
-                        <button id="chooseLadder" style="padding:12px 24px;background:#3498db;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
-                            Add to Ladder
-                        </button>
-                    </div>
-                    <button id="cancelChoice" style="margin-top:15px;padding:8px 20px;background:#6b7280;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">
-                        Cancel
-                    </button>
-                </div>
-                    `;
+                                <div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;max-width:500px;">
+                                    <h2 style="color:#ffd700;margin-bottom:15px;">🎯 Choose Sequence</h2>
+                                    <p style="color:white;margin-bottom:20px;">
+                                        ${card.toString()} can extend BOTH your triple and your ladder.<br><br>
+                                        Which sequence do you want to add it to?
+                                    </p>
+                                    <div style="display:flex;gap:15px;justify-content:center;">
+                                        <button id="chooseTriple" style="padding:12px 24px;background:#e74c3c;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
+                                            Add to Triple
+                                        </button>
+                                        <button id="chooseLadder" style="padding:12px 24px;background:#3498db;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
+                                            Add to Ladder
+                                        </button>
+                                    </div>
+                                    <button id="cancelChoice" style="margin-top:15px;padding:8px 20px;background:#6b7280;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">
+                                        Cancel
+                                    </button>
+                                </div>
+                                    `;
                 document.body.appendChild(modal);
                 document.getElementById('chooseTriple').onclick = () => {
                     console.log(`%c✅ FIX 6: User chose TRIPLE for ${card.toString()}`, 'color:#28a745;font-weight:bold');
@@ -2502,17 +2968,27 @@
                 this.renderHand(); this.renderAIHands(); this.renderPublished();
                 if (this.discardPile.length > 0) document.getElementById('topDiscard').textContent = this.discardPile[this.discardPile.length - 1].toString();
                 document.getElementById('discardBtn').disabled = this.currentPlayer !== 0 || this.gamePhase !== 'discard' || this.selectedCards.length !== 1;
-                document.getElementById('publishBtn').disabled = this.currentPlayer !== 0 || this.gamePhase !== 'discard' || !this.canPublish(0);
+
+                // 🎯 PATCH J: Only enable publish if can actually publish OR extend sequences
+                const canPublishNew = this.canPublish(0);
+                const canExtendExisting = this.publishedSequences[0].length > 0 &&
+                    this.playerHands[0].some(card =>
+                        this.publishedSequences[0].some(seq => this.canAddToPublishedSequence(card, seq))
+                    );
+
+                document.getElementById('publishBtn').disabled = this.currentPlayer !== 0 ||
+                    this.gamePhase !== 'discard' ||
+                    (!canPublishNew && !canExtendExisting);
 
                 document.getElementById('buyBtn').disabled = !this.buyWindow.active || this.buyWindow.buyWindowPlayer !== 0 || this.playerBuys[0] <= 0;
 
+                // 🎯 v2.5.0: Check last card for all players (show alert only once per player)
                 [0, 1, 2].forEach(p => {
-                    if (this.playerHands[p].length === 1) {
+                    if (this.playerHands[p].length === 1 && !this.lastCardAlertShown[p]) {
                         const playerName = p === 0 ? 'You' : p === 1 ? 'Habot' : 'Jabot';
-                        if (!this.lastCardWarningShown || this.lastCardWarningShown !== p) {
-                            showLastCardToast(playerName);
-                            this.lastCardWarningShown = p;
-                        }
+                        showLastCardToast(playerName);
+                        this.lastCardAlertShown[p] = true;  // Mark this player as alerted
+                        console.log(`%c⚠️ Last card alert shown for ${playerName}`, 'color: #ff9800; font-weight: bold;');
                     }
                 });
             }
@@ -2687,10 +3163,10 @@
                         }
 
                         cardEl.innerHTML = `
-                        <div class="card-rank">${card.rank}</div>
-                        <div class="card-suit">${card.suit}</div>
-                        ${duplicateLabel}
-                    `;
+                                        <div class="card-rank">${card.rank}</div>
+                                        <div class="card-suit">${card.suit}</div>
+                                        ${duplicateLabel}
+                                    `;
                         optDiv.appendChild(cardEl);
                     });
 
@@ -2727,10 +3203,10 @@
                         }
 
                         cardEl.innerHTML = `
-                        <div class="card-rank">${card.rank}</div>
-                        <div class="card-suit">${card.suit}</div>
-                        ${duplicateLabel}
-                    `;
+                                        <div class="card-rank">${card.rank}</div>
+                                        <div class="card-suit">${card.suit}</div>
+                                        ${duplicateLabel}
+                                    `;
                         optDiv.appendChild(cardEl);
                     });
 
@@ -2944,7 +3420,7 @@
             const forceType = canExtendTriple ? 'triple' : 'ladder';
             game.executeAddToPublished(card, playerIdx, cardIdx, forceType);
         }
-
+        //Nash: newGame
         window.onload = () => newGame();
 
         // ============================================
@@ -3002,6 +3478,92 @@
                 };
                 document.addEventListener('keydown', handleEscape);
             });
+        }
+
+        // ============================================
+        // 🎭 v2.5.0: CHARACTER BANTER SYSTEM
+        // ============================================
+
+        function getOpeningBanter() {
+            const banterPool = [
+                // Habot aggressive openers
+                { speaker: 'Habot', text: "Let's see who fortune favors today!", personality: 'confident' },
+                { speaker: 'Habot', text: "High card takes it - may the best player win!", personality: 'competitive' },
+                { speaker: 'Habot', text: "Ready to see how luck plays out?", personality: 'eager' },
+                { speaker: 'Habot', text: "Time to find out who leads the charge!", personality: 'bold' },
+
+                // Jabot patient responses
+                { speaker: 'Jabot', text: "Patience... the cards will tell the story.", personality: 'calm' },
+                { speaker: 'Jabot', text: "Let's draw and see what fate decides.", personality: 'measured' },
+                { speaker: 'Jabot', text: "The highest card speaks for itself.", personality: 'philosophical' },
+                { speaker: 'Jabot', text: "A fair draw reveals the path forward.", personality: 'wise' }
+            ];
+
+            // Pick one from each personality
+            const habotLine = banterPool.filter(b => b.speaker === 'Habot')[Math.floor(Math.random() * 4)];
+            const jabotLine = banterPool.filter(b => b.speaker === 'Jabot')[Math.floor(Math.random() * 4)];
+
+            return [habotLine, jabotLine];
+        }
+
+        function getWinReaction(winner, winnerCard, loserCards) {
+            const reactions = {
+                // Winner reactions
+                winner: {
+                    0: [  // Human wins
+                        "Looks like fortune favors you today!",
+                        "Well drawn! You'll lead us off.",
+                        "A strong start - the table is yours!",
+                        "Lady Luck smiles on you this hand."
+                    ],
+                    1: [  // Habot wins (confident/aggressive)
+                        "Habot: Yes! The rabbit leads the race!",
+                        "Habot: Perfect. Time to set the pace.",
+                        "Habot: High card, high energy - let's go!",
+                        "Habot: I'll show you how it's done."
+                    ],
+                    2: [  // Jabot wins (calm/strategic)
+                        "Jabot: Interesting. I shall start with care.",
+                        "Jabot: The cards have spoken. I begin.",
+                        "Jabot: A thoughtful start, as it should be.",
+                        "Jabot: Patience rewards... even in the draw."
+                    ]
+                },
+                // Loser reactions
+                graceful: [
+                    "Well drawn!",
+                    "Fair enough.",
+                    "The cards decided.",
+                    "So it goes."
+                ],
+                competitive: [
+                    "Next time!",
+                    "We'll see how this plays out.",
+                    "The game hasn't started yet.",
+                    "Just wait..."
+                ]
+            };
+
+            const winnerReaction = reactions.winner[winner][Math.floor(Math.random() * 4)];
+
+            // Loser reactions based on personality
+            const loserReactions = [];
+            if (winner !== 1) {  // Habot lost
+                loserReactions.push({ speaker: 'Habot', text: reactions.competitive[Math.floor(Math.random() * 4)] });
+            }
+            if (winner !== 2) {  // Jabot lost
+                loserReactions.push({ speaker: 'Jabot', text: reactions.graceful[Math.floor(Math.random() * 4)] });
+            }
+
+            return { winner: winnerReaction, losers: loserReactions };
+        }
+
+        function getSuitExplanation() {
+            return {
+                title: "♠♥♦♣ Suit Hierarchy",
+                message: "In Bridge tradition:\n♠ Spades (highest)\n♥ Hearts\n♦ Diamonds  \n♣ Clubs (lowest)",
+                tip: "Highest rank wins. If tied, highest suit breaks the tie."
+            };
         }
 
         // ============================================
@@ -3214,6 +3776,9 @@
             game.updateUI();
             game.closeBuyWindow('bought');
         }
+
+
+
 
         function sortByRank() {
             if (!game) return;
