@@ -1,0 +1,296 @@
+/* ============================================
+   DEBUG-SPECIFIC STYLING
+   For debug.html only - not used in production
+   ============================================ */
+
+/* Debug Ribbon (top-right corner) */
+.debug-ribbon {
+    position: fixed;
+    top: 16px;
+    right: -52px;
+    transform: rotate(45deg);
+    background: #f97316;
+    color: #1b1208;
+    font-weight: 900;
+    letter-spacing: .3px;
+    padding: 8px 64px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.35);
+    z-index: 9999;
+    border: 2px solid rgba(0,0,0,.25)
+}
+
+/* Fix Badge (below ribbon) */
+.fix-badge {
+    position: fixed;
+    top: 80px;
+    right: 16px;
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: #fff;
+    font-weight: 900;
+    padding: 12px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    z-index: 9998;
+    font-size: 0.9rem;
+    border: 2px solid rgba(255,255,255,0.3)
+}
+
+/* AI Status Display */
+.ai-status {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(0,0,0,.35);
+    border: 1px solid var(--player-color);
+    min-height: 56px;
+    font-size: .9rem;
+    line-height: 1.5
+}
+
+.ai-status.active {
+    background: linear-gradient(180deg,rgba(255,215,0,.18),rgba(255,215,0,.08));
+    border-color: var(--gold);
+    box-shadow: var(--ring)
+}
+
+.ai-status-title {
+    font-weight: 800;
+    color: var(--player-color);
+    margin-bottom: 4px
+}
+
+/* Buy Info Badge */
+.buy-info {
+    background: rgba(255,193,7,.25);
+    padding: 6px 10px;
+    border-radius: 10px;
+    margin-left: 8px;
+    font-size: .9rem
+}
+
+/* Selection Info Badge */
+.selection-info {
+    background: rgba(255,215,0,.25);
+    padding: 6px 10px;
+    border-radius: 10px;
+    margin-left: 8px;
+    font-size: .9rem;
+    font-weight: 900
+}
+
+/* Publish Selector */
+.publish-selector {
+    display: none;
+    background: linear-gradient(135deg,rgba(255,215,0,.22),rgba(255,215,0,.08));
+    border: 2px solid var(--gold);
+    border-radius: 14px;
+    padding: 18px;
+    margin: 12px 0
+}
+
+.publish-selector.active {
+    display: block
+}
+
+.publish-selector h3 {
+    color: var(--gold);
+    margin-bottom: 12px;
+    text-align: center;
+    font-size: 1.05rem
+}
+
+/* Publish Options */
+.publish-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px
+}
+
+.publish-option {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.20);
+    border-radius: 12px;
+    padding: 12px
+}
+
+.publish-option h4 {
+    color: var(--gold-2);
+    margin-bottom: 8px;
+    font-size: .95rem
+}
+
+.option-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+    justify-content: center
+}
+
+.publish-controls {
+    text-align: center;
+    margin-top: 10px
+}
+
+/* Add to Published Button */
+.add-to-published {
+    margin-top: 8px;
+    padding: 8px 12px;
+    font-size: .85rem;
+    background: #0ea5e9;
+    color: #062232
+}
+
+.add-to-published:hover {
+    background: #0284c7;
+    color: #001824
+}
+
+/* Game Controls */
+.game-controls {
+    text-align: center;
+    margin-top: 14px
+}
+
+/* Debug Cheatsheet (bottom-right corner) */
+.debug-cheatsheet {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 9999;
+    width: min(480px,92vw);
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(249,115,22,.6);
+    border-radius: 14px;
+    box-shadow: 0 14px 34px rgba(0,0,0,.45);
+    color: #fff
+}
+
+.debug-cheatsheet summary {
+    cursor: pointer;
+    padding: 10px 14px;
+    font-weight: 900;
+    color: #ffedd5
+}
+
+.debug-cheatsheet pre {
+    margin: 0;
+    padding: 12px 14px;
+    overflow: auto;
+    font-size: .9rem;
+    line-height: 1.45;
+    color: #fde68a;
+    background: transparent;
+    border-top: 1px solid rgba(249,115,22,.35)
+}
+
+/* Hand Cards Display (for showing AI cards in debug) */
+.hand-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    min-height: 50px
+}
+
+/* Published Sequences Area */
+.published-sequences {
+    width: 100%;
+    min-height: 150px;
+    border: 1px dashed rgba(255,215,0,.55);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    background: linear-gradient(180deg,rgba(255,215,0,.12),rgba(255,215,0,.04))
+}
+
+.published-sequences > div:first-child {
+    font-size: 1.05rem;
+    font-weight: 900;
+    color: var(--gold);
+    margin-bottom: 10px;
+    letter-spacing: .4px
+}
+
+/* Deck Area */
+.deck-area {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 16px
+}
+
+.deck, .discard-pile {
+    width: 92px;
+    height: 132px;
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform .18s,box-shadow .18s;
+    box-shadow: var(--elev);
+    position: relative;
+    overflow: hidden
+}
+
+.deck::after, .discard-pile::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: .2;
+    background: radial-gradient(500px 180px at 20% -10%,#fff,transparent 60%);
+    pointer-events: none
+}
+
+.deck {
+    background: linear-gradient(160deg,#2b5fff,#17318f)
+}
+
+.discard-pile {
+    background: linear-gradient(160deg,#ff7b2b,#8f3c17)
+}
+
+.deck:hover, .discard-pile:hover {
+    transform: translateY(-4px) scale(1.03)
+}
+
+/* Confirmation Modal (for debug new game prompt) */
+.modal-btn {
+    padding: 12px 32px;
+    font-size: 16px;
+    font-weight: 700;
+    border: 2px solid;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.modal-btn.cancel {
+    background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    border-color: var(--accent);
+    color: #052e1a;
+}
+
+.modal-btn.cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
+}
+
+.modal-btn.confirm {
+    background: linear-gradient(180deg, var(--danger), #dc2626);
+    border-color: var(--danger);
+    color: white;
+}
+
+.modal-btn.confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}

@@ -1,853 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<!--
-  Habib Punja - Strategic AI Card Game
-  Version: 2.5.0
-  Release Date: October 27, 2025
-  Developer: AgeOfBotsGames LLC
-  Website: https://ageofbotsgames.com
-  Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
-
-  This game features AI opponents powered by strategic decision-making algorithms.
-  Compete against Habot (the Rabbit) and Jabot (the Tortoise) across 7 challenging hands!
--->
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Primary Meta Tags -->
-    <title>Habib Punja - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja - Strategic AI Card Game | AgeOfBotsGames">
-    <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
-    <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
-    <meta name="author" content="AgeOfBotsGames LLC">
-    <meta name="version" content="2.5.0">
-    <meta name="copyright" content="Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ageofbotsgames.com/">
-    <meta property="og:title" content="Habib Punja - Strategic AI Card Game">
-    <meta property="og:description" content="Challenge AI opponents in this strategic Liverpool Rummy variant. Can you outsmart Habot and Jabot?">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://ageofbotsgames.com/">
-    <meta property="twitter:title" content="Habib Punja - Strategic AI Card Game">
-    <meta property="twitter:description" content="Challenge AI opponents in this strategic Liverpool Rummy variant. Can you outsmart Habot and Jabot?">
-
-    <style>
-        /* [Previous CSS remains exactly the same - keeping it brief for space] */
-        :root {
-            --bg-1: #0b1b13;
-            --bg-2: #0f2a1c;
-            --surface: #132e21;
-            --gold: #ffd54a;
-            --gold-2: #ffea8a;
-            --accent: #4ade80;
-            --accent-2: #22c55e;
-            --danger: #ef4444;
-            --muted: #cbd5e1;
-            --ring: 0 0 0 2px rgba(255,213,74,.25),0 10px 30px rgba(0,0,0,.35);
-            --radius: 14px;
-            --card-w: 64px;
-            --card-h: 92px;
-            --elev: 0 10px 25px rgba(0,0,0,.35)
-        }
-
-        * {
-            box-sizing: border-box
-        }
-
-        html, body {
-            height: 100%
-        }
-
-        body {
-            font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,'Noto Sans',sans-serif;
-            background: radial-gradient(1200px 800px at 30% -10%,#154d34 0%,transparent 60%),radial-gradient(1400px 900px at 120% 10%,#0b3d28 0%,transparent 55%),linear-gradient(180deg,var(--bg-1),var(--bg-2));
-            color: #fff;
-            min-height: 100vh;
-            padding: 24px
-        }
-
-        .game-container {
-            max-width: 1280px;
-            margin: 0 auto
-        }
-
-        .game-header {
-            text-align: center;
-            margin-bottom: 18px
-        }
-
-            .game-header h1 {
-                font-size: clamp(1.6rem,3vw,2.4rem);
-                color: var(--gold);
-                letter-spacing: .5px;
-                text-shadow: 0 1px 0 #000,0 0 24px rgba(255,213,74,.25)
-            }
-
-        .game-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-            justify-content: space-between;
-            background: linear-gradient(135deg,rgba(255,215,0,.10),rgba(255,255,255,.04));
-            padding: 16px 18px;
-            border-radius: var(--radius);
-            border: 1px solid rgba(255,215,0,.25);
-            box-shadow: var(--elev)
-        }
-
-        .current-hand {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--gold)
-        }
-
-        .requirements {
-            font-size: .95rem;
-            color: var(--gold-2)
-        }
-
-            .requirements.ready {
-                color: var(--accent)
-            }
-
-        .turn-indicator {
-            padding: 8px 14px;
-            background: linear-gradient(180deg,var(--accent),var(--accent-2));
-            border-radius: 999px;
-            font-weight: 800;
-            color: #052e1a;
-            text-shadow: 0 1px 0 rgba(255,255,255,.35);
-            box-shadow: var(--ring)
-        }
-
-        .leaderboard {
-            background: linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
-            border: 1px solid rgba(255,255,255,.15);
-            border-radius: var(--radius);
-            padding: 12px 14px;
-            margin: 16px 0 20px;
-            box-shadow: var(--elev)
-        }
-
-            .leaderboard h3 {
-                color: var(--gold);
-                margin-bottom: 6px;
-                text-align: center;
-                font-size: 1rem
-            }
-
-        .leaderboard-entries {
-            display: flex;
-            gap: 10px
-        }
-
-        .leaderboard-entry {
-            flex: 1;
-            text-align: center;
-            padding: 8px 10px;
-            background: rgba(255,255,255,.05);
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,.12)
-        }
-
-            .leaderboard-entry.first {
-                background: linear-gradient(180deg,rgba(255,215,0,.20),rgba(255,215,0,.08));
-                border-color: rgba(255,215,0,.65)
-            }
-
-            .leaderboard-entry.last {
-                background: linear-gradient(180deg,rgba(239,68,68,.22),rgba(239,68,68,.08));
-                border-color: rgba(239,68,68,.55)
-            }
-
-        .leaderboard-name {
-            font-weight: 800;
-            font-size: .9rem;
-            margin-bottom: 2px
-        }
-
-        .leaderboard-score {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--gold)
-        }
-
-        .players-section {
-            display: grid;
-            grid-template-columns: 1fr minmax(420px,1.2fr) 1fr;
-            gap: 16px;
-            margin-bottom: 22px
-        }
-
-        @media(max-width:980px) {
-            .players-section {
-                grid-template-columns: 1fr
-            }
-
-            .center-area {
-                order: 3
-            }
-        }
-
-        .player-area {
-            background: linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
-            border-radius: var(--radius);
-            padding: 16px;
-            min-height: 180px;
-            border: 1px solid rgba(255,255,255,.15);
-            box-shadow: var(--elev);
-            transition: box-shadow .2s,border-color .2s
-        }
-
-            .player-area.active-turn {
-                box-shadow: 0 0 0 2px var(--gold),0 12px 30px rgba(0,0,0,.45)
-            }
-
-        .player-name {
-            font-weight: 900;
-            margin-bottom: 10px;
-            padding-bottom: 6px;
-            border-bottom: 2px solid var(--player-color);
-            color: var(--player-color);
-            letter-spacing: .3px
-        }
-
-        .ai-status {
-            margin-top: 12px;
-            padding: 12px;
-            border-radius: 10px;
-            background: rgba(0,0,0,.35);
-            border: 1px solid var(--player-color);
-            min-height: 56px;
-            font-size: .9rem;
-            line-height: 1.5
-        }
-
-            .ai-status.active {
-                background: linear-gradient(180deg,rgba(255,215,0,.18),rgba(255,215,0,.08));
-                border-color: var(--gold);
-                box-shadow: var(--ring)
-            }
-
-        .ai-status-title {
-            font-weight: 800;
-            color: var(--player-color);
-            margin-bottom: 4px
-        }
-
-
-        /* ============================================
-        🎨 FIX 7B: Custom Confirmation Modal
-        ============================================ */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-        }
-
-            .modal-overlay.active {
-                display: flex;
-            }
-
-        .modal-content {
-            background: linear-gradient(135deg, var(--surface) 0%, var(--bg-2) 100%);
-            border: 2px solid var(--gold);
-            border-radius: var(--radius);
-            padding: 32px;
-            max-width: 450px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), var(--ring);
-            animation: modalSlideIn 0.3s ease;
-        }
-
-        @keyframes modalSlideIn {
-            from {
-                transform: translateY(-50px) scale(0.95);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* ============================================
-                🎨 FIX 7D: Auto-Fade Modal Animations
-                ============================================ */
-        @keyframes modalFadeOut {
-            from {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-
-            to {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.95);
-            }
-        }
-
-        .modal-overlay.fading-out {
-            animation: modalFadeOut 0.5s ease forwards;
-        }
-
-        .modal-auto-fade-indicator {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent), var(--gold));
-            width: 100%;
-            border-radius: 0 0 var(--radius) var(--radius);
-            transform-origin: left;
-            animation: fadeProgress 3s linear forwards;
-        }
-
-        @keyframes fadeProgress {
-            from {
-                transform: scaleX(1);
-            }
-
-            to {
-                transform: scaleX(0);
-            }
-        }
-
-        .modal-skip-hint {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.4);
-            font-weight: 600;
-            pointer-events: none;
-        }
-
-        .modal-icon {
-            font-size: 48px;
-            text-align: center;
-            margin-bottom: 16px;
-        }
-
-        .modal-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--gold);
-            text-align: center;
-            margin-bottom: 12px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .modal-message {
-            font-size: 16px;
-            color: var(--muted);
-            text-align: center;
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .modal-btn {
-            padding: 12px 32px;
-            font-size: 16px;
-            font-weight: 700;
-            border: 2px solid;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-            .modal-btn.cancel {
-                background: linear-gradient(180deg, var(--accent), var(--accent-2));
-                border-color: var(--accent);
-                color: #052e1a;
-            }
-
-                .modal-btn.cancel:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(74, 222, 128, 0.4);
-                }
-
-            .modal-btn.confirm {
-                background: linear-gradient(180deg, var(--danger), #dc2626);
-                border-color: var(--danger);
-                color: white;
-            }
-
-                .modal-btn.confirm:hover {
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-                }
-
-        .center-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center
-        }
-
-        .deck-area {
-            display: flex;
-            gap: 18px;
-            margin-bottom: 16px
-        }
-
-        .deck, .discard-pile {
-            width: 92px;
-            height: 132px;
-            border: 1px solid rgba(255,255,255,.35);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform .18s,box-shadow .18s;
-            box-shadow: var(--elev);
-            position: relative;
-            overflow: hidden
-        }
-
-            .deck::after, .discard-pile::after {
-                content: '';
-                position: absolute;
-                inset: 0;
-                opacity: .2;
-                background: radial-gradient(500px 180px at 20% -10%,#fff,transparent 60%);
-                pointer-events: none
-            }
-
-        .deck {
-            background: linear-gradient(160deg,#2b5fff,#17318f)
-        }
-
-        .discard-pile {
-            background: linear-gradient(160deg,#ff7b2b,#8f3c17)
-        }
-
-            .deck:hover, .discard-pile:hover {
-                transform: translateY(-4px) scale(1.03)
-            }
-
-        .published-sequences {
-            width: 100%;
-            min-height: 150px;
-            border: 1px dashed rgba(255,215,0,.55);
-            border-radius: 12px;
-            padding: 14px;
-            text-align: center;
-            background: linear-gradient(180deg,rgba(255,215,0,.12),rgba(255,215,0,.04))
-        }
-
-            .published-sequences > div:first-child {
-                font-size: 1.05rem;
-                font-weight: 900;
-                color: var(--gold);
-                margin-bottom: 10px;
-                letter-spacing: .4px
-            }
-
-        .player-published {
-            margin: 10px 0;
-            padding: 10px;
-            background: rgba(255,255,255,.05);
-            border-radius: 10px
-        }
-
-            .player-published h5 {
-                margin-bottom: 8px;
-                color: var(--gold);
-                font-size: .95rem;
-                font-weight: 900
-            }
-
-        .published-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            justify-content: center;
-            max-width: 100%
-        }
-
-            .published-cards .card {
-                flex: 0 0 auto;
-                transform: scale(0.7)
-            }
-
-        .hand-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px
-        }
-
-        .players-section .player-area .hand-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            justify-items: center
-        }
-
-        .card {
-            width: var(--card-w);
-            height: var(--card-h);
-            border: 1px solid rgba(0,0,0,.2);
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 900;
-            cursor: move;
-            user-select: none;
-            position: relative;
-            padding: 4px;
-            background: linear-gradient(180deg,#fbfbfb,#f0f0f0);
-            box-shadow: 0 6px 16px rgba(0,0,0,.25);
-            transition: transform .16s ease,box-shadow .16s ease,border-color .16s ease
-        }
-
-            .card::before {
-                content: '';
-                position: absolute;
-                inset: 0;
-                border-radius: 10px;
-                pointer-events: none;
-                background: radial-gradient(800px 200px at 20% -10%,rgba(255,255,255,.8),transparent 60%);
-                opacity: .35
-            }
-
-            .card:hover {
-                transform: translateY(-8px) rotate(-.4deg);
-                box-shadow: 0 12px 28px rgba(0,0,0,.35)
-            }
-
-            .card.dragging {
-                opacity: .7;
-                transform: rotate(3deg) scale(1.05)
-            }
-
-            .card.drag-over {
-                border-left: 4px solid var(--accent)
-            }
-
-            .card.red {
-                color: #db1f2f
-            }
-
-            .card.black {
-                color: #0f172a
-            }
-
-            .card.red.heart {
-                color: #e31c23
-            }
-
-            .card.red.diamond {
-                color: #ff6b35
-            }
-
-            .card.selected {
-                outline: 3px solid var(--gold);
-                outline-offset: 0;
-                transform: translateY(-12px) scale(1.02);
-                box-shadow: 0 14px 34px rgba(255,213,74,.45)
-            }
-
-        .card-rank {
-            font-size: 17px;
-            line-height: 1;
-            margin-bottom: 2px
-        }
-
-        .card-suit {
-            font-size: 30px;
-            line-height: 1
-        }
-
-        .btn {
-            background: linear-gradient(180deg,#3ddc84,#1fae63);
-            color: #052e1a;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 12px;
-            cursor: pointer;
-            margin: 0 6px 10px;
-            font-size: 15px;
-            font-weight: 900;
-            letter-spacing: .2px;
-            transition: transform .12s,box-shadow .12s;
-            box-shadow: 0 6px 16px rgba(0,0,0,.25)
-        }
-
-            .btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 22px rgba(0,0,0,.35)
-            }
-
-            .btn:disabled {
-                background: #6b7280;
-                color: #1f2937;
-                cursor: not-allowed;
-                opacity: .7;
-                box-shadow: none
-            }
-
-        .buy-info {
-            background: rgba(255,193,7,.25);
-            padding: 6px 10px;
-            border-radius: 10px;
-            margin-left: 8px;
-            font-size: .9rem
-        }
-
-        .selection-info {
-            background: rgba(255,215,0,.25);
-            padding: 6px 10px;
-            border-radius: 10px;
-            margin-left: 8px;
-            font-size: .9rem;
-            font-weight: 900
-        }
-
-        .publish-selector {
-            display: none;
-            background: linear-gradient(135deg,rgba(255,215,0,.22),rgba(255,215,0,.08));
-            border: 2px solid var(--gold);
-            border-radius: 14px;
-            padding: 18px;
-            margin: 12px 0
-        }
-
-            .publish-selector.active {
-                display: block
-            }
-
-            .publish-selector h3 {
-                color: var(--gold);
-                margin-bottom: 12px;
-                text-align: center;
-                font-size: 1.05rem
-            }
-
-        .publish-options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px
-        }
-
-        .publish-option {
-            background: rgba(255,255,255,.05);
-            border: 1px solid rgba(255,255,255,.20);
-            border-radius: 12px;
-            padding: 12px
-        }
-
-            .publish-option h4 {
-                color: var(--gold-2);
-                margin-bottom: 8px;
-                font-size: .95rem
-            }
-
-        .option-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 8px;
-            justify-content: center
-        }
-
-        .publish-controls {
-            text-align: center;
-            margin-top: 10px
-        }
-
-        .add-to-published {
-            margin-top: 8px;
-            padding: 8px 12px;
-            font-size: .85rem;
-            background: #0ea5e9;
-            color: #062232
-        }
-
-            .add-to-published:hover {
-                background: #0284c7;
-                color: #001824
-            }
-
-        .game-controls {
-            text-align: center;
-            margin-top: 14px
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1
-            }
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1
-            }
-
-            to {
-                transform: translateX(400px);
-                opacity: 0
-            }
-        }
-
-        @keyframes victoryPulse {
-            0%, 100% {
-                transform: scale(1)
-            }
-
-            50% {
-                transform: scale(1.05)
-            }
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            pointer-events: none
-        }
-
-        .fix-badge {
-            position: fixed;
-            top: 80px;
-            right: 16px;
-            background: linear-gradient(135deg, #ff6b35, #f7931e);
-            color: #fff;
-            font-weight: 900;
-            padding: 12px 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-            z-index: 9998;
-            font-size: 0.9rem;
-            border: 2px solid rgba(255,255,255,0.3)
-        }
-    </style>
-</head>
-<body>
-    <div class="fix-badge">✅ v2.5.0 </div>
-    <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v2.5.0</h1></div>
-        <div class="game-info">
-            <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
-            <div class="requirements" id="detailedRequirements">Two Triples</div>
-            <div class="turn-indicator" id="turnIndicator">Your Turn</div>
-        </div>
-        <div class="leaderboard"><div class="leaderboard-entries" id="leaderboardEntries"></div></div>
-        <div class="players-section">
-            <div class="player-area" style="--player-color: #e74c3c;">
-                <div class="player-name">Habot <span class="buy-info">Buys: <span id="player2Buys">3</span></span></div>
-                <div class="hand-cards" id="player2Cards"></div>
-                <div class="ai-status" id="habot-status">
-                    <div class="ai-status-title">Habot's Status:</div>
-                    <div class="ai-status-action" id="habot-action">Waiting...</div>
-                </div>
-            </div>
-            <div class="center-area">
-                <div class="deck-area">
-                    <div class="deck" onclick="drawFromDeck()"><div>Draw<br>Deck</div></div>
-                    <div class="discard-pile" onclick="drawFromDiscard()"><div id="topDiscard">Discard<br>Pile</div></div>
-                </div>
-                <div class="published-sequences">
-                    <div>Published Sequences</div>
-                    <div id="player1Published" class="player-published"><h5>Your Published Sequences:</h5><div class="published-cards" id="player1Cards"></div></div>
-                    <div id="player2Published" class="player-published"><h5>Habot's Published Sequences:</h5><div class="published-cards" id="player2CardsPublished"></div></div>
-                    <div id="player3Published" class="player-published"><h5>Jabot's Published Sequences:</h5><div class="published-cards" id="player3CardsPublished"></div></div>
-                </div>
-            </div>
-            <div class="player-area" style="--player-color: #9b59b6;">
-                <div class="player-name">Jabot <span class="buy-info">Buys: <span id="player3Buys">3</span></span></div>
-                <div class="hand-cards" id="player3Cards"></div>
-                <div class="ai-status" id="jabot-status">
-                    <div class="ai-status-title">Jabot's Status:</div>
-                    <div class="ai-status-action" id="jabot-action">Waiting...</div>
-                </div>
-            </div>
-        </div>
-        <div class="player-area" style="--player-color: #4a90e2;">
-            <div class="player-name">Your Hand <span class="buy-info">Buys: <span id="playerBuys">3</span></span><span id="selectionInfo" class="selection-info" style="display:none;">Selected: <span id="selectedCount">0</span></span></div>
-            <div class="hand-cards" id="playerCards"></div>
-            <div class="publish-selector" id="publishSelector">
-                <h3>Choose Cards to Publish</h3>
-                <div class="publish-options" id="publishOptions"></div>
-                <div class="publish-controls">
-                    <button class="btn" onclick="confirmManualPublish()">Publish Selected</button>
-                    <button class="btn" onclick="cancelManualPublish()">Cancel</button>
-                </div>
-            </div>
-            <div id="addToPublishedSection" style="display:none; margin-top:15px;">
-                <strong style="color:#ffd700;">Add Selected Card To:</strong>
-                <button class="btn add-to-published" onclick="addToPublished(0)">Your Sequences</button>
-                <button class="btn add-to-published" onclick="addToPublished(1)">Habot's Sequences</button>
-                <button class="btn add-to-published" onclick="addToPublished(2)">Jabot's Sequences</button>
-            </div>
-        </div>
-        <div class="game-controls">
-            <button class="btn" id="publishBtn" onclick="publishSequences()" disabled>Publish Sequences</button>
-            <button class="btn" onclick="sortByRank()">Sort by Rank</button>
-            <button class="btn" onclick="sortBySuit()">Sort by Suit</button>
-            <button class="btn" id="discardBtn" onclick="discardCard()" disabled>Discard Selected</button>
-            <button class="btn" id="buyBtn" onclick="buyCard()" disabled>Buy from Discard <span id="buyTimer" style="display:none;"></span></button>
-            <button class="btn" onclick="sortByQuantity()">Sort by Quantity</button>
-            <button class="btn" onclick="newGame()">New Game</button>
-        </div>
-    </div>
-
-    <!-- ============================================
-     🎨 FIX 7B: Custom Confirmation Modal
-     ============================================ -->
-    <div id="confirmModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-icon">⚠️</div>
-            <div class="modal-title" id="modalTitle">Confirm Action</div>
-            <div class="modal-message" id="modalMessage">Are you sure?</div>
-            <div class="modal-buttons">
-                <button class="modal-btn cancel" id="modalCancel">Continue Playing</button>
-                <button class="modal-btn confirm" id="modalConfirm">Start New Game</button>
-            </div>
-        </div>
-    </div>
-
-
-
-    <script>
-        // Add this at the very top of your <script> section, before game code
         window.addEventListener('error', function (e) {
-            // Ignore browser extension errors
             if (e.message && e.message.includes('runtime.lastError')) {
                 e.preventDefault();
                 console.log('⚠️ Browser extension error caught and ignored');
@@ -855,9 +6,11 @@
             }
         });
 
+
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
+        console.log('%c✅ v2.5.0 DEBUG', 'color:#f97316;font-size:18px;font-weight:bold');
         console.log('%c🎮 HABIB PUNJA v2.5.0', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -866,6 +19,8 @@
         console.log('%c⚠️ Unauthorized copying or distribution is prohibited.', 'color: #FF9800; font-weight: bold;');
         console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #999;');
         console.log(' ');
+        console.log('%c🛠️ DEBUG MODE ACTIVE', 'color:#ff6b35;font-size:24px;font-weight:bold');
+        console.log('%c✅ Type: game.debugHelp()', 'color:#ffd700;font-size:16px');
 
         // Game state
         let deck = [];
@@ -904,6 +59,7 @@
                 this.lastAIDiscard = [null, null, null];
                 this.aiPersonality = { 1: 'rabbit', 2: 'tortoise' };
                 this.lastCardWarningShown = null;
+                this.aiInstant = false;
                 this.handReqs = {
                     1: { name: "Two Triples", seqs: ["triple", "triple"], cards: 10 },
                     2: { name: "Triple + Ladder", seqs: ["triple", "ladder"], cards: 10 },
@@ -914,7 +70,259 @@
                     7: { name: "Three Ladders", seqs: ["ladder", "ladder", "ladder"], cards: 10 }
                 };
                 this.initDeck(); this.deal(); this.updateUI();
-                console.log('%c====== GAME STARTED ======', 'color:#28a745;font-size:14px;font-weight:bold');
+                console.log('%c====== GAME STARTED (v2.5.0 DEBUG) ======', 'color:#28a745;font-size:14px;font-weight:bold');
+            }
+
+            debugHelp() {
+                console.log('%c\n🛠️ DEBUG COMMAND REFERENCE v2.5.0', 'color:#ff6b35;font-size:18px;font-weight:bold');
+                console.log('%c\n📋 QUICK TESTS:', 'color:#ffd700;font-weight:bold');
+                console.log('  game.debugFix4Test()       - v2.5.0 FIX 4: Endgame protection');  // ✅ ADD THIS
+                console.log('  game.debugEndgameTest()    - v2.5.0.0 FIX: AI protects dangerous cards');
+                console.log('  game.debugAceLadderTest()  - v2.5.0.1 FIX 1: Both ends ladder extension');
+                console.log('  game.debug1CardTest()      - 1-card rule enforcement');
+                console.log('  game.debugFix5Test()       - v2.5.0 FIX 5: Duplicate card selection');
+                console.log('  game.debugFix6Test()       - v2.5.0 FIX 6: Ambiguous Card Assignment');
+                console.log('%c\n🎮 HAND CONTROL:', 'color:#ffd700;font-weight:bold');
+                console.log('  game.debugSetHand(3)       - Jump to hand 3');
+                console.log('  game.debugNextHand()       - Next hand');
+                console.log('%c\n🃏 CARD MANAGEMENT:', 'color:#ffd700;font-weight:bold');
+                console.log('  game.debugGiveCards(["K♠"]) - Get specific cards');
+                console.log('  game.debugSetHandSize(1)   - Set hand size');
+                console.log('%c\n👁️ VISIBILITY:', 'color:#ffd700;font-weight:bold');
+                console.log('  game.debugShowAllHands()   - See all hands');
+                console.log('  game.debugStatus()         - Show game state');
+                console.log('%c\n⚡ SPEED:', 'color:#ffd700;font-weight:bold');
+                console.log('  game.debugInstantAI()      - Toggle AI speed');
+            }
+
+            debugEndgameTest() {
+                console.log('%c🧪 v2.5.0 ENDGAME TEST (FIX 4)', 'color:#ff6b35;font-weight:bold');
+                this.playerHands[0] = [new Card('K', '♠'), new Card('Q', '♠'), new Card('J', '♠')];
+                this.publishedSequences[0] = [new Card('5', '♥'), new Card('6', '♥'), new Card('7', '♥'), new Card('8', '♥')];
+                this.playerHands[1] = [new Card('9', '♥'), new Card('10', '♥')];
+                this.publishedSequences[1] = [new Card('K', '♥'), new Card('K', '♦'), new Card('K', '♣')];
+                this.gamePhase = 'discard'; this.currentPlayer = 0;
+                this.updateUI();
+                console.log('%c✅ SETUP: Opponent has 2 cards + published. Your 9♥ would help them win.', 'color:#28a745');
+                console.log('Expected: AI should NOT discard 9♥ or 10♥ (dangerous cards)');
+            }
+
+            debugAceLadderTest() {
+                console.log('%c🧪 FIX 1: ACE LADDER TEST (Both Ends)', 'color:#ff6b35;font-weight:bold');
+                this.debugSetHand(3);
+                const testCards = [new Card('9', '♠'), new Card('10', '♠'), new Card('J', '♠'), new Card('Q', '♠'),
+                new Card('K', '♠'), new Card('A', '♠'), new Card('2', '♥'), new Card('3', '♥'), new Card('4', '♥'), new Card('5', '♥')];
+                this.playerHands[0] = testCards;
+                const ladder1 = [testCards[0], testCards[1], testCards[2], testCards[3]];
+                const ladder2 = [testCards[6], testCards[7], testCards[8], testCards[9]];
+                this.publishedSequences[0] = [...ladder1, ...ladder2];
+                this.playerHands[0] = [testCards[4], testCards[5]];
+                this.gamePhase = 'discard'; this.updateUI();
+                console.log('%c✅ TEST: K♠ extends to HIGH end (9-10-J-Q-K), A♠ wraps to LOW end (A-K-Q-J)', 'color:#28a745');
+            }
+
+            debug1CardTest() {
+                console.log('%c🧪 1-CARD RULE TEST', 'color:#ff6b35;font-weight:bold');
+                this.playerHands[0] = [new Card('K', '♠')];
+                this.publishedSequences[0] = [new Card('J', '♠'), new Card('Q', '♠'), new Card('A', '♠')];
+                this.gamePhase = 'discard'; this.selectedCards = [0];
+                this.updateUI();
+                console.log('%c✅ TEST: "Add to Published" buttons should NOT appear (only 1 card left)', 'color:#28a745');
+            }
+
+            debugFix5Test() {
+                console.log('%c🧪 FIX 5 TEST: Duplicate Card Selection', 'color:#ff6b35;font-weight:bold;font-size:16px');
+                this.debugSetHand(2);
+                this.playerHands[0] = [
+                    new Card('J', '♥'), new Card('J', '♦'), new Card('J', '♣'),
+                    new Card('10', '♦'), new Card('J', '♦'), new Card('Q', '♦'), new Card('K', '♦'),
+                    new Card('4', '♥'), new Card('6', '♥'), new Card('7', '♥')
+                ];
+                this.gamePhase = 'discard'; this.currentPlayer = 0;
+                this.updateUI();
+                console.log('%c✅ TEST SETUP:', 'color:#28a745;font-weight:bold');
+                console.log('  Hand has: 2 J♦ cards (indices 1 and 4)');
+                console.log('  Triple: J♥ J♦ J♣ (uses J♦ at index 1)');
+                console.log('  Ladder: 10♦ J♦ Q♦ K♦ (uses J♦ at index 4)');
+                console.log('\n%c▶️ Now click "Publish Sequences" and select both', 'color:#4a90e2');
+                console.log('  Expected: Error message about duplicate card');
+            }
+
+            debugFix6Test() {
+                console.log('%c🧪 FIX 6 TEST: Ambiguous Card Assignment', 'color:#ff6b35;font-weight:bold;font-size:16px');
+
+                this.currentHand = 5;
+                this.publishedSequences[0] = [
+                    new Card('J', '♥'), new Card('J', '♦'), new Card('J', '♣'),
+                    new Card('7', '♥'), new Card('8', '♥'), new Card('9', '♥'), new Card('10', '♥')
+                ];
+                this.playerHands[0] = [new Card('J', '♥'), new Card('Q', '♥')];
+                this.gamePhase = 'discard';
+                this.currentPlayer = 0;
+                this.selectedCards = [0];
+                this.updateUI();
+
+                console.log('%c✅ TEST SETUP:', 'color:#28a745;font-weight:bold');
+                console.log('  Published: J♥ J♦ J♣ (triple) + 7♥ 8♥ 9♥ 10♥ (ladder)');
+                console.log('  Hand: J♥ (selected) + Q♥');
+                console.log('  J♥ could extend BOTH triple AND ladder!');
+                console.log('\n%c▶️ Click "Add Selected Card To: Your Sequences"', 'color:#4a90e2');
+                console.log('  Expected: Modal asking "Add to Triple or Ladder?"');
+            }
+
+            debugSetHand(handNum) {
+                if (handNum < 1 || handNum > 7) { console.error('Hand must be 1-7'); return }
+                console.log(`%c🎯 Jumping to Hand ${handNum}...`, 'color:#4a90e2;font-weight:bold');
+                this.currentHand = handNum; this.playerBuys = handNum === 7 ? [2, 2, 2] : [3, 3, 3];
+                this.publishedSequences = [[], [], []]; this.playerHands = [[], [], []]; this.selectedCards = [];
+                this.gamePhase = 'draw'; this.currentPlayer = 0; this.justPublished = false; this.aiJustPublished = [false, false, false];
+                this.lastDiscard = null; this.lastDiscardByPlayer = -1; this.discardPile = [];
+                this.turnCounter = 0; this.lastAIDiscard = [null, null, null];
+                this.initDeck(); this.deal(); this.updateUI();
+                console.log(`%c✅ Now at Hand ${handNum}: ${this.handReqs[handNum].name}`, 'color:#28a745');
+            }
+
+            debugNextHand() {
+                if (this.currentHand < 7) this.debugSetHand(this.currentHand + 1);
+                else console.log('%c⚠️ Already at final hand', 'color:#ffc107');
+            }
+
+            debugGiveCards(cardStrings) {
+                console.log('%c🎁 Adding cards...', 'color:#4a90e2;font-weight:bold');
+                cardStrings.forEach(str => {
+                    const rank = str.slice(0, -1); const suit = str.slice(-1);
+                    const card = new Card(rank, suit); this.playerHands[0].push(card);
+                    console.log(`  Added: ${card.toString()}`);
+                });
+                this.updateUI(); console.log('%c✅ Cards added!', 'color:#28a745');
+            }
+
+            debugSetHandSize(size) {
+                console.log(`%c🎯 Setting hand to ${size} card(s)...`, 'color:#4a90e2;font-weight:bold');
+                this.playerHands[0] = [];
+                for (let i = 0; i < size; i++) this.playerHands[0].push(new Card('K', '♠'));
+                this.selectedCards = []; this.updateUI();
+                console.log(`%c✅ Hand now has ${size} card(s)!`, 'color:#28a745');
+            }
+
+            debugShowAllHands() {
+                console.log('%c👁️ ALL HANDS:', 'color:#ff6b35;font-size:16px;font-weight:bold');
+                console.log('\n🎮 YOUR HAND:', this.playerHands[0].map(c => c.toString()).join(', '));
+                console.log('🤖 HABOT:', this.playerHands[1].map(c => c.toString()).join(', '));
+                console.log('🤖 JABOT:', this.playerHands[2].map(c => c.toString()).join(', '));
+            }
+
+            debugStatus() {
+                console.log('%c📊 GAME STATUS:', 'color:#ff6b35;font-size:16px;font-weight:bold');
+                console.log(`Hand: ${this.currentHand} (${this.handReqs[this.currentHand].name})`);
+                console.log(`Phase: ${this.gamePhase}`);
+                console.log(`Current Player: ${this.currentPlayer === 0 ? 'YOU' : this.currentPlayer === 1 ? 'Habot' : 'Jabot'}`);
+                console.log(`Your Cards: ${this.playerHands[0].length}`);
+                console.log(`Published: ${this.publishedSequences[0].length} cards`);
+            }
+
+            debugFix4Test() {
+                console.log('%c🧪 FIX 4 TEST: Endgame Protection', 'color:#ff6b35;font-weight:bold;font-size:16px');
+
+                // Set up Hand 3 (2 Ladders)
+                this.debugSetHand(3);
+
+                // Human: 1 card left + published ladder (A-K-Q-J♣)
+                this.publishedSequences[0] = [
+                    new Card('A', '♣'),
+                    new Card('K', '♣'),
+                    new Card('Q', '♣'),
+                    new Card('J', '♣')
+                ];
+                this.playerHands[0] = [new Card('2', '♥')]; // 1 random card left
+
+                // Jabot (AI 2): Has 10♣ that would WIN the game for human
+                this.playerHands[2] = [
+                    new Card('7', '♠'),
+                    new Card('4', '♦'),
+                    new Card('4', '♦'),
+                    new Card('3', '♦'),
+                    new Card('10', '♣')  // 🚨 THE DANGEROUS CARD
+                ];
+                this.publishedSequences[2] = []; // NOT published
+
+                // Habot (AI 1): Random cards, not published
+                this.playerHands[1] = [
+                    new Card('9', '♥'),
+                    new Card('8', '♥'),
+                    new Card('6', '♣')
+                ];
+                this.publishedSequences[1] = [];
+
+                // Set Jabot's turn to discard
+                this.currentPlayer = 2;
+                this.gamePhase = 'discard';
+                this.updateUI();
+
+                console.log('%c✅ TEST SETUP:', 'color:#28a745;font-weight:bold');
+                console.log('  Human: Published A-K-Q-J♣, has 1 card left');
+                console.log('  Jabot: Has 10♣ (extends human ladder), NOT published');
+                console.log('  Expected: Jabot should AVOID discarding 10♣');
+                console.log('  Bug: Jabot discards 10♣ anyway (hands you the win)');
+                console.log('\n%c▶️ Click to manually trigger Jabot turn or wait...', 'color:#4a90e2');
+
+                // Auto-trigger AI turn after 2 seconds
+                setTimeout(() => {
+                    console.log('%c🤖 Starting Jabot turn...', 'color:#9b59b6;font-weight:bold');
+                    this.aiTurn();
+                }, 2000);
+            }
+
+            debugFix5Test() {
+                console.log('%c🧪 FIX 5 TEST: Duplicate Card Selection', 'color:#ff6b35;font-weight:bold;font-size:16px');
+
+                game.debugSetHand(2); // Triple + Ladder
+
+                // Give exactly the scenario you described
+                game.playerHands[0] = [
+                    new Card('J', '♥'), new Card('J', '♦'), new Card('J', '♣'),  // Triple
+                    new Card('10', '♦'), new Card('J', '♦'), new Card('Q', '♦'), new Card('K', '♦'),  // Ladder (with 2nd J♦)
+                    new Card('4', '♥'), new Card('6', '♥'), new Card('7', '♥')
+                ];
+
+                game.gamePhase = 'discard';
+                game.currentPlayer = 0;
+                game.updateUI();
+
+                console.log('%c✅ TEST SETUP:', 'color:#28a745;font-weight:bold');
+                console.log('  Hand has: 2 J♦ cards (indices 1 and 4)');
+                console.log('  Triple: J♥ J♦ J♣ (uses J♦ at index 1)');
+                console.log('  Ladder: 10♦ J♦ Q♦ K♦ (uses J♦ at index 4)');
+                console.log('\n%c▶️ Now click "Publish Sequences" and select both', 'color:#4a90e2');
+                console.log('  Expected WITHOUT FIX: Publishes with J♦ missing');
+                console.log('  Expected WITH FIX 5: Error message about duplicate card');
+            }
+
+            debugFix6Test() {
+                console.log('%c🧪 FIX 6 TEST: Ambiguous Card Assignment', 'color:#ff6b35;font-weight:bold;font-size:16px');
+
+                this.currentHand = 5;
+                this.publishedSequences[0] = [
+                    new Card('J', '♥'), new Card('J', '♦'), new Card('J', '♣'),
+                    new Card('7', '♥'), new Card('8', '♥'), new Card('9', '♥'), new Card('10', '♥')
+                ];
+                this.playerHands[0] = [new Card('J', '♥'), new Card('Q', '♥')];
+                this.gamePhase = 'discard';
+                this.currentPlayer = 0;
+                this.selectedCards = [0];
+                this.updateUI();
+
+                console.log('%c✅ TEST SETUP:', 'color:#28a745;font-weight:bold');
+                console.log('  Published: J♥ J♦ J♣ (triple) + 7♥ 8♥ 9♥ 10♥ (ladder)');
+                console.log('  Hand: J♥ (selected) + Q♥');
+                console.log('  J♥ could extend BOTH triple AND ladder!');
+                console.log('\n%c▶️ Click "Add Selected Card To: Your Sequences"', 'color:#4a90e2');
+                console.log('  Expected: Modal asking "Add to Triple or Ladder?"');
+            }
+
+            debugInstantAI() {
+                this.aiInstant = !this.aiInstant;
+                console.log(`%c⚡ AI Instant Mode: ${this.aiInstant ? 'ON' : 'OFF'}`, 'color:#ffd700;font-weight:bold');
             }
 
             getAIPersonality(aiIdx) {
@@ -1297,11 +705,8 @@
                 const seqs = { triples: [], ladders: [] };
                 const byRank = {};
                 hand.forEach(c => { if (!byRank[c.rank]) byRank[c.rank] = []; byRank[c.rank].push(c) });
-
-
                 Object.values(byRank).forEach(g => {
                     if (g.length >= 3) {
-                        // ✅ FIX 1C: Generate ALL combinations of 3 cards (not just sliding windows)
                         for (let i = 0; i < g.length - 2; i++) {
                             for (let j = i + 1; j < g.length - 1; j++) {
                                 for (let k = j + 1; k < g.length; k++) {
@@ -1311,8 +716,6 @@
                         }
                     }
                 });
-
-
                 const bySuit = {};
                 hand.forEach(c => { if (!bySuit[c.suit]) bySuit[c.suit] = []; bySuit[c.suit].push(c) });
                 Object.values(bySuit).forEach(g => {
@@ -1456,7 +859,6 @@
                 return true;
             }
 
-            // ✅ FIX 1: Explicit LOW and HIGH end ladder extension support
             canCardExtendLadder(cardVal, ladderValues) {
                 const sorted = [...ladderValues].sort((a, b) => a - b);
                 const minVal = sorted[0];
@@ -1509,37 +911,19 @@
                 published.forEach(c => { if (!publishedSuits[c.suit]) publishedSuits[c.suit] = []; publishedSuits[c.suit].push(c.getValue()) });
                 const hasActualLadders = Object.values(publishedSuits).some(vals => vals.length >= 4);
                 if (hasTriples || hasActualTriples) { if (publishedRankCounts[card.rank] >= 3) return true }
-
                 if (hasLadders || hasActualLadders) {
-                    // ✅ FIX 1B: Don't filter out "triple cards" - just get ALL cards of matching suit
-                    // This handles cases where a rank appears in both triple and ladder (e.g., 8♦ 8♣ 8♦ + 7♥ 8♥ 9♥ 10♥)
                     const sameSuit = published.filter(c => c.suit === card.suit);
-
                     console.log(`  🔍 FIX 1B: Checking ${card.toString()} against ${sameSuit.length} published ${card.suit} cards`);
-
                     if (sameSuit.length >= 4) {
                         const cardVal = card.getValue();
                         const values = sameSuit.map(c => c.getValue()).sort((a, b) => a - b);
                         const ladders = []; let remainingValues = [...values];
                         const hasAce = values.includes(1); const hasJack = values.includes(11);
                         const hasQueen = values.includes(12); const hasKing = values.includes(13);
-
                         if (hasAce && hasJack && hasQueen && hasKing) {
-                            // 🔧 PATCH O: Extract ALL consecutive high cards from King downward
-                            const wrapLadder = [1];  // Start with Ace (value 1)
-                            const highCards = values.filter(v => v >= 11).sort((a, b) => b - a);
-                            for (let i = 0; i < highCards.length; i++) {
-                                if (i === 0 || highCards[i] === highCards[i - 1] - 1) {
-                                    wrapLadder.push(highCards[i]);
-                                } else {
-                                    break;
-                                }
-                            }
-                            console.log(`  🔧 PATCH O: Wrap-around ladder detected: [${wrapLadder.join(',')}]`);
-                            ladders.push(wrapLadder);
-                            remainingValues = remainingValues.filter(v => !wrapLadder.includes(v));
+                            ladders.push([1, 11, 12, 13]);
+                            remainingValues = remainingValues.filter(v => ![1, 11, 12, 13].includes(v));
                         }
-
                         if (remainingValues.length >= 4) {
                             let currentLadder = [remainingValues[0]];
                             for (let i = 1; i < remainingValues.length; i++) {
@@ -1558,7 +942,6 @@
                         if (canExtend) return true;
                     }
                 }
-
                 return false;
             }
 
@@ -1757,6 +1140,7 @@
                     }
                 }
 
+
                 const isLadderOnlyHand = this.handReqs[this.currentHand].seqs.every(seq => seq === 'ladder');
                 if (isLadderOnlyHand && this.turnCounter > 80 && hand.length >= 15) {
                     const potentialLadders = {};
@@ -1944,7 +1328,6 @@
 
             setAIStatus(aiId, message) { const actionElement = document.getElementById(`${aiId}-action`); if (actionElement) actionElement.textContent = message }
 
-            // ✅ FIX 3: Reduced buy window after publishing (5s instead of 10s)
             startBuyWindow(card, discardingPlayer) {
                 if (!card) { console.log(`%c⚠️ Cannot open buy window - no card provided`, 'color: #ff6600; font-weight: bold;'); return }
                 const buyWindowPlayer = (discardingPlayer + 2) % 3;
@@ -1953,19 +1336,16 @@
                 // 🎯 v2.5.0: Consistent 3-second buy window for faster game pace
                 const duration = 3000;  // Always 3 seconds (removed conditional)
                 console.log(`%c⏱️ v2.5.0: Buy window duration: ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
-
                 this.buyWindow.active = true;
                 this.buyWindow.card = card;
                 this.buyWindow.discardingPlayer = discardingPlayer;
                 this.buyWindow.buyWindowPlayer = buyWindowPlayer;
-                this.buyWindow.expiresAt = Date.now() + duration; // ✅ FIX 3: Variable duration
-
+                this.buyWindow.expiresAt = Date.now() + duration;
                 const playerNames = ['Human', 'Habot', 'Jabot'];
-                console.log(`%c🔔 Buy window opened for ${playerNames[buyWindowPlayer]} (${card.toString()}) - ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
+                console.log(`%c🔓 Buy window opened for ${playerNames[buyWindowPlayer]} (${card.toString()}) - ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
                 if (buyWindowPlayer === 0) document.getElementById('buyBtn').disabled = false;
                 this.updateBuyTimer();
             }
-
 
             checkAndOpenBuyWindowAfterDiscard(currentAI, statusId) {
                 const aiName = currentAI === 1 ? 'Habot' : 'Jabot';
@@ -2092,7 +1472,6 @@
                             this.aiTurn();
                         }
                     }, 500);
-
                 }
             }
 
@@ -2321,7 +1700,6 @@
                     }
 
                     if (shouldTake && this.discardPile.length > 0) {
-
                         if (this.wouldDiscardImmediately(this.discardPile[this.discardPile.length - 1], ai)) {
                             this.setAIStatus(statusId, `Evaluating options...`);
                             this.handleDeckDraw(ai, statusId);
@@ -2329,13 +1707,10 @@
                         } else {
                             const drawnCard = this.discardPile.pop();
                             this.playerHands[ai].push(drawnCard);
-
-                            // ✅ FIX 2: Show specific toast when AI takes card during buy window
                             if (this.buyWindow.active && this.buyWindow.buyWindowPlayer === 0 && this.buyWindow.card && this.buyWindow.card.id === drawnCard.id) {
                                 console.log(`%c🚨 FIX 2: AI took card during human buy window`, 'color: #ff6b35; font-weight: bold;');
                                 showAITookCardToast(aiName, drawnCard);
                             }
-
                             if (this.buyWindow.active && this.buyWindow.card && this.buyWindow.card.id === drawnCard.id) {
                                 this.closeBuyWindow('taken');
                             }
@@ -2648,23 +2023,10 @@
                                 const ladders = []; let remainingValues = [...values];
                                 const hasAce = values.includes(1); const hasJack = values.includes(11);
                                 const hasQueen = values.includes(12); const hasKing = values.includes(13);
-
                                 if (hasAce && hasJack && hasQueen && hasKing) {
-                                    // 🔧 PATCH O: Extract ALL consecutive high cards from King downward
-                                    const wrapLadder = [1];  // Start with Ace (value 1)
-                                    const highCards = values.filter(v => v >= 11).sort((a, b) => b - a);
-                                    for (let i = 0; i < highCards.length; i++) {
-                                        if (i === 0 || highCards[i] === highCards[i - 1] - 1) {
-                                            wrapLadder.push(highCards[i]);
-                                        } else {
-                                            break;
-                                        }
-                                    }
-                                    console.log(`  🔧 PATCH O: Wrap-around ladder detected: [${wrapLadder.join(',')}]`);
-                                    ladders.push(wrapLadder);
-                                    remainingValues = remainingValues.filter(v => !wrapLadder.includes(v));
+                                    ladders.push([1, 11, 12, 13]);
+                                    remainingValues = remainingValues.filter(v => ![1, 11, 12, 13].includes(v));
                                 }
-
                                 if (remainingValues.length >= 4) {
                                     let currentLadder = [remainingValues[0]];
                                     for (let i = 1; i < remainingValues.length; i++) {
@@ -2748,6 +2110,7 @@
                 const msg = `Game Complete!\n\n🏆 ${winner.name} wins with ${winner.score} points!\n🎃 ${loser.name} is the Habib Punja with ${loser.score} points!`;
                 this.showModal('Final Results', msg);
 
+
                 setTimeout(async () => {
                     console.log('%c🎮 Starting New Game...', 'color: #2196f3; font-weight: bold; font-size: 16px;');
 
@@ -2780,10 +2143,10 @@
                 const modal = document.createElement('div');
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;';
                 modal.innerHTML = `<div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;">
-                                        <h2 style="color:#ffd700;margin-bottom:15px;">${title}</h2>
-                                        <p style="color:white;margin-bottom:20px;white-space:pre-line;">${msg}</p>
-                                        <button onclick="this.closest('div').parentElement.remove();" style="padding:12px 30px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">OK</button>
-                                    </div>`;
+                                <h2 style="color:#ffd700;margin-bottom:15px;">${title}</h2>
+                                <p style="color:white;margin-bottom:20px;white-space:pre-line;">${msg}</p>
+                                <button onclick="this.closest('div').parentElement.remove();" style="padding:12px 30px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">OK</button>
+                            </div>`;
                 document.body.appendChild(modal);
             }
 
@@ -2791,25 +2154,25 @@
                 const modal = document.createElement('div');
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:10000;';
                 modal.innerHTML = `
-                                <div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;max-width:500px;">
-                                    <h2 style="color:#ffd700;margin-bottom:15px;">🎯 Choose Sequence</h2>
-                                    <p style="color:white;margin-bottom:20px;">
-                                        ${card.toString()} can extend BOTH your triple and your ladder.<br><br>
-                                        Which sequence do you want to add it to?
-                                    </p>
-                                    <div style="display:flex;gap:15px;justify-content:center;">
-                                        <button id="chooseTriple" style="padding:12px 24px;background:#e74c3c;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
-                                            Add to Triple
-                                        </button>
-                                        <button id="chooseLadder" style="padding:12px 24px;background:#3498db;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
-                                            Add to Ladder
-                                        </button>
-                                    </div>
-                                    <button id="cancelChoice" style="margin-top:15px;padding:8px 20px;background:#6b7280;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">
-                                        Cancel
-                                    </button>
-                                </div>
-                                    `;
+                        <div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;max-width:500px;">
+                            <h2 style="color:#ffd700;margin-bottom:15px;">🎯 Choose Sequence</h2>
+                            <p style="color:white;margin-bottom:20px;">
+                                ${card.toString()} can extend BOTH your triple and your ladder.<br><br>
+                                Which sequence do you want to add it to?
+                            </p>
+                            <div style="display:flex;gap:15px;justify-content:center;">
+                                <button id="chooseTriple" style="padding:12px 24px;background:#e74c3c;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
+                                    Add to Triple
+                                </button>
+                                <button id="chooseLadder" style="padding:12px 24px;background:#3498db;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
+                                    Add to Ladder
+                                </button>
+                            </div>
+                            <button id="cancelChoice" style="margin-top:15px;padding:8px 20px;background:#6b7280;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">
+                                Cancel
+                            </button>
+                        </div>
+                            `;
                 document.body.appendChild(modal);
                 document.getElementById('chooseTriple').onclick = () => {
                     console.log(`%c✅ FIX 6: User chose TRIPLE for ${card.toString()}`, 'color:#28a745;font-weight:bold');
@@ -3122,7 +2485,6 @@
             }
         }
 
-        // Global functions
         function showPublishSelector(seqs, req) {
             const selector = document.getElementById('publishSelector');
             const options = document.getElementById('publishOptions');
@@ -3189,10 +2551,10 @@
                         }
 
                         cardEl.innerHTML = `
-                                        <div class="card-rank">${card.rank}</div>
-                                        <div class="card-suit">${card.suit}</div>
-                                        ${duplicateLabel}
-                                    `;
+                                <div class="card-rank">${card.rank}</div>
+                                <div class="card-suit">${card.suit}</div>
+                                ${duplicateLabel}
+                            `;
                         optDiv.appendChild(cardEl);
                     });
 
@@ -3229,10 +2591,10 @@
                         }
 
                         cardEl.innerHTML = `
-                                        <div class="card-rank">${card.rank}</div>
-                                        <div class="card-suit">${card.suit}</div>
-                                        ${duplicateLabel}
-                                    `;
+                                <div class="card-rank">${card.rank}</div>
+                                <div class="card-suit">${card.suit}</div>
+                                ${duplicateLabel}
+                            `;
                         optDiv.appendChild(cardEl);
                     });
 
@@ -3403,23 +2765,10 @@
                     const hasJack = values.includes(11);
                     const hasQueen = values.includes(12);
                     const hasKing = values.includes(13);
-
                     if (hasAce && hasJack && hasQueen && hasKing) {
-                        // 🔧 PATCH O: Extract ALL consecutive high cards from King downward
-                        const wrapLadder = [1];  // Start with Ace (value 1)
-                        const highCards = values.filter(v => v >= 11).sort((a, b) => b - a);
-                        for (let i = 0; i < highCards.length; i++) {
-                            if (i === 0 || highCards[i] === highCards[i - 1] - 1) {
-                                wrapLadder.push(highCards[i]);
-                            } else {
-                                break;
-                            }
-                        }
-                        console.log(`  🔧 PATCH O: Wrap-around ladder detected: [${wrapLadder.join(',')}]`);
-                        ladders.push(wrapLadder);
-                        remainingValues = remainingValues.filter(v => !wrapLadder.includes(v));
+                        ladders.push([1, 11, 12, 13]);
+                        remainingValues = remainingValues.filter(v => ![1, 11, 12, 13].includes(v));
                     }
-
                     if (remainingValues.length >= 4) {
                         let currentLadder = [remainingValues[0]];
                         for (let i = 1; i < remainingValues.length; i++) {
@@ -3816,9 +3165,6 @@
             game.closeBuyWindow('bought');
         }
 
-
-
-
         function sortByRank() {
             if (!game) return;
             game.playerHands[0].sort((a, b) => {
@@ -3854,7 +3200,6 @@
             game.updateUI();
         }
 
-        // Toast Notification System
         function showToast(message, type = 'info', duration = 2500) {
             const container = document.querySelector('.toast-container') || createToastContainer();
             const toast = document.createElement('div');
@@ -3924,6 +3269,3 @@
         }
 
 
-    </script>
-</body>
-</html>

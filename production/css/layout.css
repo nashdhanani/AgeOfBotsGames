@@ -1,0 +1,215 @@
+/*
+ * Habib Punja - Layout Styles
+ * Version: 2.5.0
+ * Copyright © 2025 AgeOfBotsGames LLC
+ */
+
+/* ============================================
+   GAME CONTAINER
+   ============================================ */
+.game-container {
+    max-width: 1280px;
+    margin: 0 auto
+}
+
+/* ============================================
+   GAME HEADER
+   ============================================ */
+.game-header {
+    text-align: center;
+    margin-bottom: 18px
+}
+
+.game-header h1 {
+    font-size: clamp(1.6rem,3vw,2.4rem);
+    color: var(--gold);
+    letter-spacing: .5px;
+    text-shadow: 0 1px 0 #000,0 0 24px rgba(255,213,74,.25)
+}
+
+/* ============================================
+   GAME INFO BAR
+   ============================================ */
+.game-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg,rgba(255,215,0,.10),rgba(255,255,255,.04));
+    padding: 16px 18px;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255,215,0,.25);
+    box-shadow: var(--elev)
+}
+
+.current-hand {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--gold)
+}
+
+.requirements {
+    font-size: .95rem;
+    color: var(--gold-2)
+}
+
+.requirements.ready {
+    color: var(--accent)
+}
+
+.turn-indicator {
+    padding: 8px 14px;
+    background: linear-gradient(180deg,var(--accent),var(--accent-2));
+    border-radius: 999px;
+    font-weight: 800;
+    color: #052e1a;
+    text-shadow: 0 1px 0 rgba(255,255,255,.35);
+    box-shadow: var(--ring)
+}
+
+/* ============================================
+   PLAYERS SECTION LAYOUT
+   ============================================ */
+.players-section {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px
+}
+
+.center-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px
+}
+
+/* ============================================
+   DECK AREA
+   ============================================ */
+.deck-area {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin-bottom: 16px
+}
+
+/* ============================================
+   PUBLISHED SEQUENCES SECTION
+   ============================================ */
+.published-sequences {
+    background: linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: var(--radius);
+    padding: 12px;
+    text-align: center;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,.15)
+}
+
+.player-published {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(255,255,255,.15)
+}
+
+.player-published h5 {
+    color: var(--gold-2);
+    margin-bottom: 8px;
+    font-size: .9rem
+}
+
+.published-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    min-height: 20px
+}
+
+/* ============================================
+   PUBLISH SELECTOR
+   ============================================ */
+.publish-selector {
+    display: none;
+    background: linear-gradient(180deg,rgba(102,126,234,.15),rgba(118,75,162,.10));
+    border: 2px solid rgba(102,126,234,.45);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-top: 12px;
+    box-shadow: 0 8px 24px rgba(102,126,234,.25)
+}
+
+.publish-selector h3 {
+    color: var(--gold);
+    margin-bottom: 12px;
+    text-align: center
+}
+
+.publish-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px
+}
+
+.publish-option {
+    background: rgba(255,255,255,.06);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all .2s
+}
+
+.publish-option:hover {
+    background: rgba(255,255,255,.10);
+    border-color: rgba(255,213,74,.4)
+}
+
+.publish-option.selected {
+    background: rgba(102,126,234,.2);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(76,222,128,.15)
+}
+
+.publish-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center
+}
+
+/* ============================================
+   ADD TO PUBLISHED SECTION
+   ============================================ */
+#addToPublishedSection {
+    margin-top: 15px
+}
+
+.add-to-published {
+    margin: 5px;
+    padding: 10px 16px;
+    background: linear-gradient(180deg,rgba(74,144,226,.8),rgba(58,115,181,.8));
+    border: 1px solid rgba(255,255,255,.2);
+    transition: all .2s
+}
+
+.add-to-published:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(74,144,226,.4)
+}
+
+/* ============================================
+   SELECTION INFO
+   ============================================ */
+.selection-info {
+    margin-left: 12px;
+    padding: 4px 12px;
+    background: rgba(255,213,74,.15);
+    border-radius: 999px;
+    color: var(--gold);
+    font-size: .85rem;
+    font-weight: 600
+}

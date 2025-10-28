@@ -1825,10 +1825,23 @@ game.debugFix6Test()       - FIX 6: Ambiguous Card Assignment
                         const ladders = []; let remainingValues = [...values];
                         const hasAce = values.includes(1); const hasJack = values.includes(11);
                         const hasQueen = values.includes(12); const hasKing = values.includes(13);
+
                         if (hasAce && hasJack && hasQueen && hasKing) {
-                            ladders.push([1, 11, 12, 13]);
-                            remainingValues = remainingValues.filter(v => ![1, 11, 12, 13].includes(v));
+                            // 🔧 PATCH O: Extract ALL consecutive high cards from King downward
+                            const wrapLadder = [1];  // Start with Ace (value 1)
+                            const highCards = values.filter(v => v >= 11).sort((a, b) => b - a);
+                            for (let i = 0; i < highCards.length; i++) {
+                                if (i === 0 || highCards[i] === highCards[i - 1] - 1) {
+                                    wrapLadder.push(highCards[i]);
+                                } else {
+                                    break;
+                                }
+                            }
+                            console.log(`  🔧 PATCH O: Wrap-around ladder detected: [${wrapLadder.join(',')}]`);
+                            ladders.push(wrapLadder);
+                            remainingValues = remainingValues.filter(v => !wrapLadder.includes(v));
                         }
+
                         if (remainingValues.length >= 4) {
                             let currentLadder = [remainingValues[0]];
                             for (let i = 1; i < remainingValues.length; i++) {
@@ -2928,10 +2941,23 @@ game.debugFix6Test()       - FIX 6: Ambiguous Card Assignment
                                 const ladders = []; let remainingValues = [...values];
                                 const hasAce = values.includes(1); const hasJack = values.includes(11);
                                 const hasQueen = values.includes(12); const hasKing = values.includes(13);
+
                                 if (hasAce && hasJack && hasQueen && hasKing) {
-                                    ladders.push([1, 11, 12, 13]);
-                                    remainingValues = remainingValues.filter(v => ![1, 11, 12, 13].includes(v));
+                                    // 🔧 PATCH O: Extract ALL consecutive high cards from King downward
+                                    const wrapLadder = [1];  // Start with Ace (value 1)
+                                    const highCards = values.filter(v => v >= 11).sort((a, b) => b - a);
+                                    for (let i = 0; i < highCards.length; i++) {
+                                        if (i === 0 || highCards[i] === highCards[i - 1] - 1) {
+                                            wrapLadder.push(highCards[i]);
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                    console.log(`  🔧 PATCH O: Wrap-around ladder detected: [${wrapLadder.join(',')}]`);
+                                    ladders.push(wrapLadder);
+                                    remainingValues = remainingValues.filter(v => !wrapLadder.includes(v));
                                 }
+
                                 if (remainingValues.length >= 4) {
                                     let currentLadder = [remainingValues[0]];
                                     for (let i = 1; i < remainingValues.length; i++) {
@@ -3670,10 +3696,23 @@ game.debugFix6Test()       - FIX 6: Ambiguous Card Assignment
                     const hasJack = values.includes(11);
                     const hasQueen = values.includes(12);
                     const hasKing = values.includes(13);
+
                     if (hasAce && hasJack && hasQueen && hasKing) {
-                        ladders.push([1, 11, 12, 13]);
-                        remainingValues = remainingValues.filter(v => ![1, 11, 12, 13].includes(v));
+                        // 🔧 PATCH O: Extract ALL consecutive high cards from King downward
+                        const wrapLadder = [1];  // Start with Ace (value 1)
+                        const highCards = values.filter(v => v >= 11).sort((a, b) => b - a);
+                        for (let i = 0; i < highCards.length; i++) {
+                            if (i === 0 || highCards[i] === highCards[i - 1] - 1) {
+                                wrapLadder.push(highCards[i]);
+                            } else {
+                                break;
+                            }
+                        }
+                        console.log(`  🔧 PATCH O: Wrap-around ladder detected: [${wrapLadder.join(',')}]`);
+                        ladders.push(wrapLadder);
+                        remainingValues = remainingValues.filter(v => !wrapLadder.includes(v));
                     }
+
                     if (remainingValues.length >= 4) {
                         let currentLadder = [remainingValues[0]];
                         for (let i = 1; i < remainingValues.length; i++) {

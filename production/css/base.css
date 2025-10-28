@@ -1,0 +1,61 @@
+/*
+ * Habib Punja - Base Styles
+ * Version: 2.5.0
+ * Copyright © 2025 AgeOfBotsGames LLC
+ */
+
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+:root {
+    --bg-1: #0b1b13;
+    --bg-2: #0f2a1c;
+    --surface: #132e21;
+    --gold: #ffd54a;
+    --gold-2: #ffea8a;
+    --accent: #4ade80;
+    --accent-2: #22c55e;
+    --danger: #ef4444;
+    --muted: #cbd5e1;
+    --ring: 0 0 0 2px rgba(255,213,74,.25),0 10px 30px rgba(0,0,0,.35);
+    --radius: 14px;
+    --card-w: 64px;
+    --card-h: 92px;
+    --elev: 0 10px 25px rgba(0,0,0,.35)
+}
+
+/* ============================================
+   GLOBAL RESETS
+   ============================================ */
+* {
+    box-sizing: border-box
+}
+
+html, body {
+    height: 100%
+}
+
+body {
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,'Noto Sans',sans-serif;
+    background: radial-gradient(1200px 800px at 30% -10%,#154d34 0%,transparent 60%),radial-gradient(1400px 900px at 120% 10%,#0b3d28 0%,transparent 55%),linear-gradient(180deg,var(--bg-1),var(--bg-2));
+    color: #fff;
+    min-height: 100vh;
+    padding: 24px
+}
+
+/* ============================================
+   VERSION BADGE
+   ============================================ */
+.fix-badge {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(135deg,#ff6b35,#f7931e);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    z-index: 10000
+}
