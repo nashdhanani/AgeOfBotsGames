@@ -1,0 +1,157 @@
+/*
+ * Habib Punja - Card Styles
+ * Version: 2.5.0
+ * Copyright © 2025 AgeOfBotsGames LLC
+ */
+
+/* ============================================
+   DECK AND DISCARD PILE
+   ============================================ */
+.deck, .discard-pile {
+    width: 92px;
+    height: 132px;
+    border: 1px solid rgba(255,255,255,.35);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform .18s,box-shadow .18s;
+    box-shadow: var(--elev);
+    position: relative;
+    font-weight: 900;
+    font-size: 15px;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,.4)
+}
+
+.deck::after, .discard-pile::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: .2;
+    background: radial-gradient(500px 180px at 20% -10%,#fff,transparent 60%);
+    pointer-events: none;
+    border-radius: 12px
+}
+
+.deck {
+    background: linear-gradient(160deg,#2b5fff,#17318f)
+}
+
+.discard-pile {
+    background: linear-gradient(160deg,#ff7b2b,#8f3c17)
+}
+
+.deck:hover, .discard-pile:hover {
+    transform: translateY(-4px) scale(1.03)
+}
+
+.deck div, .discard-pile div {
+    text-align: center;
+    line-height: 1.4;
+    position: relative;
+    z-index: 1
+}
+
+/* ============================================
+   CARD BASE STYLES
+   ============================================ */
+.card {
+    width: var(--card-w);
+    height: var(--card-h);
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 900;
+    cursor: move;
+    user-select: none;
+    position: relative;
+    padding: 4px;
+    background: linear-gradient(180deg,#fbfbfb,#f0f0f0);
+    box-shadow: 0 6px 16px rgba(0,0,0,.25);
+    transition: transform .16s ease,box-shadow .16s ease,border-color .16s ease
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    pointer-events: none;
+    background: radial-gradient(800px 200px at 20% -10%,rgba(255,255,255,.8),transparent 60%);
+    opacity: .35
+}
+
+/* ============================================
+   CARD INTERACTIONS
+   ============================================ */
+.card:hover {
+    transform: translateY(-8px) rotate(-.4deg);
+    box-shadow: 0 12px 28px rgba(0,0,0,.35)
+}
+
+.card.dragging {
+    opacity: .7;
+    transform: rotate(3deg) scale(1.05)
+}
+
+.card.drag-over {
+    border-left: 4px solid var(--accent)
+}
+
+.card.selected {
+    outline: 3px solid var(--gold);
+    outline-offset: 0;
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 14px 34px rgba(255,213,74,.45)
+}
+
+/* ============================================
+   CARD COLORS
+   ============================================ */
+.card.red {
+    color: #db1f2f
+}
+
+.card.black {
+    color: #0f172a
+}
+
+.card.red.heart {
+    color: #e31c23
+}
+
+.card.red.diamond {
+    color: #ff6b35
+}
+
+/* ============================================
+   CARD CONTENT
+   ============================================ */
+.card-rank {
+    font-size: 17px;
+    line-height: 1;
+    margin-bottom: 2px
+}
+
+.card-suit {
+    font-size: 30px;
+    line-height: 1
+}
+
+/* ============================================
+   PUBLISHED CARDS SCALING
+   ============================================ */
+.published-cards .card {
+    flex: 0 0 auto;
+    transform: scale(0.7)
+}
+
+.published-cards .card:hover {
+    transform: scale(0.75) translateY(-4px)
+}

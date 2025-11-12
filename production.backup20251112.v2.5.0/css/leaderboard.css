@@ -1,0 +1,93 @@
+/*
+ * Habib Punja - Leaderboard Styles
+ * Version: 2.5.0
+ * Copyright © 2025 AgeOfBotsGames LLC
+ */
+
+/* ============================================
+   LEADERBOARD CONTAINER
+   ============================================ */
+.leaderboard {
+    background: linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin: 16px 0 20px;
+    box-shadow: var(--elev)
+}
+
+.leaderboard h3 {
+    color: var(--gold);
+    margin-bottom: 6px;
+    text-align: center;
+    font-size: 1rem
+}
+
+/* ============================================
+   LEADERBOARD ENTRIES
+   ============================================ */
+.leaderboard-entries {
+    display: flex;
+    gap: 10px
+}
+
+.leaderboard-entry {
+    flex: 1;
+    background: linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 10px;
+    padding: 10px 12px;
+    text-align: center;
+    transition: all .2s
+}
+
+.leaderboard-entry.first {
+    background: linear-gradient(180deg,rgba(255,215,0,.18),rgba(255,215,0,.08));
+    border-color: rgba(255,215,0,.4);
+    box-shadow: 0 0 20px rgba(255,215,0,.15)
+}
+
+.leaderboard-entry.second {
+    background: linear-gradient(180deg,rgba(192,192,192,.15),rgba(192,192,192,.05));
+    border-color: rgba(192,192,192,.35)
+}
+
+.leaderboard-entry.third {
+    background: linear-gradient(180deg,rgba(205,127,50,.15),rgba(205,127,50,.05));
+    border-color: rgba(205,127,50,.35)
+}
+
+.leaderboard-entry.last {
+    background: linear-gradient(180deg,rgba(239,68,68,.22),rgba(239,68,68,.08));
+    border-color: rgba(239,68,68,.55)
+}
+
+.leaderboard-entry .emoji {
+    font-size: 1.5rem;
+    margin-bottom: 2px
+}
+
+.leaderboard-name {
+    font-weight: 700;
+    color: var(--gold);
+    font-size: .95rem;
+    margin-bottom: 2px
+}
+
+.leaderboard-score {
+    font-size: .85rem;
+    color: var(--muted)
+}
+
+/* Also support the old class names for compatibility */
+.leaderboard-entry .name {
+    font-weight: 700;
+    color: var(--gold);
+    font-size: .95rem;
+    margin-bottom: 2px
+}
+
+.leaderboard-entry .score {
+    font-size: .85rem;
+    color: var(--muted)
+}

@@ -1,0 +1,32 @@
+﻿.character-emoji {
+    width: 48px;
+    height: 48px;
+    vertical-align: middle;
+    margin-right: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+.character-name {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #3C3C3C;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.character-splash {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto 2rem auto;
+    text-align: center;
+}
+
+.splash-img {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 16px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+    object-fit: cover;
+}

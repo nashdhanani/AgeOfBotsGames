@@ -1,6 +1,4 @@
-        // Add this at the very top of your <script> section, before game code
         window.addEventListener('error', function (e) {
-            // Ignore browser extension errors
             if (e.message && e.message.includes('runtime.lastError')) {
                 e.preventDefault();
                 console.log('⚠️ Browser extension error caught and ignored');
@@ -8,9 +6,11 @@
             }
         });
 
+
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
+        console.log('%c✅ v2.5.0 DEBUG', 'color:#f97316;font-size:18px;font-weight:bold');
         console.log('%c🎮 HABIB PUNJA v2.5.0', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -19,6 +19,8 @@
         console.log('%c⚠️ Unauthorized copying or distribution is prohibited.', 'color: #FF9800; font-weight: bold;');
         console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #999;');
         console.log(' ');
+        console.log('%c🛠️ DEBUG MODE ACTIVE', 'color:#ff6b35;font-size:24px;font-weight:bold');
+        console.log('%c✅ Type: game.debugHelp()', 'color:#ffd700;font-size:16px');
 
         // Game state
         let deck = [];
@@ -57,6 +59,7 @@
                 this.lastAIDiscard = [null, null, null];
                 this.aiPersonality = { 1: 'rabbit', 2: 'tortoise' };
                 this.lastCardWarningShown = null;
+                this.aiInstant = false;
                 this.handReqs = {
                     1: { name: "Two Triples", seqs: ["triple", "triple"], cards: 10 },
                     2: { name: "Triple + Ladder", seqs: ["triple", "ladder"], cards: 10 },
@@ -67,7 +70,259 @@
                     7: { name: "Three Ladders", seqs: ["ladder", "ladder", "ladder"], cards: 10 }
                 };
                 this.initDeck(); this.deal(); this.updateUI();
-                console.log('%c====== GAME STARTED ======', 'color:#28a745;font-size:14px;font-weight:bold');
+                console.log('%c====== GAME STARTED (v2.5.0 DEBUG) ======', 'color:#28a745;font-size:14px;font-weight:bold');
+            }
+
+            debugHelp() {
+                console.log('%c\n🛠️ DEBUG COMMAND REFERENCE v2.5.0', 'color:#ff6b35;font-size:18px;font-weight:bold');
+                console.log('%c\n📋 QUICK TESTS:', 'color:#ffd700;font-weight:bold');
+                console.log('  game.debugFix4Test()       - v2.5.0 FIX 4: Endgame protection');  // ✅ ADD THIS
+                console.log('  game.debugEndgameTest()    - v2.5.0.0 FIX: AI protects dangerous cards');
+                console.log('  game.debugAceLadderTest()  - v2.5.0.1 FIX 1: Both ends ladder extension');
+                console.log('  game.debug1CardTest()      - 1-card rule enforcement');
+                console.log('  game.debugFix5Test()       - v2.5.0 FIX 5: Duplicate card selection');
+                console.log('  game.debugFix6Test()       - v2.5.0 FIX 6: Ambiguous Card Assignment');
+                console.log('%c\n🎮 HAND CONTROL:', 'color:#ffd700;font-weight:bold');
+                console.log('  game.debugSetHand(3)       - Jump to hand 3');
+                console.log('  game.debugNextHand()       - Next hand');
+                console.log('%c\n🃏 CARD MANAGEMENT:', 'color:#ffd700;font-weight:bold');
+                console.log('  game.debugGiveCards(["K♠"]) - Get specific cards');
+                console.log('  game.debugSetHandSize(1)   - Set hand size');
+                console.log('%c\n👁️ VISIBILITY:', 'color:#ffd700;font-weight:bold');
+                console.log('  game.debugShowAllHands()   - See all hands');
+                console.log('  game.debugStatus()         - Show game state');
+                console.log('%c\n⚡ SPEED:', 'color:#ffd700;font-weight:bold');
+                console.log('  game.debugInstantAI()      - Toggle AI speed');
+            }
+
+            debugEndgameTest() {
+                console.log('%c🧪 v2.5.0 ENDGAME TEST (FIX 4)', 'color:#ff6b35;font-weight:bold');
+                this.playerHands[0] = [new Card('K', '♠'), new Card('Q', '♠'), new Card('J', '♠')];
+                this.publishedSequences[0] = [new Card('5', '♥'), new Card('6', '♥'), new Card('7', '♥'), new Card('8', '♥')];
+                this.playerHands[1] = [new Card('9', '♥'), new Card('10', '♥')];
+                this.publishedSequences[1] = [new Card('K', '♥'), new Card('K', '♦'), new Card('K', '♣')];
+                this.gamePhase = 'discard'; this.currentPlayer = 0;
+                this.updateUI();
+                console.log('%c✅ SETUP: Opponent has 2 cards + published. Your 9♥ would help them win.', 'color:#28a745');
+                console.log('Expected: AI should NOT discard 9♥ or 10♥ (dangerous cards)');
+            }
+
+            debugAceLadderTest() {
+                console.log('%c🧪 FIX 1: ACE LADDER TEST (Both Ends)', 'color:#ff6b35;font-weight:bold');
+                this.debugSetHand(3);
+                const testCards = [new Card('9', '♠'), new Card('10', '♠'), new Card('J', '♠'), new Card('Q', '♠'),
+                new Card('K', '♠'), new Card('A', '♠'), new Card('2', '♥'), new Card('3', '♥'), new Card('4', '♥'), new Card('5', '♥')];
+                this.playerHands[0] = testCards;
+                const ladder1 = [testCards[0], testCards[1], testCards[2], testCards[3]];
+                const ladder2 = [testCards[6], testCards[7], testCards[8], testCards[9]];
+                this.publishedSequences[0] = [...ladder1, ...ladder2];
+                this.playerHands[0] = [testCards[4], testCards[5]];
+                this.gamePhase = 'discard'; this.updateUI();
+                console.log('%c✅ TEST: K♠ extends to HIGH end (9-10-J-Q-K), A♠ wraps to LOW end (A-K-Q-J)', 'color:#28a745');
+            }
+
+            debug1CardTest() {
+                console.log('%c🧪 1-CARD RULE TEST', 'color:#ff6b35;font-weight:bold');
+                this.playerHands[0] = [new Card('K', '♠')];
+                this.publishedSequences[0] = [new Card('J', '♠'), new Card('Q', '♠'), new Card('A', '♠')];
+                this.gamePhase = 'discard'; this.selectedCards = [0];
+                this.updateUI();
+                console.log('%c✅ TEST: "Add to Published" buttons should NOT appear (only 1 card left)', 'color:#28a745');
+            }
+
+            debugFix5Test() {
+                console.log('%c🧪 FIX 5 TEST: Duplicate Card Selection', 'color:#ff6b35;font-weight:bold;font-size:16px');
+                this.debugSetHand(2);
+                this.playerHands[0] = [
+                    new Card('J', '♥'), new Card('J', '♦'), new Card('J', '♣'),
+                    new Card('10', '♦'), new Card('J', '♦'), new Card('Q', '♦'), new Card('K', '♦'),
+                    new Card('4', '♥'), new Card('6', '♥'), new Card('7', '♥')
+                ];
+                this.gamePhase = 'discard'; this.currentPlayer = 0;
+                this.updateUI();
+                console.log('%c✅ TEST SETUP:', 'color:#28a745;font-weight:bold');
+                console.log('  Hand has: 2 J♦ cards (indices 1 and 4)');
+                console.log('  Triple: J♥ J♦ J♣ (uses J♦ at index 1)');
+                console.log('  Ladder: 10♦ J♦ Q♦ K♦ (uses J♦ at index 4)');
+                console.log('\n%c▶️ Now click "Publish Sequences" and select both', 'color:#4a90e2');
+                console.log('  Expected: Error message about duplicate card');
+            }
+
+            debugFix6Test() {
+                console.log('%c🧪 FIX 6 TEST: Ambiguous Card Assignment', 'color:#ff6b35;font-weight:bold;font-size:16px');
+
+                this.currentHand = 5;
+                this.publishedSequences[0] = [
+                    new Card('J', '♥'), new Card('J', '♦'), new Card('J', '♣'),
+                    new Card('7', '♥'), new Card('8', '♥'), new Card('9', '♥'), new Card('10', '♥')
+                ];
+                this.playerHands[0] = [new Card('J', '♥'), new Card('Q', '♥')];
+                this.gamePhase = 'discard';
+                this.currentPlayer = 0;
+                this.selectedCards = [0];
+                this.updateUI();
+
+                console.log('%c✅ TEST SETUP:', 'color:#28a745;font-weight:bold');
+                console.log('  Published: J♥ J♦ J♣ (triple) + 7♥ 8♥ 9♥ 10♥ (ladder)');
+                console.log('  Hand: J♥ (selected) + Q♥');
+                console.log('  J♥ could extend BOTH triple AND ladder!');
+                console.log('\n%c▶️ Click "Add Selected Card To: Your Sequences"', 'color:#4a90e2');
+                console.log('  Expected: Modal asking "Add to Triple or Ladder?"');
+            }
+
+            debugSetHand(handNum) {
+                if (handNum < 1 || handNum > 7) { console.error('Hand must be 1-7'); return }
+                console.log(`%c🎯 Jumping to Hand ${handNum}...`, 'color:#4a90e2;font-weight:bold');
+                this.currentHand = handNum; this.playerBuys = handNum === 7 ? [2, 2, 2] : [3, 3, 3];
+                this.publishedSequences = [[], [], []]; this.playerHands = [[], [], []]; this.selectedCards = [];
+                this.gamePhase = 'draw'; this.currentPlayer = 0; this.justPublished = false; this.aiJustPublished = [false, false, false];
+                this.lastDiscard = null; this.lastDiscardByPlayer = -1; this.discardPile = [];
+                this.turnCounter = 0; this.lastAIDiscard = [null, null, null];
+                this.initDeck(); this.deal(); this.updateUI();
+                console.log(`%c✅ Now at Hand ${handNum}: ${this.handReqs[handNum].name}`, 'color:#28a745');
+            }
+
+            debugNextHand() {
+                if (this.currentHand < 7) this.debugSetHand(this.currentHand + 1);
+                else console.log('%c⚠️ Already at final hand', 'color:#ffc107');
+            }
+
+            debugGiveCards(cardStrings) {
+                console.log('%c🎁 Adding cards...', 'color:#4a90e2;font-weight:bold');
+                cardStrings.forEach(str => {
+                    const rank = str.slice(0, -1); const suit = str.slice(-1);
+                    const card = new Card(rank, suit); this.playerHands[0].push(card);
+                    console.log(`  Added: ${card.toString()}`);
+                });
+                this.updateUI(); console.log('%c✅ Cards added!', 'color:#28a745');
+            }
+
+            debugSetHandSize(size) {
+                console.log(`%c🎯 Setting hand to ${size} card(s)...`, 'color:#4a90e2;font-weight:bold');
+                this.playerHands[0] = [];
+                for (let i = 0; i < size; i++) this.playerHands[0].push(new Card('K', '♠'));
+                this.selectedCards = []; this.updateUI();
+                console.log(`%c✅ Hand now has ${size} card(s)!`, 'color:#28a745');
+            }
+
+            debugShowAllHands() {
+                console.log('%c👁️ ALL HANDS:', 'color:#ff6b35;font-size:16px;font-weight:bold');
+                console.log('\n🎮 YOUR HAND:', this.playerHands[0].map(c => c.toString()).join(', '));
+                console.log('🤖 HABOT:', this.playerHands[1].map(c => c.toString()).join(', '));
+                console.log('🤖 JABOT:', this.playerHands[2].map(c => c.toString()).join(', '));
+            }
+
+            debugStatus() {
+                console.log('%c📊 GAME STATUS:', 'color:#ff6b35;font-size:16px;font-weight:bold');
+                console.log(`Hand: ${this.currentHand} (${this.handReqs[this.currentHand].name})`);
+                console.log(`Phase: ${this.gamePhase}`);
+                console.log(`Current Player: ${this.currentPlayer === 0 ? 'YOU' : this.currentPlayer === 1 ? 'Habot' : 'Jabot'}`);
+                console.log(`Your Cards: ${this.playerHands[0].length}`);
+                console.log(`Published: ${this.publishedSequences[0].length} cards`);
+            }
+
+            debugFix4Test() {
+                console.log('%c🧪 FIX 4 TEST: Endgame Protection', 'color:#ff6b35;font-weight:bold;font-size:16px');
+
+                // Set up Hand 3 (2 Ladders)
+                this.debugSetHand(3);
+
+                // Human: 1 card left + published ladder (A-K-Q-J♣)
+                this.publishedSequences[0] = [
+                    new Card('A', '♣'),
+                    new Card('K', '♣'),
+                    new Card('Q', '♣'),
+                    new Card('J', '♣')
+                ];
+                this.playerHands[0] = [new Card('2', '♥')]; // 1 random card left
+
+                // Jabot (AI 2): Has 10♣ that would WIN the game for human
+                this.playerHands[2] = [
+                    new Card('7', '♠'),
+                    new Card('4', '♦'),
+                    new Card('4', '♦'),
+                    new Card('3', '♦'),
+                    new Card('10', '♣')  // 🚨 THE DANGEROUS CARD
+                ];
+                this.publishedSequences[2] = []; // NOT published
+
+                // Habot (AI 1): Random cards, not published
+                this.playerHands[1] = [
+                    new Card('9', '♥'),
+                    new Card('8', '♥'),
+                    new Card('6', '♣')
+                ];
+                this.publishedSequences[1] = [];
+
+                // Set Jabot's turn to discard
+                this.currentPlayer = 2;
+                this.gamePhase = 'discard';
+                this.updateUI();
+
+                console.log('%c✅ TEST SETUP:', 'color:#28a745;font-weight:bold');
+                console.log('  Human: Published A-K-Q-J♣, has 1 card left');
+                console.log('  Jabot: Has 10♣ (extends human ladder), NOT published');
+                console.log('  Expected: Jabot should AVOID discarding 10♣');
+                console.log('  Bug: Jabot discards 10♣ anyway (hands you the win)');
+                console.log('\n%c▶️ Click to manually trigger Jabot turn or wait...', 'color:#4a90e2');
+
+                // Auto-trigger AI turn after 2 seconds
+                setTimeout(() => {
+                    console.log('%c🤖 Starting Jabot turn...', 'color:#9b59b6;font-weight:bold');
+                    this.aiTurn();
+                }, 2000);
+            }
+
+            debugFix5Test() {
+                console.log('%c🧪 FIX 5 TEST: Duplicate Card Selection', 'color:#ff6b35;font-weight:bold;font-size:16px');
+
+                game.debugSetHand(2); // Triple + Ladder
+
+                // Give exactly the scenario you described
+                game.playerHands[0] = [
+                    new Card('J', '♥'), new Card('J', '♦'), new Card('J', '♣'),  // Triple
+                    new Card('10', '♦'), new Card('J', '♦'), new Card('Q', '♦'), new Card('K', '♦'),  // Ladder (with 2nd J♦)
+                    new Card('4', '♥'), new Card('6', '♥'), new Card('7', '♥')
+                ];
+
+                game.gamePhase = 'discard';
+                game.currentPlayer = 0;
+                game.updateUI();
+
+                console.log('%c✅ TEST SETUP:', 'color:#28a745;font-weight:bold');
+                console.log('  Hand has: 2 J♦ cards (indices 1 and 4)');
+                console.log('  Triple: J♥ J♦ J♣ (uses J♦ at index 1)');
+                console.log('  Ladder: 10♦ J♦ Q♦ K♦ (uses J♦ at index 4)');
+                console.log('\n%c▶️ Now click "Publish Sequences" and select both', 'color:#4a90e2');
+                console.log('  Expected WITHOUT FIX: Publishes with J♦ missing');
+                console.log('  Expected WITH FIX 5: Error message about duplicate card');
+            }
+
+            debugFix6Test() {
+                console.log('%c🧪 FIX 6 TEST: Ambiguous Card Assignment', 'color:#ff6b35;font-weight:bold;font-size:16px');
+
+                this.currentHand = 5;
+                this.publishedSequences[0] = [
+                    new Card('J', '♥'), new Card('J', '♦'), new Card('J', '♣'),
+                    new Card('7', '♥'), new Card('8', '♥'), new Card('9', '♥'), new Card('10', '♥')
+                ];
+                this.playerHands[0] = [new Card('J', '♥'), new Card('Q', '♥')];
+                this.gamePhase = 'discard';
+                this.currentPlayer = 0;
+                this.selectedCards = [0];
+                this.updateUI();
+
+                console.log('%c✅ TEST SETUP:', 'color:#28a745;font-weight:bold');
+                console.log('  Published: J♥ J♦ J♣ (triple) + 7♥ 8♥ 9♥ 10♥ (ladder)');
+                console.log('  Hand: J♥ (selected) + Q♥');
+                console.log('  J♥ could extend BOTH triple AND ladder!');
+                console.log('\n%c▶️ Click "Add Selected Card To: Your Sequences"', 'color:#4a90e2');
+                console.log('  Expected: Modal asking "Add to Triple or Ladder?"');
+            }
+
+            debugInstantAI() {
+                this.aiInstant = !this.aiInstant;
+                console.log(`%c⚡ AI Instant Mode: ${this.aiInstant ? 'ON' : 'OFF'}`, 'color:#ffd700;font-weight:bold');
             }
 
             getAIPersonality(aiIdx) {
@@ -450,11 +705,8 @@
                 const seqs = { triples: [], ladders: [] };
                 const byRank = {};
                 hand.forEach(c => { if (!byRank[c.rank]) byRank[c.rank] = []; byRank[c.rank].push(c) });
-
-
                 Object.values(byRank).forEach(g => {
                     if (g.length >= 3) {
-                        // ✅ FIX 1C: Generate ALL combinations of 3 cards (not just sliding windows)
                         for (let i = 0; i < g.length - 2; i++) {
                             for (let j = i + 1; j < g.length - 1; j++) {
                                 for (let k = j + 1; k < g.length; k++) {
@@ -464,8 +716,6 @@
                         }
                     }
                 });
-
-
                 const bySuit = {};
                 hand.forEach(c => { if (!bySuit[c.suit]) bySuit[c.suit] = []; bySuit[c.suit].push(c) });
                 Object.values(bySuit).forEach(g => {
@@ -609,7 +859,6 @@
                 return true;
             }
 
-            // ✅ FIX 1: Explicit LOW and HIGH end ladder extension support
             canCardExtendLadder(cardVal, ladderValues) {
                 const sorted = [...ladderValues].sort((a, b) => a - b);
                 const minVal = sorted[0];
@@ -662,14 +911,9 @@
                 published.forEach(c => { if (!publishedSuits[c.suit]) publishedSuits[c.suit] = []; publishedSuits[c.suit].push(c.getValue()) });
                 const hasActualLadders = Object.values(publishedSuits).some(vals => vals.length >= 4);
                 if (hasTriples || hasActualTriples) { if (publishedRankCounts[card.rank] >= 3) return true }
-
                 if (hasLadders || hasActualLadders) {
-                    // ✅ FIX 1B: Don't filter out "triple cards" - just get ALL cards of matching suit
-                    // This handles cases where a rank appears in both triple and ladder (e.g., 8♦ 8♣ 8♦ + 7♥ 8♥ 9♥ 10♥)
                     const sameSuit = published.filter(c => c.suit === card.suit);
-
                     console.log(`  🔍 FIX 1B: Checking ${card.toString()} against ${sameSuit.length} published ${card.suit} cards`);
-
                     if (sameSuit.length >= 4) {
                         const cardVal = card.getValue();
                         const values = sameSuit.map(c => c.getValue()).sort((a, b) => a - b);
@@ -698,7 +942,6 @@
                         if (canExtend) return true;
                     }
                 }
-
                 return false;
             }
 
@@ -897,6 +1140,7 @@
                     }
                 }
 
+
                 const isLadderOnlyHand = this.handReqs[this.currentHand].seqs.every(seq => seq === 'ladder');
                 if (isLadderOnlyHand && this.turnCounter > 80 && hand.length >= 15) {
                     const potentialLadders = {};
@@ -1084,7 +1328,6 @@
 
             setAIStatus(aiId, message) { const actionElement = document.getElementById(`${aiId}-action`); if (actionElement) actionElement.textContent = message }
 
-            // ✅ FIX 3: Reduced buy window after publishing (5s instead of 10s)
             startBuyWindow(card, discardingPlayer) {
                 if (!card) { console.log(`%c⚠️ Cannot open buy window - no card provided`, 'color: #ff6600; font-weight: bold;'); return }
                 const buyWindowPlayer = (discardingPlayer + 2) % 3;
@@ -1093,19 +1336,16 @@
                 // 🎯 v2.5.0: Consistent 3-second buy window for faster game pace
                 const duration = 3000;  // Always 3 seconds (removed conditional)
                 console.log(`%c⏱️ v2.5.0: Buy window duration: ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
-
                 this.buyWindow.active = true;
                 this.buyWindow.card = card;
                 this.buyWindow.discardingPlayer = discardingPlayer;
                 this.buyWindow.buyWindowPlayer = buyWindowPlayer;
-                this.buyWindow.expiresAt = Date.now() + duration; // ✅ FIX 3: Variable duration
-
+                this.buyWindow.expiresAt = Date.now() + duration;
                 const playerNames = ['Human', 'Habot', 'Jabot'];
-                console.log(`%c🔔 Buy window opened for ${playerNames[buyWindowPlayer]} (${card.toString()}) - ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
+                console.log(`%c🔓 Buy window opened for ${playerNames[buyWindowPlayer]} (${card.toString()}) - ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
                 if (buyWindowPlayer === 0) document.getElementById('buyBtn').disabled = false;
                 this.updateBuyTimer();
             }
-
 
             checkAndOpenBuyWindowAfterDiscard(currentAI, statusId) {
                 const aiName = currentAI === 1 ? 'Habot' : 'Jabot';
@@ -1232,7 +1472,6 @@
                             this.aiTurn();
                         }
                     }, 500);
-
                 }
             }
 
@@ -1461,7 +1700,6 @@
                     }
 
                     if (shouldTake && this.discardPile.length > 0) {
-
                         if (this.wouldDiscardImmediately(this.discardPile[this.discardPile.length - 1], ai)) {
                             this.setAIStatus(statusId, `Evaluating options...`);
                             this.handleDeckDraw(ai, statusId);
@@ -1469,13 +1707,10 @@
                         } else {
                             const drawnCard = this.discardPile.pop();
                             this.playerHands[ai].push(drawnCard);
-
-                            // ✅ FIX 2: Show specific toast when AI takes card during buy window
                             if (this.buyWindow.active && this.buyWindow.buyWindowPlayer === 0 && this.buyWindow.card && this.buyWindow.card.id === drawnCard.id) {
                                 console.log(`%c🚨 FIX 2: AI took card during human buy window`, 'color: #ff6b35; font-weight: bold;');
                                 showAITookCardToast(aiName, drawnCard);
                             }
-
                             if (this.buyWindow.active && this.buyWindow.card && this.buyWindow.card.id === drawnCard.id) {
                                 this.closeBuyWindow('taken');
                             }
@@ -1605,7 +1840,7 @@
                         // End turn - we already discarded
                         this.setAIStatus(statusId, '');
                         document.getElementById(`${statusId}-status`).classList.remove('active');
-                        nextPlayer();
+                        this.nextPlayer();
                         return;
                     }
                 }
@@ -1875,6 +2110,7 @@
                 const msg = `Game Complete!\n\n🏆 ${winner.name} wins with ${winner.score} points!\n🎃 ${loser.name} is the Habib Punja with ${loser.score} points!`;
                 this.showModal('Final Results', msg);
 
+
                 setTimeout(async () => {
                     console.log('%c🎮 Starting New Game...', 'color: #2196f3; font-weight: bold; font-size: 16px;');
 
@@ -1907,10 +2143,10 @@
                 const modal = document.createElement('div');
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;';
                 modal.innerHTML = `<div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;">
-                                        <h2 style="color:#ffd700;margin-bottom:15px;">${title}</h2>
-                                        <p style="color:white;margin-bottom:20px;white-space:pre-line;">${msg}</p>
-                                        <button onclick="this.closest('div').parentElement.remove();" style="padding:12px 30px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">OK</button>
-                                    </div>`;
+                                <h2 style="color:#ffd700;margin-bottom:15px;">${title}</h2>
+                                <p style="color:white;margin-bottom:20px;white-space:pre-line;">${msg}</p>
+                                <button onclick="this.closest('div').parentElement.remove();" style="padding:12px 30px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">OK</button>
+                            </div>`;
                 document.body.appendChild(modal);
             }
 
@@ -1918,25 +2154,25 @@
                 const modal = document.createElement('div');
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:10000;';
                 modal.innerHTML = `
-                                <div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;max-width:500px;">
-                                    <h2 style="color:#ffd700;margin-bottom:15px;">🎯 Choose Sequence</h2>
-                                    <p style="color:white;margin-bottom:20px;">
-                                        ${card.toString()} can extend BOTH your triple and your ladder.<br><br>
-                                        Which sequence do you want to add it to?
-                                    </p>
-                                    <div style="display:flex;gap:15px;justify-content:center;">
-                                        <button id="chooseTriple" style="padding:12px 24px;background:#e74c3c;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
-                                            Add to Triple
-                                        </button>
-                                        <button id="chooseLadder" style="padding:12px 24px;background:#3498db;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
-                                            Add to Ladder
-                                        </button>
-                                    </div>
-                                    <button id="cancelChoice" style="margin-top:15px;padding:8px 20px;background:#6b7280;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">
-                                        Cancel
-                                    </button>
-                                </div>
-                                    `;
+                        <div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;max-width:500px;">
+                            <h2 style="color:#ffd700;margin-bottom:15px;">🎯 Choose Sequence</h2>
+                            <p style="color:white;margin-bottom:20px;">
+                                ${card.toString()} can extend BOTH your triple and your ladder.<br><br>
+                                Which sequence do you want to add it to?
+                            </p>
+                            <div style="display:flex;gap:15px;justify-content:center;">
+                                <button id="chooseTriple" style="padding:12px 24px;background:#e74c3c;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
+                                    Add to Triple
+                                </button>
+                                <button id="chooseLadder" style="padding:12px 24px;background:#3498db;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:1rem;">
+                                    Add to Ladder
+                                </button>
+                            </div>
+                            <button id="cancelChoice" style="margin-top:15px;padding:8px 20px;background:#6b7280;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">
+                                Cancel
+                            </button>
+                        </div>
+                            `;
                 document.body.appendChild(modal);
                 document.getElementById('chooseTriple').onclick = () => {
                     console.log(`%c✅ FIX 6: User chose TRIPLE for ${card.toString()}`, 'color:#28a745;font-weight:bold');
@@ -2249,7 +2485,6 @@
             }
         }
 
-        // Global functions
         function showPublishSelector(seqs, req) {
             const selector = document.getElementById('publishSelector');
             const options = document.getElementById('publishOptions');
@@ -2316,10 +2551,10 @@
                         }
 
                         cardEl.innerHTML = `
-                                        <div class="card-rank">${card.rank}</div>
-                                        <div class="card-suit">${card.suit}</div>
-                                        ${duplicateLabel}
-                                    `;
+                                <div class="card-rank">${card.rank}</div>
+                                <div class="card-suit">${card.suit}</div>
+                                ${duplicateLabel}
+                            `;
                         optDiv.appendChild(cardEl);
                     });
 
@@ -2356,10 +2591,10 @@
                         }
 
                         cardEl.innerHTML = `
-                                        <div class="card-rank">${card.rank}</div>
-                                        <div class="card-suit">${card.suit}</div>
-                                        ${duplicateLabel}
-                                    `;
+                                <div class="card-rank">${card.rank}</div>
+                                <div class="card-suit">${card.suit}</div>
+                                ${duplicateLabel}
+                            `;
                         optDiv.appendChild(cardEl);
                     });
 
@@ -2930,9 +3165,6 @@
             game.closeBuyWindow('bought');
         }
 
-
-
-
         function sortByRank() {
             if (!game) return;
             game.playerHands[0].sort((a, b) => {
@@ -2968,7 +3200,6 @@
             game.updateUI();
         }
 
-        // Toast Notification System
         function showToast(message, type = 'info', duration = 2500) {
             const container = document.querySelector('.toast-container') || createToastContainer();
             const toast = document.createElement('div');

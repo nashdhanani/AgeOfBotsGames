@@ -1,0 +1,110 @@
+/*
+ * Habib Punja - Controls Styles
+ * Version: 2.5.0
+ * Copyright © 2025 AgeOfBotsGames LLC
+ */
+
+/* ============================================
+   BUTTON BASE STYLES
+   ============================================ */
+.btn {
+    background: linear-gradient(180deg,#3ddc84,#1fae63);
+    color: #052e1a;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin: 0 6px 10px;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: .2px;
+    transition: transform .12s,box-shadow .12s;
+    box-shadow: 0 6px 16px rgba(0,0,0,.25)
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px rgba(0,0,0,.35)
+}
+
+.btn:disabled {
+    background: #6b7280;
+    color: #1f2937;
+    cursor: not-allowed;
+    opacity: .7;
+    box-shadow: none
+}
+
+/* ============================================
+   GAME CONTROLS CONTAINER
+   ============================================ */
+.game-controls {
+    text-align: center;
+    margin-top: 14px
+}
+
+/* ============================================
+   SPECIAL BUTTON STYLES
+   ============================================ */
+#publishBtn {
+    background: linear-gradient(180deg,var(--gold),#f39c12);
+    color: #052e1a;
+    font-weight: 900
+}
+
+#publishBtn:disabled {
+    background: #6b7280;
+    color: #1f2937;
+    cursor: not-allowed;
+    opacity: .7;
+    box-shadow: none
+}
+
+#publishBtn:hover:not(:disabled) {
+    box-shadow: 0 10px 22px rgba(255,213,74,.4)
+}
+
+#discardBtn {
+    background: linear-gradient(180deg,#ef4444,#dc2626)
+}
+
+#discardBtn:disabled {
+    background: #6b7280;
+    color: #1f2937;
+    cursor: not-allowed;
+    opacity: .7;
+    box-shadow: none
+}
+
+#discardBtn:hover:not(:disabled) {
+    box-shadow: 0 10px 22px rgba(239,68,68,.4)
+}
+
+#buyBtn {
+    background: linear-gradient(180deg,#667eea,#764ba2)
+}
+
+#buyBtn:disabled {
+    background: #6b7280;
+    color: #1f2937;
+    cursor: not-allowed;
+    opacity: .7;
+    box-shadow: none
+}
+
+#buyBtn:hover:not(:disabled) {
+    box-shadow: 0 10px 22px rgba(102,126,234,.4)
+}
+
+/* ============================================
+   BUY TIMER
+   ============================================ */
+#buyTimer {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 8px;
+    background: rgba(255,255,255,.2);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 900
+}
