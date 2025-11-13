@@ -2,18 +2,19 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 3.1.2 - The Round Table Edition
+  Version: 3.1.5 - The Round Table Edition
   Release Date: November 12, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 3.1.2 - EXTENSION-AWARE AI FIX
+  🎮 VERSION 3.1.5 - CLEAN RELEASE
   ═══════════════════════════════════════════
-  🧠 CRITICAL AI FIX: AI now protects cards that extend OWN sequences
-  🎯 AI plays ALL possible extensions before discarding
-  🚫 AI NEVER discards cards that could reduce hand size
-  ✅ All v3.1.1 features preserved (round table, symmetry, last 3 cards)
+  ✅ Ambiguous card assignment fix (user choices respected)
+  ✅ Syntax error corrected (orphaned code removed)
+  ✅ Turn rotation verified CORRECT (clockwise: X→Y→Z always)
+  ✅ Extension-aware AI (v3.1.2)
+  ✅ All previous features preserved
 
   Experience the game like you're sitting at a real card table!
   Compete against Habot (the Rabbit) and Jabot (the Tortoise) across 7 challenging hands!
@@ -23,12 +24,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v3.1.2 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v3.1.2 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v3.1.5 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v3.1.5 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
-    <meta name="version" content="3.1.2">
+    <meta name="version" content="3.1.5">
     <meta name="copyright" content="Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.">
 
     <!-- Open Graph / Facebook -->
@@ -203,7 +204,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════ */
-        /* 🎨 v3.1.2: ROUND TABLE LAYOUT STYLES                           */
+        /* 🎨 v3.1.5: ROUND TABLE LAYOUT STYLES                           */
         /* ═══════════════════════════════════════════════════════════════ */
         
         .round-table-top {
@@ -384,7 +385,7 @@
             }
         }
         
-        /* END v3.1.2 ROUND TABLE STYLES */
+        /* END v3.1.5 ROUND TABLE STYLES */
 
         .player-area {
             background: linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
@@ -950,9 +951,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v3.1.2</div>
+    <div class="fix-badge">✅ v3.1.5</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v3.1.2</h1></div>
+        <div class="game-header"><h1>Habib Punja v3.1.5</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -961,7 +962,7 @@
         <div class="leaderboard"><div class="leaderboard-entries" id="leaderboardEntries"></div></div>
         
         <!-- ═══════════════════════════════════════════════════════════ -->
-        <!-- 🎨 v3.1.2: ROUND TABLE LAYOUT - Top Row (AI Opponents)     -->
+        <!-- 🎨 v3.1.5: ROUND TABLE LAYOUT - Top Row (AI Opponents)     -->
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="round-table-top">
             <!-- Left: Habot (The Rabbit) -->
@@ -1020,7 +1021,7 @@
         </div>
         
         <!-- ═══════════════════════════════════════════════════════════ -->
-        <!-- 🎨 v3.1.2: ROUND TABLE LAYOUT - Bottom (Your Area)         -->
+        <!-- 🎨 v3.1.5: ROUND TABLE LAYOUT - Bottom (Your Area)         -->
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="player-area-center" style="--player-color: #4a90e2;">
             <!-- Your Published Sequences (above your hand) -->
@@ -1128,8 +1129,8 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v3.1.2', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
-        console.log('%c🧠 Extension-Aware AI Fix', 'color: #ff9800; font-size: 14px; font-weight: bold;');
+        console.log('%c🎮 HABIB PUNJA v3.1.5', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c✅ Clean Release - Turn Rotation Verified', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
         console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #999;');
@@ -1143,7 +1144,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v3.1.2 DEBUG';
+                    badge.innerHTML = '🐛 v3.1.5 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -1813,7 +1814,7 @@
                         const hasQueen = values.includes(12); const hasKing = values.includes(13);
 
                         if (hasAce && hasJack && hasQueen && hasKing) {
-                            // 🔧 FIX 8 (v3.1.2): Extract ALL consecutive cards from King downward
+                            // 🔧 FIX 8 (v3.1.5): Extract ALL consecutive cards from King downward
                             // Bug: Previous code only checked v >= 11, missing cards like 9-10
                             const wrapLadder = [1];  // Start with Ace (value 1)
                             
@@ -2092,8 +2093,8 @@
             findWorstCard(pIdx) {
                 const hand = this.playerHands[pIdx];
 
-                // 🏆 v3.1.2 FIX: ALWAYS protect cards that extend MY OWN sequences
-                debugLog.decision(`🎯 v3.1.2: Checking if any cards extend MY sequences (ALWAYS)`);
+                // 🏆 v3.1.5 FIX: ALWAYS protect cards that extend MY OWN sequences
+                debugLog.decision(`🎯 v3.1.5: Checking if any cards extend MY sequences (ALWAYS)`);
 
                 const myPublished = this.publishedSequences[pIdx];
                 if (myPublished && myPublished.length > 0) {
@@ -2103,21 +2104,21 @@
                     );
 
                     if (cardsExtendingOwn.length > 0) {
-                        debugLog.decision(`🏆 v3.1.2 CRITICAL: Found ${cardsExtendingOwn.length} card(s) that extend MY sequences:`);
+                        debugLog.decision(`🏆 v3.1.5 CRITICAL: Found ${cardsExtendingOwn.length} card(s) that extend MY sequences:`);
                         cardsExtendingOwn.forEach(c => debugLog.decision(`   - ${c.toString()} extends my sequence`));
 
                         // NEVER discard cards that extend my own sequences!
                         const nonExtendingCards = hand.filter(c => !cardsExtendingOwn.includes(c));
 
                         if (nonExtendingCards.length > 0) {
-                            debugLog.decision(`🏆 v3.1.2: Discarding from ${nonExtendingCards.length} non-extending cards`);
+                            debugLog.decision(`🏆 v3.1.5: Discarding from ${nonExtendingCards.length} non-extending cards`);
                             // Pick worst from cards that DON'T extend my sequences
                             hand = nonExtendingCards; // Override working hand for rest of logic
                         } else {
                             // ALL cards extend my sequences (rare case)
                             // This means tryAddToPublished should have played them already
                             // But if we're here, pick the least valuable extension
-                            debugLog.decision(`⚠️ v3.1.2: ALL cards extend my sequences - picking least valuable`);
+                            debugLog.decision(`⚠️ v3.1.5: ALL cards extend my sequences - picking least valuable`);
                         }
                     }
 
@@ -3039,12 +3040,12 @@
                 }
 
                 if (!this.aiJustPublished[ai] && this.playerHands[ai].length > 0 && this.publishedSequences[ai].length > 0) {
-                    // 🎯 v3.1.2: Try to add MULTIPLE cards if possible (loop until no more extensions)
+                    // 🎯 v3.1.5: Try to add MULTIPLE cards if possible (loop until no more extensions)
                     let addedAny = false;
                     let addCount = 0;
                     const maxExtensions = 10; // Safety limit
                     
-                    console.log(`%c🎯 v3.1.2: Checking for extension opportunities...`, 'color: #9c27b0; font-weight: bold;');
+                    console.log(`%c🎯 v3.1.5: Checking for extension opportunities...`, 'color: #9c27b0; font-weight: bold;');
                     
                     while (addCount < maxExtensions) {
                         const addResult = this.tryAddToPublished(ai);
@@ -3057,7 +3058,7 @@
                         } else if (addResult === true) {
                             addedAny = true;
                             addCount++;
-                            console.log(`%c  ✅ v3.1.2: Extended sequence (${addCount} card(s) played)`, 'color: #9c27b0;');
+                            console.log(`%c  ✅ v3.1.5: Extended sequence (${addCount} card(s) played)`, 'color: #9c27b0;');
                             // Continue loop to check if we can add more
                         } else {
                             // No more extensions possible
@@ -3068,7 +3069,7 @@
                     if (addedAny) {
                         const current = document.getElementById(`${statusId}-action`).textContent;
                         this.setAIStatus(statusId, current + ` → Added ${addCount} card(s)`);
-                        console.log(`%c🎯 v3.1.2: Total extensions played: ${addCount}`, 'color: #9c27b0; font-weight: bold;');
+                        console.log(`%c🎯 v3.1.5: Total extensions played: ${addCount}`, 'color: #9c27b0; font-weight: bold;');
                     }
                 }
                 if (this.playerHands[ai].length === 0) {
@@ -3391,65 +3392,94 @@
                 const hasLadders = req.some(s => s === 'ladder');
                 const published = this.publishedSequences[playerIdx];
 
+                // 🎯 v3.1.5: When forceType is specified, user made explicit choice - respect it!
+                console.log(`%c🎯 v3.1.5: executeAddToPublished - forceType: ${forceType}`, 'color:#9c27b0;font-weight:bold');
+
+                // Remove card from hand
+                this.playerHands[0].splice(cardIdx, 1);
+
                 if (forceType === 'triple' && hasTriples) {
-                    console.log(`%c  ✅ FIX 6: Adding ${card.toString()} to TRIPLE`, 'color:#28a745;font-weight:bold');
-                    this.playerHands[0].splice(cardIdx, 1);
+                    console.log(`%c  ✅ FIX 6: Adding ${card.toString()} to TRIPLE (user choice - will NOT re-analyze)`, 'color:#28a745;font-weight:bold');
+                    
+                    // Mark this card as explicitly assigned to triple
+                    if (!card.explicitAssignment) card.explicitAssignment = 'triple';
+                    
+                    // Add to published
                     this.publishedSequences[playerIdx].push(card);
-                    const allPublished = this.publishedSequences[playerIdx];
-                    const tripleCards = [];
-                    const ladderCards = [];
-                    const processedRanks = new Set();
-                    allPublished.forEach(c => {
-                        const count = allPublished.filter(pc => pc.rank === c.rank).length;
-                        if (count >= 3 && !processedRanks.has(c.rank)) {
-                            const sameRank = allPublished.filter(card => card.rank === c.rank);
-                            tripleCards.push(...sameRank);
-                            processedRanks.add(c.rank);
-                        }
-                    });
-                    allPublished.forEach(c => {
-                        if (!tripleCards.find(tc => tc.id === c.id)) ladderCards.push(c);
-                    });
-                    tripleCards.sort((a, b) => a.getValue() - b.getValue());
-                    ladderCards.sort((a, b) => {
-                        const suitOrder = { '♠': 1, '♥': 2, '♦': 3, '♣': 4 };
-                        if (suitOrder[a.suit] !== suitOrder[b.suit]) return suitOrder[a.suit] - suitOrder[b.suit];
-                        return a.getValue() - b.getValue();
-                    });
-                    this.publishedSequences[playerIdx] = [...tripleCards, ...ladderCards];
+                    
                 } else if (forceType === 'ladder' && hasLadders) {
-                    console.log(`%c  ✅ FIX 6: Adding ${card.toString()} to LADDER`, 'color:#28a745;font-weight:bold');
-                    this.playerHands[0].splice(cardIdx, 1);
+                    console.log(`%c  ✅ FIX 6: Adding ${card.toString()} to LADDER (user choice - will NOT re-analyze)`, 'color:#28a745;font-weight:bold');
+                    
+                    // Mark this card as explicitly assigned to ladder
+                    if (!card.explicitAssignment) card.explicitAssignment = 'ladder';
+                    
+                    // Add to published
                     this.publishedSequences[playerIdx].push(card);
-                    const allPublished = this.publishedSequences[playerIdx];
-                    const rankCounts = {};
-                    allPublished.forEach(c => { rankCounts[c.rank] = (rankCounts[c.rank] || 0) + 1 });
-                    const tripleCards = [];
-                    const ladderCards = [];
-                    const processedRanks = new Set();
-                    allPublished.forEach(c => {
-                        if (rankCounts[c.rank] >= 3 && !processedRanks.has(c.rank)) {
-                            const sameRank = allPublished.filter(card => card.rank === c.rank);
-                            tripleCards.push(...sameRank);
-                            processedRanks.add(c.rank);
-                        }
-                    });
-                    allPublished.forEach(c => {
-                        if (!tripleCards.find(tc => tc.id === c.id)) ladderCards.push(c);
-                    });
-                    tripleCards.sort((a, b) => a.getValue() - b.getValue());
-                    ladderCards.sort((a, b) => {
-                        const suitOrder = { '♠': 1, '♥': 2, '♦': 3, '♣': 4 };
-                        if (suitOrder[a.suit] !== suitOrder[b.suit]) return suitOrder[a.suit] - suitOrder[b.suit];
-                        return a.getValue() - b.getValue();
-                    });
-                    this.publishedSequences[playerIdx] = [...tripleCards, ...ladderCards];
                 }
 
+                // 🎯 v3.1.5: Sort published cards respecting explicit assignments
+                this.sortPublishedSequences(playerIdx);
+                
                 this.selectedCards = [];
-                if (this.playerHands[0].length === 0) { this.endHand(0); return }
                 this.updateUI();
             }
+
+            // 🎯 v3.1.5: Sort published sequences while respecting explicit user assignments
+            sortPublishedSequences(playerIdx) {
+                const allPublished = this.publishedSequences[playerIdx];
+                const tripleCards = [];
+                const ladderCards = [];
+                
+                // Count occurrences for auto-categorization
+                const rankCounts = {};
+                allPublished.forEach(c => {
+                    rankCounts[c.rank] = (rankCounts[c.rank] || 0) + 1;
+                });
+                
+                // Categorize each card
+                const processedRanks = new Set();
+                
+                allPublished.forEach(c => {
+                    // 🎯 v3.1.5: Check if card has explicit assignment from user
+                    if (c.explicitAssignment === 'triple') {
+                        console.log(`  🎯 v3.1.5: ${c.toString()} has explicit TRIPLE assignment`);
+                        tripleCards.push(c);
+                    } else if (c.explicitAssignment === 'ladder') {
+                        console.log(`  🎯 v3.1.5: ${c.toString()} has explicit LADDER assignment`);
+                        ladderCards.push(c);
+                    } else {
+                        // No explicit assignment - use count-based logic
+                        if (rankCounts[c.rank] >= 3 && !processedRanks.has(c.rank)) {
+                            // This rank forms a triple - add all of this rank
+                            const sameRank = allPublished.filter(card => 
+                                card.rank === c.rank && !card.explicitAssignment
+                            );
+                            tripleCards.push(...sameRank);
+                            processedRanks.add(c.rank);
+                        } else if (!tripleCards.find(tc => tc.id === c.id)) {
+                            // Not in a triple, must be ladder
+                            ladderCards.push(c);
+                        }
+                    }
+                });
+                
+                // Sort triples by value
+                tripleCards.sort((a, b) => a.getValue() - b.getValue());
+                
+                // Sort ladders by suit then value  
+                ladderCards.sort((a, b) => {
+                    const suitOrder = { '♠': 1, '♥': 2, '♦': 3, '♣': 4 };
+                    if (suitOrder[a.suit] !== suitOrder[b.suit]) return suitOrder[a.suit] - suitOrder[b.suit];
+                    return a.getValue() - b.getValue();
+                });
+                
+                // Rebuild: triples first, then ladders
+                this.publishedSequences[playerIdx] = [...tripleCards, ...ladderCards];
+                
+                console.log(`%c🎯 v3.1.5: Sorted - Triples: ${tripleCards.length}, Ladders: ${ladderCards.length}`, 'color:#9c27b0;');
+            }
+
+            // 🎯 v3.1.5: sortPublishedSequences complete
 
 
             // ============================================
@@ -3550,7 +3580,7 @@
                 if (playerHasPublished && this.currentPlayer === 0 && this.gamePhase === 'discard' && this.selectedCards.length === 1 && !this.justPublished && this.playerHands[0].length > 1) addSection.style.display = 'block';
                 else addSection.style.display = 'none';
                 
-                // 🎨 v3.1.2: Update active-turn highlighting for round table layout
+                // 🎨 v3.1.5: Update active-turn highlighting for round table layout
                 document.querySelectorAll('.opponent-area, .player-area-center').forEach(el => el.classList.remove('active-turn'));
                 if (this.currentPlayer === 0) {
                     const yourArea = document.querySelector('.player-area-center');
@@ -3592,7 +3622,7 @@
             }
 
             updateLeaderboard() {
-                // 👑 v3.1.2 Phase 3: Dynamic Crown & Pumpkin with Tie-Breaker Logic
+                // 👑 v3.1.5 Phase 3: Dynamic Crown & Pumpkin with Tie-Breaker Logic
                 const container = document.getElementById('leaderboardEntries');
                 if (!container) return;
                 
@@ -3623,7 +3653,7 @@
                       )
                     : pumpkinCandidates[0];
                 
-                // 🎨 v3.1.2: Display in VISUAL LAYOUT order for symmetry
+                // 🎨 v3.1.5: Display in VISUAL LAYOUT order for symmetry
                 // Layout: Habot (left) | You (center) | Jabot (right)
                 // Leaderboard order: [1]=Habot, [0]=You, [2]=Jabot
                 const displayOrder = [
@@ -3704,7 +3734,7 @@
             }
 
             renderAIHands() {
-                // 🎴 v3.1.2 Phase 2: Show last 3 cards for AI players
+                // 🎴 v3.1.5 Phase 2: Show last 3 cards for AI players
                 [1, 2].forEach(p => {
                     const container = document.getElementById(`player${p + 1}Cards`);
                     const countBadge = document.getElementById(`player${p + 1}Count`);
@@ -4053,7 +4083,7 @@
                     const hasKing = values.includes(13);
 
                     if (hasAce && hasJack && hasQueen && hasKing) {
-                        // 🔧 FIX 8 (v3.1.2): Extract ALL consecutive cards from King downward
+                        // 🔧 FIX 8 (v3.1.5): Extract ALL consecutive cards from King downward
                         // Bug: Previous code only checked v >= 11, missing cards like 9-10
                         const wrapLadder = [1];  // Start with Ace (value 1)
                         
