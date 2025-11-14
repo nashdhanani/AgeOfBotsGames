@@ -2,22 +2,24 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 3.2.1-stable - The Round Table Edition
+  Version: 3.2.2 - The Round Table Edition
   Release Date: November 12, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 3.2.1-STABLE - PRODUCTION RELEASE
+  🎮 VERSION 3.2.2 - BUY WINDOW INTELLIGENCE + FIXES
   ═══════════════════════════════════════════
-  ✅ STABLE: No async errors, fully functional
-  🎯 PATCH LADDER: AI takes cards that extend published ladders
+  ⏱️ 8-second buy window for humans (was 3s)
+  🚫 Block AI from buying back their own discards
+  ⚡ Skip buy windows when player has 0 buys
+  🎯 PATCH LADDER: AI takes ladder-extending cards
+  🧠 PATCH LADDER-DISCARD: AI keeps sequential cards
   🌍 PATCH M: AI checks global published sequences
   🚨 PATCH 4: Emergency publishing at 13+ cards
-  ✅ All previous fixes included and working
   
-  Version 3.2.1-stable - November 14, 2025
-  Stable Production Release
+  Version 3.2.2 - November 14, 2025
+  Smarter Buy Logic + Better AI
 
   Experience the game like you're sitting at a real card table!
   Compete against Habot (the Rabbit) and Jabot (the Tortoise) across 7 challenging hands!
@@ -27,8 +29,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v3.2.1-stable - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v3.2.1-stable - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v3.2.2 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v3.2.2 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -207,7 +209,7 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════ */
-        /* 🎨 v3.2.1-stable: ROUND TABLE LAYOUT STYLES                           */
+        /* 🎨 v3.2.2: ROUND TABLE LAYOUT STYLES                           */
         /* ═══════════════════════════════════════════════════════════════ */
         
         .round-table-top {
@@ -388,7 +390,7 @@
             }
         }
         
-        /* END v3.2.1-stable ROUND TABLE STYLES */
+        /* END v3.2.2 ROUND TABLE STYLES */
 
         .player-area {
             background: linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
@@ -954,9 +956,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v3.2.1-stable</div>
+    <div class="fix-badge">✅ v3.2.2</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v3.2.1-stable</h1></div>
+        <div class="game-header"><h1>Habib Punja v3.2.2</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -965,7 +967,7 @@
         <div class="leaderboard"><div class="leaderboard-entries" id="leaderboardEntries"></div></div>
         
         <!-- ═══════════════════════════════════════════════════════════ -->
-        <!-- 🎨 v3.2.1-stable: ROUND TABLE LAYOUT - Top Row (AI Opponents)     -->
+        <!-- 🎨 v3.2.2: ROUND TABLE LAYOUT - Top Row (AI Opponents)     -->
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="round-table-top">
             <!-- Left: Habot (The Rabbit) -->
@@ -1024,7 +1026,7 @@
         </div>
         
         <!-- ═══════════════════════════════════════════════════════════ -->
-        <!-- 🎨 v3.2.1-stable: ROUND TABLE LAYOUT - Bottom (Your Area)         -->
+        <!-- 🎨 v3.2.2: ROUND TABLE LAYOUT - Bottom (Your Area)         -->
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="player-area-center" style="--player-color: #4a90e2;">
             <!-- Your Published Sequences (above your hand) -->
@@ -1132,7 +1134,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v3.2.1-stable', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v3.2.2', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1147,7 +1149,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v3.2.1-stable DEBUG';
+                    badge.innerHTML = '🐛 v3.2.2 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -1817,7 +1819,7 @@
                         const hasQueen = values.includes(12); const hasKing = values.includes(13);
 
                         if (hasAce && hasJack && hasQueen && hasKing) {
-                            // 🔧 FIX 8 (v3.2.1-stable): Extract ALL consecutive cards from King downward
+                            // 🔧 FIX 8 (v3.2.2): Extract ALL consecutive cards from King downward
                             // Bug: Previous code only checked v >= 11, missing cards like 9-10
                             const wrapLadder = [1];  // Start with Ace (value 1)
                             
@@ -2159,8 +2161,8 @@
                     return worst.card;
                 }
 
-                // 🏆 v3.2.1-stable FIX: ALWAYS protect cards that extend MY OWN sequences
-                debugLog.decision(`🎯 v3.2.1-stable: Checking if any cards extend MY sequences (ALWAYS)`);
+                // 🏆 v3.2.2 FIX: ALWAYS protect cards that extend MY OWN sequences
+                debugLog.decision(`🎯 v3.2.2: Checking if any cards extend MY sequences (ALWAYS)`);
 
                 const myPublished = this.publishedSequences[pIdx];
                 if (myPublished && myPublished.length > 0) {
@@ -2170,21 +2172,21 @@
                     );
 
                     if (cardsExtendingOwn.length > 0) {
-                        debugLog.decision(`🏆 v3.2.1-stable CRITICAL: Found ${cardsExtendingOwn.length} card(s) that extend MY sequences:`);
+                        debugLog.decision(`🏆 v3.2.2 CRITICAL: Found ${cardsExtendingOwn.length} card(s) that extend MY sequences:`);
                         cardsExtendingOwn.forEach(c => debugLog.decision(`   - ${c.toString()} extends my sequence`));
 
                         // NEVER discard cards that extend my own sequences!
                         const nonExtendingCards = hand.filter(c => !cardsExtendingOwn.includes(c));
 
                         if (nonExtendingCards.length > 0) {
-                            debugLog.decision(`🏆 v3.2.1-stable: Discarding from ${nonExtendingCards.length} non-extending cards`);
+                            debugLog.decision(`🏆 v3.2.2: Discarding from ${nonExtendingCards.length} non-extending cards`);
                             // Pick worst from cards that DON'T extend my sequences
                             hand = nonExtendingCards; // Override working hand for rest of logic
                         } else {
                             // ALL cards extend my sequences (rare case)
                             // This means tryAddToPublished should have played them already
                             // But if we're here, pick the least valuable extension
-                            debugLog.decision(`⚠️ v3.2.1-stable: ALL cards extend my sequences - picking least valuable`);
+                            debugLog.decision(`⚠️ v3.2.2: ALL cards extend my sequences - picking least valuable`);
                         }
                     }
 
@@ -2214,12 +2216,12 @@
                 debugLog.info(`  → PATCH K: Checking danger with published sequences (expanded)`);
 
                 // 🔧 PATCH S: UNIVERSAL CHECK - Always filter out cards that extend ANY opponent's published sequences
-                // 🎯 v3.2.1-stable FIX: This should apply ESPECIALLY when all players published (racing!)
+                // 🎯 v3.2.2 FIX: This should apply ESPECIALLY when all players published (racing!)
                 const allPlayersPublished = this.publishedSequences.every(seq => seq.length > 0);
                 const isRacing = allPlayersPublished && this.publishedSequences[pIdx].length > 0;
                 
                 if (isRacing) {
-                    debugLog.info(`  🏁 v3.2.1-stable: RACING MODE - All players published! Defensive discard engaged.`);
+                    debugLog.info(`  🏁 v3.2.2: RACING MODE - All players published! Defensive discard engaged.`);
                 }
                 
                 debugLog.info(`  🔧 PATCH S: Universal discard safety - checking all opponents`);
@@ -2229,14 +2231,14 @@
 
                         const opponentPublished = this.publishedSequences[p];
                         if (opponentPublished && opponentPublished.length > 0) {
-                            // 🎯 v3.2.1-stable: Check if card extends opponent's sequences
+                            // 🎯 v3.2.2: Check if card extends opponent's sequences
                             if (this.canAddToPublishedSequence(c, opponentPublished)) {
                                 const playerName = p === 0 ? 'Human' : (p === 1 ? 'Habot' : 'Jabot');
                                 const opponentCards = this.playerHands[p].length;
                                 
-                                // 🎯 v3.2.1-stable: Be EXTRA defensive in racing mode or if opponent close to winning
+                                // 🎯 v3.2.2: Be EXTRA defensive in racing mode or if opponent close to winning
                                 if (isRacing || opponentCards <= 5) {
-                                    debugLog.info(`  🚫 v3.2.1-stable: ${c.toString()} extends ${playerName}'s sequence (${opponentCards} cards) - BLOCKING!`);
+                                    debugLog.info(`  🚫 v3.2.2: ${c.toString()} extends ${playerName}'s sequence (${opponentCards} cards) - BLOCKING!`);
                                     return false; // Not safe - helps opponent
                                 }
                             }
@@ -2249,11 +2251,11 @@
                 let workingHand = hand;
                 if (universallySafeCards.length > 0 && universallySafeCards.length < hand.length) {
                     const blockedCount = hand.length - universallySafeCards.length;
-                    debugLog.info(`  🛡️ v3.2.1-stable: Defensive filter removed ${blockedCount} dangerous cards`);
+                    debugLog.info(`  🛡️ v3.2.2: Defensive filter removed ${blockedCount} dangerous cards`);
                     workingHand = universallySafeCards;
                 } else if (universallySafeCards.length === 0) {
-                    // 🎯 v3.2.1-stable: ALL cards are dangerous!
-                    debugLog.warn(`  ⚠️ v3.2.1-stable: ALL ${hand.length} cards extend opponents - picking least dangerous`);
+                    // 🎯 v3.2.2: ALL cards are dangerous!
+                    debugLog.warn(`  ⚠️ v3.2.2: ALL ${hand.length} cards extend opponents - picking least dangerous`);
                     // Keep workingHand as full hand, but log the dilemma
                 }
 
@@ -2538,11 +2540,19 @@
             startBuyWindow(card, discardingPlayer) {
                 if (!card) { console.log(`%c⚠️ Cannot open buy window - no card provided`, 'color: #ff6600; font-weight: bold;'); return }
                 const buyWindowPlayer = (discardingPlayer + 2) % 3;
+                
+                // 🎯 CRITICAL: Don't open buy window if player has no buys left!
+                if (this.playerBuys[buyWindowPlayer] <= 0) {
+                    const playerNames = ['Human', 'Habot', 'Jabot'];
+                    console.log(`%c⏭️ SKIP: ${playerNames[buyWindowPlayer]} has no buys left (${this.playerBuys[buyWindowPlayer]}) - no buy window`, 'color: #9e9e9e; font-weight: bold;');
+                    return;
+                }
+                
                 if (this.buyWindow.active) this.closeBuyWindow();
 
-                // 🎯 v2.5.0: Consistent 3-second buy window for faster game pace
-                const duration = 3000;  // Always 3 seconds (removed conditional)
-                console.log(`%c⏱️ v2.5.0: Buy window duration: ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
+                // 🎯 v3.2.2: Longer buy window for humans (8s), shorter for AI (3s)
+                const duration = buyWindowPlayer === 0 ? 8000 : 3000;
+                console.log(`%c⏱️ v3.2.2: Buy window duration: ${duration / 1000}s (${buyWindowPlayer === 0 ? 'Human' : 'AI'})`, 'color: #ffc107; font-weight: bold;');
 
                 this.buyWindow.active = true;
                 this.buyWindow.card = card;
@@ -2709,6 +2719,20 @@
                     return;
                 }
 
+                // 🎯 CRITICAL FIX: Don't let AI buy back the card they just discarded!
+                if (this.buyWindow.discardingPlayer === aiPlayer) {
+                    console.log(`%c🚫 CRITICAL: ${aiName} just discarded this card - blocking stupid buyback!`, 'color: #ff6b35; font-weight: bold;');
+                    this.closeBuyWindow('ai-no-buyback');
+                    return;
+                }
+
+                // 🎯 SAFETY CHECK: If AI has no buys left, don't process buy window
+                if (this.playerBuys[aiPlayer] <= 0) {
+                    console.log(`%c⏭️ SKIP: ${aiName} has no buys left (${this.playerBuys[aiPlayer]}) - closing buy window`, 'color: #9e9e9e; font-weight: bold;');
+                    this.closeBuyWindow('no-buys');
+                    return;
+                }
+
                 if (!card) {
                     console.log(`%c⚠️ ${aiName} buy window has no card - closing`, 'color: #ff6600; font-weight: bold;');
                     this.closeBuyWindow('invalid');
@@ -2779,7 +2803,7 @@
 
                 console.log(`%c🤖 ${aiName} starting turn`, 'color: #3498db; font-weight: bold;');
 
-                // 🎯 v3.2.1-stable FIX: Reset publish flag at START of turn (not end of previous turn!)
+                // 🎯 v3.2.2 FIX: Reset publish flag at START of turn (not end of previous turn!)
                 // This ensures AI cannot extend on the SAME turn as publishing
                 // Flag is set when AI publishes, and cleared on NEXT turn start
                 this.aiJustPublished[ai] = false;
@@ -2859,8 +2883,8 @@
                     let shouldTake = forceBuy || (discardCard && discardScore >= threshold);
 
                     // 🎯 PATCH M: In triple games, only buy if completes/extends a triple
-                    // 🎯 v3.2.1-stable FIX: Check BOTH hand AND published sequences!
-                    // 🎯 v3.2.1-stable FIX: Check ALL published sequences (global resources), not just AI's own!
+                    // 🎯 v3.2.2 FIX: Check BOTH hand AND published sequences!
+                    // 🎯 v3.2.2 FIX: Check ALL published sequences (global resources), not just AI's own!
                     if (shouldTake && this.discardPile.length > 0) {
                         const req = this.handReqs[this.currentHand].seqs;
                         const hasOnlyTriples = req.every(s => s === 'triple');
@@ -2869,7 +2893,7 @@
                             const topCard = this.discardPile[this.discardPile.length - 1];
                             const matchingInHand = this.playerHands[ai].filter(c => c.rank === topCard.rank).length;
                             
-                            // 🎯 v3.2.1-stable: Check ALL published sequences (anyone's!)
+                            // 🎯 v3.2.2: Check ALL published sequences (anyone's!)
                             let matchingInAnyPublished = 0;
                             for (let p = 0; p < this.players; p++) {
                                 const matching = this.publishedSequences[p].filter(c => c.rank === topCard.rank).length;
@@ -3180,12 +3204,12 @@
                 }
 
                 if (!this.aiJustPublished[ai] && this.playerHands[ai].length > 0 && this.publishedSequences[ai].length > 0) {
-                    // 🎯 v3.2.1-stable: Try to add MULTIPLE cards if possible (loop until no more extensions)
+                    // 🎯 v3.2.2: Try to add MULTIPLE cards if possible (loop until no more extensions)
                     let addedAny = false;
                     let addCount = 0;
                     const maxExtensions = 10; // Safety limit
                     
-                    console.log(`%c🎯 v3.2.1-stable: Checking for extension opportunities...`, 'color: #9c27b0; font-weight: bold;');
+                    console.log(`%c🎯 v3.2.2: Checking for extension opportunities...`, 'color: #9c27b0; font-weight: bold;');
                     
                     while (addCount < maxExtensions) {
                         const addResult = this.tryAddToPublished(ai);
@@ -3198,7 +3222,7 @@
                         } else if (addResult === true) {
                             addedAny = true;
                             addCount++;
-                            console.log(`%c  ✅ v3.2.1-stable: Extended sequence (${addCount} card(s) played)`, 'color: #9c27b0;');
+                            console.log(`%c  ✅ v3.2.2: Extended sequence (${addCount} card(s) played)`, 'color: #9c27b0;');
                             // Continue loop to check if we can add more
                         } else {
                             // No more extensions possible
@@ -3209,7 +3233,7 @@
                     if (addedAny) {
                         const current = document.getElementById(`${statusId}-action`).textContent;
                         this.setAIStatus(statusId, current + ` → Added ${addCount} card(s)`);
-                        console.log(`%c🎯 v3.2.1-stable: Total extensions played: ${addCount}`, 'color: #9c27b0; font-weight: bold;');
+                        console.log(`%c🎯 v3.2.2: Total extensions played: ${addCount}`, 'color: #9c27b0; font-weight: bold;');
                     }
                 }
                 if (this.playerHands[ai].length === 0) {
@@ -3244,7 +3268,7 @@
 
                 this.lastDiscard = this.discardPile[this.discardPile.length - 1];
                 this.lastDiscardByPlayer = ai;
-                // 🎯 v3.2.1-stable: REMOVED aiJustPublished[ai] = false from here
+                // 🎯 v3.2.2: REMOVED aiJustPublished[ai] = false from here
                 // Flag now resets at START of NEXT turn, not end of THIS turn
                 // This prevents extending on same turn as publishing
 
@@ -3275,7 +3299,7 @@
                 for (let p of playerOrder) {
                     if (this.publishedSequences[p].length === 0) continue;
 
-                    // 🎯 v3.2.1-stable FIX: REMOVED PATCH Q entirely!
+                    // 🎯 v3.2.2 FIX: REMOVED PATCH Q entirely!
                     // OLD LOGIC (WRONG):
                     // "Don't extend opponent AI when all published" - prevented Jabot from extending Habot
                     // 
@@ -3296,7 +3320,7 @@
                         const card = this.playerHands[aiIdx][i];
                         const published = this.publishedSequences[p];
                         
-                        // 🎯 v3.2.1-stable FIX: REMOVED incorrect check
+                        // 🎯 v3.2.2 FIX: REMOVED incorrect check
                         // OLD BUG: const inOwnSequences = this.publishedSequences[aiIdx].find(c => c.rank === card.rank && c.suit === card.suit);
                         // OLD BUG: if (inOwnSequences) continue;
                         // This was blocking cards like "second 8♦" from extending "first 8♦" in triples!
@@ -3340,6 +3364,7 @@
                         }
                         if (hasLadders) {
                             const sameSuit = published.filter(c => c.suit === card.suit);
+                            console.log(`  🔍 tryAddToPublished: Checking ${card.toString()} - found ${sameSuit.length} published ${card.suit} cards`);
                             if (sameSuit.length >= 4) {
                                 const cardVal = card.getValue();
                                 const values = sameSuit.map(c => c.getValue()).sort((a, b) => a - b);
@@ -3540,8 +3565,8 @@
                 const hasLadders = req.some(s => s === 'ladder');
                 const published = this.publishedSequences[playerIdx];
 
-                // 🎯 v3.2.1-stable: When forceType is specified, user made explicit choice - respect it!
-                console.log(`%c🎯 v3.2.1-stable: executeAddToPublished - forceType: ${forceType}`, 'color:#9c27b0;font-weight:bold');
+                // 🎯 v3.2.2: When forceType is specified, user made explicit choice - respect it!
+                console.log(`%c🎯 v3.2.2: executeAddToPublished - forceType: ${forceType}`, 'color:#9c27b0;font-weight:bold');
 
                 // Remove card from hand
                 this.playerHands[0].splice(cardIdx, 1);
@@ -3565,14 +3590,14 @@
                     this.publishedSequences[playerIdx].push(card);
                 }
 
-                // 🎯 v3.2.1-stable: Sort published cards respecting explicit assignments
+                // 🎯 v3.2.2: Sort published cards respecting explicit assignments
                 this.sortPublishedSequences(playerIdx);
                 
                 this.selectedCards = [];
                 this.updateUI();
             }
 
-            // 🎯 v3.2.1-stable: Sort published sequences while respecting explicit user assignments
+            // 🎯 v3.2.2: Sort published sequences while respecting explicit user assignments
             sortPublishedSequences(playerIdx) {
                 const allPublished = this.publishedSequences[playerIdx];
                 const tripleCards = [];
@@ -3588,12 +3613,12 @@
                 const processedRanks = new Set();
                 
                 allPublished.forEach(c => {
-                    // 🎯 v3.2.1-stable: Check if card has explicit assignment from user
+                    // 🎯 v3.2.2: Check if card has explicit assignment from user
                     if (c.explicitAssignment === 'triple') {
-                        console.log(`  🎯 v3.2.1-stable: ${c.toString()} has explicit TRIPLE assignment`);
+                        console.log(`  🎯 v3.2.2: ${c.toString()} has explicit TRIPLE assignment`);
                         tripleCards.push(c);
                     } else if (c.explicitAssignment === 'ladder') {
-                        console.log(`  🎯 v3.2.1-stable: ${c.toString()} has explicit LADDER assignment`);
+                        console.log(`  🎯 v3.2.2: ${c.toString()} has explicit LADDER assignment`);
                         ladderCards.push(c);
                     } else {
                         // No explicit assignment - use count-based logic
@@ -3624,10 +3649,10 @@
                 // Rebuild: triples first, then ladders
                 this.publishedSequences[playerIdx] = [...tripleCards, ...ladderCards];
                 
-                console.log(`%c🎯 v3.2.1-stable: Sorted - Triples: ${tripleCards.length}, Ladders: ${ladderCards.length}`, 'color:#9c27b0;');
+                console.log(`%c🎯 v3.2.2: Sorted - Triples: ${tripleCards.length}, Ladders: ${ladderCards.length}`, 'color:#9c27b0;');
             }
 
-            // 🎯 v3.2.1-stable: sortPublishedSequences complete
+            // 🎯 v3.2.2: sortPublishedSequences complete
 
 
             // ============================================
@@ -3728,7 +3753,7 @@
                 if (playerHasPublished && this.currentPlayer === 0 && this.gamePhase === 'discard' && this.selectedCards.length === 1 && !this.justPublished && this.playerHands[0].length > 1) addSection.style.display = 'block';
                 else addSection.style.display = 'none';
                 
-                // 🎨 v3.2.1-stable: Update active-turn highlighting for round table layout
+                // 🎨 v3.2.2: Update active-turn highlighting for round table layout
                 document.querySelectorAll('.opponent-area, .player-area-center').forEach(el => el.classList.remove('active-turn'));
                 if (this.currentPlayer === 0) {
                     const yourArea = document.querySelector('.player-area-center');
@@ -3770,7 +3795,7 @@
             }
 
             updateLeaderboard() {
-                // 👑 v3.2.1-stable Phase 3: Dynamic Crown & Pumpkin with Tie-Breaker Logic
+                // 👑 v3.2.2 Phase 3: Dynamic Crown & Pumpkin with Tie-Breaker Logic
                 const container = document.getElementById('leaderboardEntries');
                 if (!container) return;
                 
@@ -3801,7 +3826,7 @@
                       )
                     : pumpkinCandidates[0];
                 
-                // 🎨 v3.2.1-stable: Display in VISUAL LAYOUT order for symmetry
+                // 🎨 v3.2.2: Display in VISUAL LAYOUT order for symmetry
                 // Layout: Habot (left) | You (center) | Jabot (right)
                 // Leaderboard order: [1]=Habot, [0]=You, [2]=Jabot
                 const displayOrder = [
@@ -3882,7 +3907,7 @@
             }
 
             renderAIHands() {
-                // 🎴 v3.2.1-stable Phase 2: Show last 3 cards for AI players
+                // 🎴 v3.2.2 Phase 2: Show last 3 cards for AI players
                 [1, 2].forEach(p => {
                     const container = document.getElementById(`player${p + 1}Cards`);
                     const countBadge = document.getElementById(`player${p + 1}Count`);
@@ -4231,7 +4256,7 @@
                     const hasKing = values.includes(13);
 
                     if (hasAce && hasJack && hasQueen && hasKing) {
-                        // 🔧 FIX 8 (v3.2.1-stable): Extract ALL consecutive cards from King downward
+                        // 🔧 FIX 8 (v3.2.2): Extract ALL consecutive cards from King downward
                         // Bug: Previous code only checked v >= 11, missing cards like 9-10
                         const wrapLadder = [1];  // Start with Ace (value 1)
                         
