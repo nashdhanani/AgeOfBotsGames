@@ -4396,7 +4396,7 @@
             const req = game.handReqs[game.currentHand].seqs;
             const hasTriples = req.some(s => s === 'triple');
             const hasLadders = req.some(s => s === 'ladder');
-            const published = game.publishedSequences[playerIdx];
+            const published = game.getFlatPublished(playerIdx);
 
             // ✅ FIX 6: Check if card could extend BOTH triple AND ladder (AMBIGUOUS!)
             const rankCounts = {};
