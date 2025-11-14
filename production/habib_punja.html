@@ -2,14 +2,18 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.0.7 - The Round Table Edition
-  Release Date: November 12, 2025
+  Version: 4.0.8 - The Round Table Edition
+  Release Date: November 14, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 4.0.7 - BUGFIX: findWorstCard const/let
+  🎮 VERSION 4.0.8 - BUGFIX: Human extension validation
   ═══════════════════════════════════════════
+  🐛 Fixed: addToPublished now uses getFlatPublished()
+  ✅ Human extensions now work correctly with 2D sequences
+  
+  Version 4.0.7 - November 14, 2025
   🐛 Fixed: Changed 'hand' from const to let
   ✅ AI can now reassign hand when filtering cards
   
@@ -50,8 +54,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.0.7 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.0.7 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.0.8 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.0.8 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -979,7 +983,7 @@
 <body>
     <div class="fix-badge">✅ v4.0.7</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.0.7</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.0.8</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
