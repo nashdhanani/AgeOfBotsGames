@@ -2,21 +2,22 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.1.0 - The Round Table Edition
-  Release Date: November 14, 2025
+  Version: 4.1.1 - The Round Table Edition
+  Release Date: November 15, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 4.1.0 - BUGFIX: Wrap-around ladder detection
+  🎮 VERSION 4.1.1 - AI Buy Logic + CSP Compliance
   ═══════════════════════════════════════════
+  🐛 Fixed: AI no longer buys after publishing in triple-only hands
+  ✅ Simplified PATCH I - once published in triple-only, NO more buys
+  🔒 Fixed: Removed all inline event handlers for CSP compliance
+  ✅ All buttons now use proper addEventListener
+  
+  Version 4.1.0 - November 14, 2025
   🐛 Fixed: Wrap-around ladders (A-K-Q-J) now properly detected
   ✅ Handles both wrap-around and regular consecutive ladders
-  ✅ Prevents invalid ladders with gaps
-  
-  Version 4.0.9 - November 14, 2025
-  🐛 Fixed: separateSequences now validates consecutive cards
-  ✅ Ladders with gaps are rejected
   
   Version 4.0.5 - November 14, 2025
   
@@ -55,8 +56,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.1.0 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.1.0 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.1.1 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.1.1 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -982,9 +983,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.1.0</div>
+    <div class="fix-badge">✅ v4.1.1</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.1.0</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.1.1</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1022,8 +1023,8 @@
             <!-- Center Top: Deck & Discard -->
             <div class="center-table-area">
                 <div class="deck-area-compact">
-                    <div class="deck" onclick="drawFromDeck()"><div>Draw<br>Deck</div></div>
-                    <div class="discard-pile" onclick="drawFromDiscard()"><div id="topDiscard">Discard<br>Pile</div></div>
+                    <div class="deck" id="drawDeck"><div>Draw<br>Deck</div></div>
+                    <div class="discard-pile" id="discardPile"><div id="topDiscard">Discard<br>Pile</div></div>
                 </div>
             </div>
             
@@ -1074,29 +1075,29 @@
                 <h3>Choose Cards to Publish</h3>
                 <div class="publish-options" id="publishOptions"></div>
                 <div class="publish-controls">
-                    <button class="btn" onclick="confirmManualPublish()">Publish Selected</button>
-                    <button class="btn" onclick="cancelManualPublish()">Cancel</button>
+                    <button class="btn" id="confirmManualPublish">Publish Selected</button>
+                    <button class="btn" id="cancelManualPublish">Cancel</button>
                 </div>
             </div>
             
             <!-- Add to Published Section -->
             <div id="addToPublishedSection" style="display:none; margin-top:15px;">
                 <strong style="color:#ffd700;">Add Selected Card To:</strong>
-                <button class="btn add-to-published" onclick="addToPublished(0)">Your Sequences</button>
-                <button class="btn add-to-published" onclick="addToPublished(1)">Habot's Sequences</button>
-                <button class="btn add-to-published" onclick="addToPublished(2)">Jabot's Sequences</button>
+                <button class="btn add-to-published" data-player="0">Your Sequences</button>
+                <button class="btn add-to-published" data-player="1">Habot's Sequences</button>
+                <button class="btn add-to-published" data-player="2">Jabot's Sequences</button>
             </div>
         </div>
         
         <!-- Game Controls (unchanged) -->
         <div class="game-controls">
-            <button class="btn" id="publishBtn" onclick="publishSequences()" disabled>Publish Sequences</button>
-            <button class="btn" onclick="sortByRank()">Sort by Rank</button>
-            <button class="btn" onclick="sortBySuit()">Sort by Suit</button>
-            <button class="btn" id="discardBtn" onclick="discardCard()" disabled>Discard Selected</button>
-            <button class="btn" id="buyBtn" onclick="buyCard()" disabled>Buy from Discard <span id="buyTimer" style="display:none;"></span></button>
-            <button class="btn" onclick="sortByQuantity()">Sort by Quantity</button>
-            <button class="btn" onclick="newGame()">New Game</button>
+            <button class="btn" id="publishBtn" disabled>Publish Sequences</button>
+            <button class="btn" id="sortByRankBtn">Sort by Rank</button>
+            <button class="btn" id="sortBySuitBtn">Sort by Suit</button>
+            <button class="btn" id="discardBtn" disabled>Discard Selected</button>
+            <button class="btn" id="buyBtn" disabled>Buy from Discard <span id="buyTimer" style="display:none;"></span></button>
+            <button class="btn" id="sortByQuantityBtn">Sort by Quantity</button>
+            <button class="btn" id="newGameBtn">New Game</button>
         </div>
     </div>
 
@@ -1160,7 +1161,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.1.0', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.1.1', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1175,7 +1176,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.1.0 DEBUG';
+                    badge.innerHTML = '🐛 v4.1.1 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -3183,19 +3184,14 @@
                     console.log(`     forceBuy: ${forceBuy}`);
                     console.log(`     shouldTake: ${shouldTake} ${!shouldTake && (aiHandSize <= 3 || anyPlayerNearWin) ? '(BLOCKED - endgame)' : ''}`);
 
-                    // 🎯 PATCH I: Block buying after publishing all required sequences in triple games
+                    // 🎯 PATCH I v4.1.1: Block ALL buying after publishing in triple-only games
                     if (shouldTake && this.publishedSequences[ai].length > 0) {
                         const req = this.handReqs[this.currentHand].seqs;
-                        const needTriples = req.filter(s => s === 'triple').length;
                         const needLadders = req.filter(s => s === 'ladder').length;
 
-                        // Count what AI has published
-                        const publishedCards = this.publishedSequences[ai].flat();
-                        const hasPublishedEnough = publishedCards.length >= (needTriples * 3 + needLadders * 4);
-
-                        if (hasPublishedEnough && needLadders === 0) {
-                            // Triple-only game and AI has published all requirements
-                            console.log(`%c  🛑 PATCH I: Blocking buy - Already published all triples`, 'color: #ff9800; font-weight: bold;');
+                        if (needLadders === 0) {
+                            // Triple-only game and AI has published - NO MORE BUYING
+                            console.log(`%c  🛑 PATCH I v4.1.1: Blocking buy - Triple-only hand, AI already published`, 'color: #ff9800; font-weight: bold;');
                             shouldTake = false;
                         }
                     }
@@ -3723,11 +3719,27 @@
             showModal(title, msg) {
                 const modal = document.createElement('div');
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;';
-                modal.innerHTML = `<div style="background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;">
-                                        <h2 style="color:#ffd700;margin-bottom:15px;">${title}</h2>
-                                        <p style="color:white;margin-bottom:20px;white-space:pre-line;">${msg}</p>
-                                        <button onclick="this.closest('div').parentElement.remove();" style="padding:12px 30px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;">OK</button>
-                                    </div>`;
+                
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = 'background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;';
+                
+                const titleEl = document.createElement('h2');
+                titleEl.style.cssText = 'color:#ffd700;margin-bottom:15px;';
+                titleEl.textContent = title;
+                
+                const msgEl = document.createElement('p');
+                msgEl.style.cssText = 'color:white;margin-bottom:20px;white-space:pre-line;';
+                msgEl.textContent = msg;
+                
+                const okBtn = document.createElement('button');
+                okBtn.style.cssText = 'padding:12px 30px;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:bold;';
+                okBtn.textContent = 'OK';
+                okBtn.addEventListener('click', () => modal.remove());
+                
+                modalContent.appendChild(titleEl);
+                modalContent.appendChild(msgEl);
+                modalContent.appendChild(okBtn);
+                modal.appendChild(modalContent);
                 document.body.appendChild(modal);
             }
 
@@ -4590,7 +4602,40 @@
             game.executeAddToPublished(card, playerIdx, cardIdx, forceType);
         }
         //Nash: newGame
-        window.onload = () => newGame();
+        // ============================================
+        // EVENT LISTENERS (v4.1.1 - CSP Compliance)
+        // ============================================
+        window.onload = () => {
+            // Main action buttons
+            document.getElementById('publishBtn').addEventListener('click', publishSequences);
+            document.getElementById('discardBtn').addEventListener('click', discardCard);
+            document.getElementById('buyBtn').addEventListener('click', buyCard);
+            document.getElementById('newGameBtn').addEventListener('click', newGame);
+            
+            // Sorting buttons
+            document.getElementById('sortByRankBtn').addEventListener('click', sortByRank);
+            document.getElementById('sortBySuitBtn').addEventListener('click', sortBySuit);
+            document.getElementById('sortByQuantityBtn').addEventListener('click', sortByQuantity);
+            
+            // Deck interaction
+            document.getElementById('drawDeck').addEventListener('click', drawFromDeck);
+            document.getElementById('discardPile').addEventListener('click', drawFromDiscard);
+            
+            // Manual publish buttons
+            document.getElementById('confirmManualPublish').addEventListener('click', confirmManualPublish);
+            document.getElementById('cancelManualPublish').addEventListener('click', cancelManualPublish);
+            
+            // Add to published buttons (delegate by data-player attribute)
+            document.querySelectorAll('.add-to-published').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const playerIdx = parseInt(this.getAttribute('data-player'));
+                    addToPublished(playerIdx);
+                });
+            });
+            
+            // Start the game
+            newGame();
+        };
 
         // ============================================
         // 🎨 FIX 7B: Custom Confirmation Modal
