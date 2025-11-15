@@ -2,21 +2,21 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.0.9 - The Round Table Edition
+  Version: 4.1.0 - The Round Table Edition
   Release Date: November 14, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 4.0.9 - BUGFIX: Ladder validation in separateSequences
+  🎮 VERSION 4.1.0 - BUGFIX: Wrap-around ladder detection
   ═══════════════════════════════════════════
-  🐛 Fixed: separateSequences now validates consecutive cards
-  ✅ Ladders with gaps (like 7♠, 9♠, 10♠...) are now rejected
-  ✅ Only consecutive sequences accepted as valid ladders
+  🐛 Fixed: Wrap-around ladders (A-K-Q-J) now properly detected
+  ✅ Handles both wrap-around and regular consecutive ladders
+  ✅ Prevents invalid ladders with gaps
   
-  Version 4.0.8 - November 14, 2025
-  🐛 Fixed: addToPublished now uses getFlatPublished()
-  ✅ Human extensions now work correctly with 2D sequences
+  Version 4.0.9 - November 14, 2025
+  🐛 Fixed: separateSequences now validates consecutive cards
+  ✅ Ladders with gaps are rejected
   
   Version 4.0.5 - November 14, 2025
   
@@ -55,8 +55,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.0.9 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.0.9 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.1.0 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.1.0 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -984,7 +984,7 @@
 <body>
     <div class="fix-badge">✅ v4.0.7</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.0.9</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.0.7</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1767,31 +1767,65 @@
                     if (suitCards.length >= 4) {
                         suitCards.sort((a, b) => a.getValue() - b.getValue());
                         
-                        // Find consecutive sequences within this suit
-                        let currentLadder = [suitCards[0]];
+                        // Check for wrap-around ladder (A-K-Q-J...) FIRST
+                        const values = suitCards.map(c => c.getValue());
+                        const hasAce = values.includes(1);
+                        const hasKing = values.includes(13);
                         
-                        for (let i = 1; i < suitCards.length; i++) {
-                            const prevValue = currentLadder[currentLadder.length - 1].getValue();
-                            const currValue = suitCards[i].getValue();
+                        if (hasAce && hasKing) {
+                            // Potential wrap-around - check if we have consecutive high cards leading to King
+                            const nonAceCards = suitCards.filter(c => c.getValue() !== 1);
+                            nonAceCards.sort((a, b) => b.getValue() - a.getValue()); // Sort high to low
                             
-                            // Check for wrap-around (Ace can follow King)
-                            const isConsecutive = (currValue === prevValue + 1) || 
-                                                 (prevValue === 13 && currValue === 1);
+                            // Build wrap ladder from King downward
+                            let wrapLadder = [];
+                            let expectedValue = 13; // Start at King
                             
-                            if (isConsecutive) {
-                                currentLadder.push(suitCards[i]);
-                            } else {
-                                // Gap found - save current ladder if valid, start new one
-                                if (currentLadder.length >= 4) {
-                                    sequences.push([...currentLadder]);
+                            for (let card of nonAceCards) {
+                                if (card.getValue() === expectedValue) {
+                                    wrapLadder.push(card);
+                                    expectedValue--;
+                                } else {
+                                    break; // Gap found
                                 }
-                                currentLadder = [suitCards[i]];
+                            }
+                            
+                            // If we have 3+ consecutive high cards (K, Q, J minimum), add Ace at front
+                            if (wrapLadder.length >= 3) {
+                                const aceCard = suitCards.find(c => c.getValue() === 1);
+                                wrapLadder.unshift(aceCard); // Add Ace at the beginning
+                                sequences.push([...wrapLadder]);
+                                
+                                // Remove used cards from suitCards for normal ladder processing
+                                const usedIds = new Set(wrapLadder.map(c => c.id));
+                                suitCards = suitCards.filter(c => !usedIds.has(c.id));
                             }
                         }
                         
-                        // Don't forget the last ladder!
-                        if (currentLadder.length >= 4) {
-                            sequences.push(currentLadder);
+                        // Now find regular consecutive ladders in remaining cards
+                        if (suitCards.length >= 4) {
+                            suitCards.sort((a, b) => a.getValue() - b.getValue());
+                            let currentLadder = [suitCards[0]];
+                            
+                            for (let i = 1; i < suitCards.length; i++) {
+                                const prevValue = currentLadder[currentLadder.length - 1].getValue();
+                                const currValue = suitCards[i].getValue();
+                                
+                                if (currValue === prevValue + 1) {
+                                    currentLadder.push(suitCards[i]);
+                                } else {
+                                    // Gap found - save current ladder if valid, start new one
+                                    if (currentLadder.length >= 4) {
+                                        sequences.push([...currentLadder]);
+                                    }
+                                    currentLadder = [suitCards[i]];
+                                }
+                            }
+                            
+                            // Don't forget the last ladder!
+                            if (currentLadder.length >= 4) {
+                                sequences.push(currentLadder);
+                            }
                         }
                     }
                 });
