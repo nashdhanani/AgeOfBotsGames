@@ -55,8 +55,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.2.2 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.2.2 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.2.3 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.2.3 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -982,9 +982,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.2.2</div>
+    <div class="fix-badge">✅ v4.2.3</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.2.2</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.2.3</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1160,7 +1160,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.2.2', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.2.3', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1175,7 +1175,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.2.2 DEBUG';
+                    badge.innerHTML = '🐛 v4.1.6 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -2268,7 +2268,7 @@
                 if (this.publishedSequences[pIdx].length > 0) {
                     if (this.couldExtendSequence(card, pIdx)) val += 100;
                 }
-                // 🎯 v4.2.2 FIX: Cards that extend ANY published sequence are valuable!
+                // 🎯 v4.2.3 FIX: Cards that extend ANY published sequence are valuable!
                 // Published sequences are global resources - extending them reduces YOUR hand!
                 for (let p = 0; p < this.players; p++) {
                     if (this.publishedSequences[p].length === 0) continue;
@@ -2287,82 +2287,92 @@
                 const req = this.handReqs[this.currentHand].seqs;
                 const needsLadders = req.some(s => s === 'ladder');
                 
+                // 🎯 v4.2.3 FIX: Calculate minimum cards needed to publish
+                const minCardsNeeded = req.reduce((sum, s) => sum + (s === 'triple' ? 3 : 4), 0);
+                
                 if (needsLadders && !this.publishedSequences[pIdx].length) {
-                    // Before publishing, focus on building ladders
-                    console.log(`%c🎯 PATCH LADDER-DISCARD: Evaluating cards for ladder building`, 'color: #3498db;');
-                    
-                    // Group cards by suit and find sequential runs
-                    const cardsBySuit = {};
-                    hand.forEach(card => {
-                        if (!cardsBySuit[card.suit]) cardsBySuit[card.suit] = [];
-                        cardsBySuit[card.suit].push(card);
-                    });
-                    
-                    // Score each card based on ladder potential
-                    const cardScores = hand.map(card => {
-                        const sameSuitCards = cardsBySuit[card.suit];
-                        if (sameSuitCards.length < 2) {
-                            // Isolated card - low score (good to discard)
-                            return { card, score: 0, reason: 'isolated' };
-                        }
+                    // 🎯 v4.2.3 CRITICAL FIX: If hand < minimum required, AI MUST BUY first!
+                    // Skip PATCH LADDER-DISCARD and use normal evaluation to encourage buying
+                    if (hand.length < minCardsNeeded) {
+                        console.log(`%c🚨 v4.2.3: Need ${minCardsNeeded} cards but only have ${hand.length} - must BUY! Skipping PATCH LADDER-DISCARD`, 'color: #ef4444; font-weight: bold;');
+                        // Fall through to normal evaluation logic below
+                    } else {
+                        // Before publishing, focus on building ladders
+                        console.log(`%c🎯 PATCH LADDER-DISCARD: Evaluating cards for ladder building`, 'color: #3498db;');
                         
-                        // Check if part of sequential run
-                        const values = sameSuitCards.map(c => c.value).sort((a, b) => a - b);
-                        let inRun = false;
-                        let runLength = 0;
+                        // Group cards by suit and find sequential runs
+                        const cardsBySuit = {};
+                        hand.forEach(card => {
+                            if (!cardsBySuit[card.suit]) cardsBySuit[card.suit] = [];
+                            cardsBySuit[card.suit].push(card);
+                        });
                         
-                        for (let i = 0; i < values.length; i++) {
-                            if (values[i] === card.value) {
-                                // Check neighbors
-                                let run = 1;
-                                // Check left
-                                for (let j = i - 1; j >= 0 && values[j] === values[j + 1] - 1; j--) run++;
-                                // Check right
-                                for (let j = i + 1; j < values.length && values[j] === values[j - 1] + 1; j++) run++;
-                                
-                                if (run >= 3) {
-                                    inRun = true;
-                                    runLength = run;
-                                    break;
+                        // Score each card based on ladder potential
+                        const cardScores = hand.map(card => {
+                            const sameSuitCards = cardsBySuit[card.suit];
+                            if (sameSuitCards.length < 2) {
+                                // Isolated card - low score (good to discard)
+                                return { card, score: 0, reason: 'isolated' };
+                            }
+                            
+                            // Check if part of sequential run
+                            const values = sameSuitCards.map(c => c.value).sort((a, b) => a - b);
+                            let inRun = false;
+                            let runLength = 0;
+                            
+                            for (let i = 0; i < values.length; i++) {
+                                if (values[i] === card.value) {
+                                    // Check neighbors
+                                    let run = 1;
+                                    // Check left
+                                    for (let j = i - 1; j >= 0 && values[j] === values[j + 1] - 1; j--) run++;
+                                    // Check right
+                                    for (let j = i + 1; j < values.length && values[j] === values[j - 1] + 1; j++) run++;
+                                    
+                                    if (run >= 3) {
+                                        inRun = true;
+                                        runLength = run;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        
-                        if (inRun) {
-                            return { card, score: runLength * 10, reason: `in ${runLength}-run` };
-                        } else if (sameSuitCards.length >= 3) {
-                            return { card, score: sameSuitCards.length * 2, reason: `${sameSuitCards.length} same suit` };
-                        } else {
-                            return { card, score: 1, reason: 'pair only' };
-                        }
-                    });
-                    
-                    // Sort by score (lowest = worst = discard first)
-                    cardScores.sort((a, b) => a.score - b.score);
-                    
-                    // 🎯 v4.2.2 FIX: Add discard safety check - don't help opponents!
-                    // Filter out cards that would extend opponent sequences when they're close to winning
-                    const safeCardScores = cardScores.filter(scoreObj => {
-                        for (let p = 0; p < this.players; p++) {
-                            if (p === pIdx) continue; // Skip self
-                            if (this.publishedSequences[p].length === 0) continue; // Skip unpublished opponents
                             
-                            const opponentHandSize = this.playerHands[p].length;
-                            if (opponentHandSize <= 4 && this.couldExtendSequence(scoreObj.card, p)) {
-                                console.log(`  🚫 v4.2.2: Can't discard ${scoreObj.card.toString()} - would help Player ${p} (${opponentHandSize} cards)`);
-                                return false; // Not safe - opponent is close to winning
+                            if (inRun) {
+                                return { card, score: runLength * 10, reason: `in ${runLength}-run` };
+                            } else if (sameSuitCards.length >= 3) {
+                                return { card, score: sameSuitCards.length * 2, reason: `${sameSuitCards.length} same suit` };
+                            } else {
+                                return { card, score: 1, reason: 'pair only' };
                             }
-                        }
-                        return true; // Safe to discard
-                    });
-                    
-                    // If we filtered out all cards, fall back to original list (edge case)
-                    const finalScores = safeCardScores.length > 0 ? safeCardScores : cardScores;
-                    
-                    // Discard lowest scoring SAFE card (least useful for ladders, won't help opponents)
-                    const worst = finalScores[0];
-                    console.log(`%c🎯 PATCH LADDER-DISCARD: Discarding ${worst.card.toString()} (${worst.reason}, score: ${worst.score})`, 'color: #e67e22;');
-                    return worst.card;
+                        });
+                        
+                        // Sort by score (lowest = worst = discard first)
+                        cardScores.sort((a, b) => a.score - b.score);
+                        
+                        // 🎯 v4.2.3 FIX: Add discard safety check - don't help opponents!
+                        // Filter out cards that would extend opponent sequences when they're close to winning
+                        const safeCardScores = cardScores.filter(scoreObj => {
+                            for (let p = 0; p < this.players; p++) {
+                                if (p === pIdx) continue; // Skip self
+                                if (this.publishedSequences[p].length === 0) continue; // Skip unpublished opponents
+                                
+                                const opponentHandSize = this.playerHands[p].length;
+                                if (opponentHandSize <= 4 && this.couldExtendSequence(scoreObj.card, p)) {
+                                    console.log(`  🚫 v4.2.3: Can't discard ${scoreObj.card.toString()} - would help Player ${p} (${opponentHandSize} cards)`);
+                                    return false; // Not safe - opponent is close to winning
+                                }
+                            }
+                            return true; // Safe to discard
+                        });
+                        
+                        // If we filtered out all cards, fall back to original list (edge case)
+                        const finalScores = safeCardScores.length > 0 ? safeCardScores : cardScores;
+                        
+                        // Discard lowest scoring SAFE card (least useful for ladders, won't help opponents)
+                        const worst = finalScores[0];
+                        console.log(`%c🎯 PATCH LADDER-DISCARD: Discarding ${worst.card.toString()} (${worst.reason}, score: ${worst.score})`, 'color: #e67e22;');
+                        return worst.card;
+                    }
                 }
 
                 // 🏆 v4.0.7 FIX: ALWAYS protect cards that extend MY OWN sequences
@@ -2466,8 +2476,8 @@
                     debugLog.info(`  🛡️ v4.0.7: Defensive filter removed ${blockedCount} dangerous cards`);
                     workingHand = universallySafeCards;
                 } else if (universallySafeCards.length === 0) {
-                    // 🎯 v4.2.2 FIX: ALL cards are dangerous - pick LEAST dangerous!
-                    debugLog.warn(`  ⚠️ v4.2.2: ALL ${hand.length} cards extend opponents - picking least dangerous`);
+                    // 🎯 v4.2.3 FIX: ALL cards are dangerous - pick LEAST dangerous!
+                    debugLog.warn(`  ⚠️ v4.2.3: ALL ${hand.length} cards extend opponents - picking least dangerous`);
                     
                     // Build danger map: which opponents does each card help?
                     const dangerMap = hand.map(card => {
@@ -2507,7 +2517,7 @@
                     
                     // Pick least dangerous card
                     const leastDangerous = dangerMap[0];
-                    debugLog.warn(`  🎯 v4.2.2: Least dangerous = ${leastDangerous.card.toString()}`);
+                    debugLog.warn(`  🎯 v4.2.3: Least dangerous = ${leastDangerous.card.toString()}`);
                     leastDangerous.helpsOpponents.forEach(opp => {
                         debugLog.warn(`     Helps ${opp.name} (${opp.handSize} cards)`);
                     });
@@ -3270,7 +3280,7 @@
                     const aiHandSize = this.playerHands[ai].length;  // ← Changed name
                     const anyPlayerNearWin = this.playerHands.some((h, idx) => h.length <= 3 && this.publishedSequences[idx].length > 0);
 
-                    // 🎯 v4.2.2 FIX: Don't block if card extends ANY published sequence!
+                    // 🎯 v4.2.3 FIX: Don't block if card extends ANY published sequence!
                     // Published sequences are GLOBAL resources - extending ANY sequence helps AI win!
                     let extendsAnySequence = false;
                     if (shouldTake && discardCard) {
@@ -3278,7 +3288,7 @@
                             if (this.publishedSequences[p].length > 0 && this.couldExtendSequence(discardCard, p)) {
                                 extendsAnySequence = true;
                                 const playerName = p === 0 ? 'Human' : (p === 1 ? 'Habot' : 'Jabot');
-                                console.log(`  🌍 v4.2.2: ${discardCard.toString()} extends ${playerName}'s published sequence (global resource)`);
+                                console.log(`  🌍 v4.2.3: ${discardCard.toString()} extends ${playerName}'s published sequence (global resource)`);
                                 break;
                             }
                         }
@@ -3295,7 +3305,7 @@
                     }
                     
                     if (extendsAnySequence && aiHandSize <= 3) {
-                        console.log(`%c  ✅ v4.2.2: ALLOWING buy - ${discardCard.toString()} extends published sequences (global resource, helps AI win)!`, 'color: #27ae60; font-weight: bold;');
+                        console.log(`%c  ✅ v4.2.3: ALLOWING buy - ${discardCard.toString()} extends published sequences (global resource, helps AI win)!`, 'color: #27ae60; font-weight: bold;');
                     }
 
                     console.log(`%c  🎯 ${aiName} evaluation:`, 'color: #e67e22; font-weight: bold;');
@@ -3642,7 +3652,7 @@
                     // - Habot's published: 3 → 4 cards (but Habot's hand unchanged)
                     // - Net result: Jabot closer to winning! ✓
 
-                    // 🎯 v4.2.2 FIX: REMOVED opponent hand size check entirely!
+                    // 🎯 v4.2.3 FIX: REMOVED opponent hand size check entirely!
                     // After publishing, ALWAYS extend ALL sequences (global resources)!
                     // Playing cards to extend reduces YOUR hand - it's always good!
                     // OLD BUG: if (p !== aiIdx && this.playerHands[p].length <= 4 && this.playerHands[aiIdx].length > 1) continue;
@@ -4600,7 +4610,7 @@
             // ✅ KEEP EVERYTHING BELOW (Execution section - unchanged)
             published.forEach(c => { const idx = game.playerHands[0].findIndex(card => card.id === c.id); if (idx > -1) game.playerHands[0].splice(idx, 1) });
             
-            // 🎯 v4.2.2 FIX: Build sequences from user selections, don't re-organize!
+            // 🎯 v4.2.3 FIX: Build sequences from user selections, don't re-organize!
             // Don't call separateSequences() - it ignores user's manual selections!
             const sequences = [];
             game.publishSelection.triples.forEach(idx => sequences.push(seqs.triples[idx]));
