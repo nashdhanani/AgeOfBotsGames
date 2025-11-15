@@ -55,8 +55,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.1.8 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.1.8 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.1.9 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.1.9 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -982,9 +982,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.1.8</div>
+    <div class="fix-badge">✅ v4.1.9</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.1.8</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.1.9</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1160,7 +1160,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.1.8', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.1.9', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1175,7 +1175,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.1.8 DEBUG';
+                    badge.innerHTML = '🐛 v4.1.9 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -2341,8 +2341,27 @@
                     // Sort by score (lowest = worst = discard first)
                     cardScores.sort((a, b) => a.score - b.score);
                     
-                    // Discard lowest scoring card (least useful for ladders)
-                    const worst = cardScores[0];
+                    // 🎯 v4.1.9 FIX: Add discard safety check - don't help opponents!
+                    // Filter out cards that would extend opponent sequences when they're close to winning
+                    const safeCardScores = cardScores.filter(scoreObj => {
+                        for (let p = 0; p < this.players; p++) {
+                            if (p === pIdx) continue; // Skip self
+                            if (this.publishedSequences[p].length === 0) continue; // Skip unpublished opponents
+                            
+                            const opponentHandSize = this.playerHands[p].length;
+                            if (opponentHandSize <= 4 && this.couldExtendSequence(scoreObj.card, p)) {
+                                console.log(`  🚫 v4.1.9: Can't discard ${scoreObj.card.toString()} - would help Player ${p} (${opponentHandSize} cards)`);
+                                return false; // Not safe - opponent is close to winning
+                            }
+                        }
+                        return true; // Safe to discard
+                    });
+                    
+                    // If we filtered out all cards, fall back to original list (edge case)
+                    const finalScores = safeCardScores.length > 0 ? safeCardScores : cardScores;
+                    
+                    // Discard lowest scoring SAFE card (least useful for ladders, won't help opponents)
+                    const worst = finalScores[0];
                     console.log(`%c🎯 PATCH LADDER-DISCARD: Discarding ${worst.card.toString()} (${worst.reason}, score: ${worst.score})`, 'color: #e67e22;');
                     return worst.card;
                 }
@@ -3561,7 +3580,7 @@
                     // - Habot's published: 3 → 4 cards (but Habot's hand unchanged)
                     // - Net result: Jabot closer to winning! ✓
 
-                    // 🎯 v4.1.8 FIX: Don't skip opponent sequences if extending would make AI win!
+                    // 🎯 v4.1.9 FIX: Don't skip opponent sequences if extending would make AI win!
                     // Old bug: if (p !== aiIdx && this.playerHands[p].length <= 4) continue;
                     // This prevented AI from winning by extending opponent sequences
                     // New logic: Only skip if opponent is close to winning AND AI won't win
@@ -4518,7 +4537,7 @@
             // ✅ KEEP EVERYTHING BELOW (Execution section - unchanged)
             published.forEach(c => { const idx = game.playerHands[0].findIndex(card => card.id === c.id); if (idx > -1) game.playerHands[0].splice(idx, 1) });
             
-            // 🎯 v4.1.8 FIX: Build sequences from user selections, don't re-organize!
+            // 🎯 v4.1.9 FIX: Build sequences from user selections, don't re-organize!
             // Don't call separateSequences() - it ignores user's manual selections!
             const sequences = [];
             game.publishSelection.triples.forEach(idx => sequences.push(seqs.triples[idx]));
