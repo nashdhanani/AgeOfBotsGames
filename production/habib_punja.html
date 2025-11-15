@@ -55,8 +55,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.1.7 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.1.7 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.1.8 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.1.8 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -982,9 +982,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.1.7</div>
+    <div class="fix-badge">✅ v4.1.8</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.1.7</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.1.8</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1160,7 +1160,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.1.7', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.1.8', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1175,7 +1175,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.1.7 DEBUG';
+                    badge.innerHTML = '🐛 v4.1.8 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -3561,7 +3561,11 @@
                     // - Habot's published: 3 → 4 cards (but Habot's hand unchanged)
                     // - Net result: Jabot closer to winning! ✓
 
-                    if (p !== aiIdx && this.playerHands[p].length <= 4) continue;
+                    // 🎯 v4.1.8 FIX: Don't skip opponent sequences if extending would make AI win!
+                    // Old bug: if (p !== aiIdx && this.playerHands[p].length <= 4) continue;
+                    // This prevented AI from winning by extending opponent sequences
+                    // New logic: Only skip if opponent is close to winning AND AI won't win
+                    if (p !== aiIdx && this.playerHands[p].length <= 4 && this.playerHands[aiIdx].length > 1) continue;
                     for (let i = 0; i < this.playerHands[aiIdx].length; i++) {
                         const card = this.playerHands[aiIdx][i];
                         
@@ -4514,7 +4518,7 @@
             // ✅ KEEP EVERYTHING BELOW (Execution section - unchanged)
             published.forEach(c => { const idx = game.playerHands[0].findIndex(card => card.id === c.id); if (idx > -1) game.playerHands[0].splice(idx, 1) });
             
-            // 🎯 v4.1.7 FIX: Build sequences from user selections, don't re-organize!
+            // 🎯 v4.1.8 FIX: Build sequences from user selections, don't re-organize!
             // Don't call separateSequences() - it ignores user's manual selections!
             const sequences = [];
             game.publishSelection.triples.forEach(idx => sequences.push(seqs.triples[idx]));
