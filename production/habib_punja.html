@@ -2,21 +2,22 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.1.2 - The Round Table Edition
+  Version: 4.1.3 - The Round Table Edition
   Release Date: November 15, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 4.1.2 - CRITICAL: Extension card loss bug
+  🎮 VERSION 4.1.3 - Glass Vault Rule: Discard Pile Access Control
   ═══════════════════════════════════════════
+  🔒 NEW: Implemented "glass vault" rule for discard pile
+  ✅ Discard pile only accessible after NEW card is discarded
+  ✅ Pile locks when card is taken (draw or buy)
+  ✅ Prevents accessing buried cards in the pile
+  
+  Version 4.1.2 - November 15, 2025
   🐛 Fixed: sortPublishedSequences no longer loses cards when extending
   ✅ Handles 4-of-a-kind, 5-of-a-kind extensions properly
-  ✅ Respects explicit assignments without calling separateSequences
-  
-  Version 4.1.1 - November 15, 2025
-  🐛 Fixed: AI no longer buys after publishing in triple-only hands
-  🔒 Fixed: Removed all inline event handlers for CSP compliance
   
   Version 4.0.5 - November 14, 2025
   
@@ -55,8 +56,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.1.2 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.1.2 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.1.3 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.1.3 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -982,9 +983,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.1.2</div>
+    <div class="fix-badge">✅ v4.3.0</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.1.2</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.3.0</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1160,7 +1161,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.1.2', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.1.3', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1175,7 +1176,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.1.2 DEBUG';
+                    badge.innerHTML = '🐛 v4.1.3 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -1218,6 +1219,7 @@
                 this.lastAIDiscard = [null, null, null];
                 this.aiPersonality = { 1: 'rabbit', 2: 'tortoise' };
                 this.lastCardWarningShown = null;
+                this.discardPileAccessible = false; // 🔒 v4.1.3: Glass vault - only accessible after NEW discard
                 
                 // 🎯 v3.0: Cache for sequence separation to reduce logging spam
                 this.sequenceSeparationCache = {
@@ -1471,6 +1473,7 @@
                 if (this.deck.length > 0) {
                     const initialDiscard = this.deck.pop();
                     this.discardPile.push(initialDiscard);
+                    this.discardPileAccessible = true; // 🔒 v4.1.3: Unlock vault - new card on glass
 
                     console.log(`%c🎴 Initial discard card: ${initialDiscard.toString()}`, 'color: #ff9800; font-weight: bold;');
 
@@ -2959,6 +2962,7 @@
                         if (idx > -1) {
                             this.discardPile.splice(idx, 1);
                             this.playerHands[aiPlayer].push(card);
+                            this.discardPileAccessible = false; // 🔒 v4.1.3: Lock vault after buy
                             if (this.lastDiscard && this.lastDiscard.rank === card.rank && this.lastDiscard.suit === card.suit) {
                                 this.lastDiscard = null;
                                 this.lastDiscardByPlayer = -1;
@@ -3204,6 +3208,7 @@
                         } else {
                             const drawnCard = this.discardPile.pop();
                             this.playerHands[ai].push(drawnCard);
+                            this.discardPileAccessible = false; // 🔒 v4.1.3: Lock vault after taking card
 
                             // ✅ FIX 2: Show specific toast when AI takes card during buy window
                             if (this.buyWindow.active && this.buyWindow.buyWindowPlayer === 0 && this.buyWindow.card && this.buyWindow.card.id === drawnCard.id) {
@@ -3333,6 +3338,7 @@
                         const dropIndex = this.playerHands[ai].indexOf(cardToDrop);
                         this.playerHands[ai].splice(dropIndex, 1);
                         this.discardPile.push(cardToDrop);
+                        this.discardPileAccessible = true; // 🔒 v4.1.3: Unlock vault
 
                         console.log(`%c  → PATCH L2: Auto-dropped ${cardToDrop.toString()} (highest-value pair)`, 'color: #e67e22; font-weight: bold;');
                         this.updateUI();
@@ -3450,6 +3456,7 @@
                     if (idx > -1) {
                         this.playerHands[ai].splice(idx, 1);
                         this.discardPile.push(worst);
+                        this.discardPileAccessible = true; // 🔒 v4.1.3: Unlock vault
                         this.lastAIDiscard[ai] = worst;
                         this.lastDiscard = worst;
                         this.lastDiscardByPlayer = ai;
@@ -4932,6 +4939,19 @@
         function drawFromDiscard() {
             if (!game || game.currentPlayer !== 0 || game.gamePhase !== 'draw') return;
 
+            // 🔒 v4.1.3: Glass vault rule - check if discard pile is accessible
+            if (!game.discardPileAccessible) {
+                showInfoModal(
+                    'Discard Pile Locked',
+                    'The discard pile is locked. The last card was taken, so you must draw from the deck.',
+                    'Okay',
+                    '🔒',
+                    true,    // auto-fade
+                    2000     // 2 seconds
+                );
+                return;
+            }
+
             // 🎨 v2.5: Show modal if discard pile is empty
             if (game.discardPile.length === 0) {
                 showInfoModal(
@@ -4947,6 +4967,7 @@
 
             const card = game.discardPile.pop();
             game.playerHands[0].push(card);
+            game.discardPileAccessible = false; // 🔒 v4.1.3: Lock vault after taking card
             if (game.buyWindow.active) game.closeBuyWindow('player-took');
             if (game.lastDiscard && game.lastDiscard.rank === card.rank && game.lastDiscard.suit === card.suit) {
                 game.lastDiscard = null;
@@ -4961,6 +4982,7 @@
             if (!game || game.currentPlayer !== 0 || game.gamePhase !== 'discard' || game.selectedCards.length !== 1) return;
             const card = game.playerHands[0].splice(game.selectedCards[0], 1)[0];
             game.discardPile.push(card);
+            game.discardPileAccessible = true; // 🔒 v4.1.3: Unlock vault - new card on top of glass
             game.selectedCards = [];
             game.lastDiscard = card;
             game.lastDiscardByPlayer = 0;
@@ -5002,6 +5024,7 @@
             if (idx === -1) { game.closeBuyWindow('taken'); showToast('Card no longer available', 'warning', 2000); return }
             game.discardPile.splice(idx, 1);
             game.playerHands[0].push(card);
+            game.discardPileAccessible = false; // 🔒 v4.1.3: Lock vault after buy
             if (game.lastDiscard && game.lastDiscard.rank === card.rank && game.lastDiscard.suit === card.suit) {
                 game.lastDiscard = null;
                 game.lastDiscardByPlayer = -1;
