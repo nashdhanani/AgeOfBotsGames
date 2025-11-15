@@ -2,22 +2,21 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.1.1 - The Round Table Edition
+  Version: 4.1.2 - The Round Table Edition
   Release Date: November 15, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 4.1.1 - AI Buy Logic + CSP Compliance
+  🎮 VERSION 4.1.2 - CRITICAL: Extension card loss bug
   ═══════════════════════════════════════════
-  🐛 Fixed: AI no longer buys after publishing in triple-only hands
-  ✅ Simplified PATCH I - once published in triple-only, NO more buys
-  🔒 Fixed: Removed all inline event handlers for CSP compliance
-  ✅ All buttons now use proper addEventListener
+  🐛 Fixed: sortPublishedSequences no longer loses cards when extending
+  ✅ Handles 4-of-a-kind, 5-of-a-kind extensions properly
+  ✅ Respects explicit assignments without calling separateSequences
   
-  Version 4.1.0 - November 14, 2025
-  🐛 Fixed: Wrap-around ladders (A-K-Q-J) now properly detected
-  ✅ Handles both wrap-around and regular consecutive ladders
+  Version 4.1.1 - November 15, 2025
+  🐛 Fixed: AI no longer buys after publishing in triple-only hands
+  🔒 Fixed: Removed all inline event handlers for CSP compliance
   
   Version 4.0.5 - November 14, 2025
   
@@ -56,8 +55,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.1.1 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.1.1 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.1.2 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.1.2 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -983,9 +982,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.1.1</div>
+    <div class="fix-badge">✅ v4.1.2</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.1.1</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.1.2</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1161,7 +1160,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.1.1', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.1.2', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1176,7 +1175,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.1.1 DEBUG';
+                    badge.innerHTML = '🐛 v4.1.2 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -3880,13 +3879,40 @@
                     return a.getValue() - b.getValue();
                 });
                 
-                // 🎯 v4.0.7 FIX: Rebuild as 2D array using separateSequences
-                const flatSorted = [...tripleCards, ...ladderCards];
-                const req = this.handReqs[this.currentHand].seqs;
-                const sequences = this.separateSequences(flatSorted, req);
+                // 🐛 FIX v4.1.2: Build sequences manually, respecting explicit assignments
+                const sequences = [];
+                
+                // Group triples by rank
+                const triplesByRank = {};
+                tripleCards.forEach(c => {
+                    if (!triplesByRank[c.rank]) triplesByRank[c.rank] = [];
+                    triplesByRank[c.rank].push(c);
+                });
+                
+                // Add each rank's cards as a sequence (handles 3, 4, 5+ of same rank)
+                Object.values(triplesByRank).forEach(cards => {
+                    sequences.push(cards);
+                });
+                
+                // Group ladders by suit and find consecutive runs
+                if (ladderCards.length >= 4) {
+                    const laddersBySuit = {};
+                    ladderCards.forEach(c => {
+                        if (!laddersBySuit[c.suit]) laddersBySuit[c.suit] = [];
+                        laddersBySuit[c.suit].push(c);
+                    });
+                    
+                    Object.values(laddersBySuit).forEach(suitCards => {
+                        if (suitCards.length >= 4) {
+                            suitCards.sort((a, b) => a.getValue() - b.getValue());
+                            sequences.push(suitCards);
+                        }
+                    });
+                }
+                
                 this.publishedSequences[playerIdx] = sequences;
                 
-                console.log(`%c🎯 v4.0.7: Sorted and separated - ${sequences.length} sequences`, 'color:#9c27b0;');
+                console.log(`%c🎯 v4.1.2: Sorted and separated - ${sequences.length} sequences`, 'color:#9c27b0;');
                 sequences.forEach((seq, i) => {
                     console.log(`  Sequence ${i + 1}: ${seq.map(c => c.toString()).join(' ')}`);
                 });
