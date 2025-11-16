@@ -2,11 +2,24 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.1.6 - The Round Table Edition
-  Release Date: November 15, 2025
+  Version: 4.3.0 - Ladders First Strategy
+  Release Date: November 16, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
+
+  🎮 VERSION 4.3.0 - CRITICAL FIX: Ladders First Strategy!
+  ═══════════════════════════════════════════
+  🐛 Fixed: Hand 6 AI now uses SMART STRATEGY: Build 2 ladders FIRST, then triple
+  ✅ Ladders are harder (4+ sequential same-suit) → prioritize these
+  ✅ Triples are easier (3 matching ranks) → form from leftover cards
+  ✅ AI ONLY buys ladder-building cards until 2 ladders complete
+  ✅ After 2 ladders: AI can buy triple-completing cards from leftovers
+  📊 Prevents: Wasting buys on multiple triples while missing ladders
+  📊 Result: AI forms 1T + 2L efficiently and publishes!
+  
+  Previous v4.2.9: AI bought triple cards first = wrong order! ❌
+  New v4.3.0: AI builds ladders first (player-proven strategy) ✅
 
   🎮 VERSION 4.2.9 - CRITICAL FIX: Goal-Oriented Buying for Hands 6-7!
   ═══════════════════════════════════════════
@@ -78,8 +91,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.2.9 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.2.9 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.3.0 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.3.0 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -1005,9 +1018,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.2.9</div>
+    <div class="fix-badge">✅ v4.3.0</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.2.9</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.3.0</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1183,7 +1196,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.2.9', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.3.0', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1198,7 +1211,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.1.9 DEBUG';
+                    badge.innerHTML = '🐛 v4.3.0 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -2820,11 +2833,19 @@
                     case 5: if (buysUsed >= 2) return false; const hasAnySequence = hasTriple || hasLadder; return hasAnySequence && cardValue >= 30;
                     case 6: 
                         if (buysUsed >= 2) return false;
-                        // Hand 6 needs 1T + 2L - must ensure we're building toward ladders!
+                        // Hand 6 SMART STRATEGY: Build 2 LADDERS first, then triple from leftovers!
+                        // Ladders are harder (4+ sequential same-suit), triples easier (3 matching)
                         const sameSuit = hand.filter(c => c.suit === discardCard.suit);
                         const cardHelpsLadder = sameSuit.length >= 2 && sameSuit.some(c => Math.abs(c.getValue() - discardCard.getValue()) === 1);
-                        const completesTriple = hand.filter(c => c.rank === discardCard.rank).length >= 2;
-                        return (completesTriple || cardHelpsLadder) && cardValue >= 15;
+                        
+                        // If we have 2+ ladders already, focus on completing triple
+                        if (hasLadder && seqs.ladders.length >= 2) {
+                            const completesTriple = hand.filter(c => c.rank === discardCard.rank).length >= 2;
+                            return (completesTriple || cardHelpsLadder) && cardValue >= 15;
+                        }
+                        
+                        // Otherwise: ONLY buy ladder-building cards (ladders first strategy!)
+                        return cardHelpsLadder && cardValue >= 10;
                     case 7: 
                         // Hand 7 needs 3L - ONLY buy cards that build ladders!
                         const sameSuit7 = hand.filter(c => c.suit === discardCard.suit);
