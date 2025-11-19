@@ -2,12 +2,45 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.4.0 - Staged Construction Strategy
+  Version: 4.4.1 - Critical Initialization & Extension Fixes
   Release Date: November 17, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
+  🎮 VERSION 4.4.1 - CRITICAL HOTFIX: Initialization & Extension
+  ═══════════════════════════════════════════════════════════════
+  🐛 Fixed: Staged construction now initializes in jumpToHand()
+  🐛 Fixed: User extension choice now respected (triple vs ladder)
+  
+  **BUG 1 - Stage Stuck at 'initial':**
+  Problem: When using game.jumpToHand(6), staged construction never initialized
+  - Stage stayed at 'initial' instead of 'building_L1'
+  - Buying logic failed because it checks for 'building_L1' stage
+  - Result: AI never bought anything (Turn 37, zero buys)
+  
+  Fix: Added initialization to jumpToHand() function
+  - Now runs whenever jumping to Hand 6 or 7
+  - Stage correctly set to 'building_L1'
+  - Targets and suit focus generated immediately
+  
+  **BUG 2 - Extension Added to Wrong Sequence:**
+  Problem: User chose LADDER but card added to TRIPLE instead
+  - executeAddToPublished() ignored forceType parameter
+  - Checked ALL sequences, added to first match (triple)
+  - Console: "User chose LADDER" but "Added to sequence: 7♠ 7♣ 7♦ 7♦"
+  
+  Fix: Respect forceType when selecting sequence
+  - If forceType='ladder', ONLY check ladder sequences
+  - If forceType='triple', ONLY check triple sequences
+  - Correctly adds 7♦ to diamond ladder: 7♦ 8♦ 9♦...
+  
+  **Testing Checklist:**
+  ✅ game.jumpToHand(6) → Stage should be 'building_L1'
+  ✅ AI should generate targets immediately
+  ✅ AI should buy when target cards appear
+  ✅ Extension choice respected (ladder vs triple)
+  
   🎮 VERSION 4.4.0 - REVOLUTIONARY: Staged Construction Strategy!
   ═══════════════════════════════════════════════════════════════
   🏗️ PARADIGM SHIFT: Sequential building instead of parallel accumulation
@@ -161,12 +194,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.4.0 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.4.0 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.4.1 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.4.1 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
-    <meta name="version" content="4.4.0">
+    <meta name="version" content="4.4.1">
     <meta name="copyright" content="Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.">
 
     <!-- Open Graph / Facebook -->
@@ -1088,9 +1121,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.4.0</div>
+    <div class="fix-badge">✅ v4.4.1</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.4.0</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.4.1</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1266,7 +1299,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.4.0 - STAGED CONSTRUCTION', 'color: #9b59b6; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.4.1 - STAGED CONSTRUCTION', 'color: #9b59b6; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1281,7 +1314,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.4.0 DEBUG';
+                    badge.innerHTML = '🐛 v4.4.1 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -4440,21 +4473,26 @@
                 // Remove card from hand
                 this.playerHands[0].splice(cardIdx, 1);
 
-                // 🎯 v4.2.7 CRITICAL FIX: Add directly to matching sequence, DON'T call sortPublishedSequences!
-                // sortPublishedSequences re-categorizes based on rank counts which breaks explicit assignments
-                
+                // 🎯 v4.4.1 CRITICAL FIX: When forceType specified, ONLY check matching sequence type!
                 let addedToSequence = false;
                 for (let seq of published) {
-                    if (this.canAddToPublishedSequence(card, seq)) {
+                    // Determine if this sequence is triple or ladder
+                    const isTriple = seq.length >= 3 && seq.every(c => c.rank === seq[0].rank);
+                    const isLadder = !isTriple;
+                    
+                    // Only check if sequence type matches forceType
+                    const typeMatches = (forceType === 'triple' && isTriple) || (forceType === 'ladder' && isLadder);
+                    
+                    if (typeMatches && this.canAddToPublishedSequence(card, seq)) {
                         seq.push(card);
-                        console.log(`%c  ✅ v4.2.7: Added ${card.toString()} to sequence: ${seq.map(c => c.toString()).join(' ')}`, 'color:#28a745;font-weight:bold');
+                        console.log(`%c  ✅ v4.4.1: Added ${card.toString()} to ${forceType} sequence: ${seq.map(c => c.toString()).join(' ')}`, 'color:#28a745;font-weight:bold');
                         addedToSequence = true;
                         break;
                     }
                 }
                 
                 if (!addedToSequence) {
-                    console.log(`%c  ⚠️ v4.2.7: Could not add to existing sequence, creating new`, 'color:#f59e0b;');
+                    console.log(`%c  ⚠️ v4.4.1: Could not add to existing ${forceType} sequence, creating new`, 'color:#f59e0b;');
                     published.push([card]);
                 }
                 
@@ -4580,6 +4618,16 @@
                 this.lastAIDiscard = [null, null, null];
                 this.lastCardWarningShown = null;
                 this.buyWindow = { active: false, card: null, discardingPlayer: -1, buyWindowPlayer: -1, expiresAt: 0, timerInterval: null, pendingDeckDraw: null };
+                
+                // 🏗️ v4.4.1 FIX: Initialize staged construction when jumping to Hands 6-7
+                if (handNum >= 6) {
+                    console.log(`%c🏗️ v4.4.1: Initializing STAGED CONSTRUCTION for Hand ${handNum}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
+                    this.aiConstructionStage = [null, 'building_L1', 'building_L1'];
+                    this.aiLockedSequences = [[], [], []];
+                    this.aiTargetCards = [null, [], []];
+                    this.aiSuitFocus = [null, [], []];
+                }
+                
                 this.initDeck();
                 this.deal();
                 this.updateUI();
