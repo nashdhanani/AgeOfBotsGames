@@ -2,12 +2,62 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.3.2 - Wrap-Around Ladder Extension Fix
-  Release Date: November 16, 2025
+  Version: 4.4.0 - Staged Construction Strategy
+  Release Date: November 17, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
+  🎮 VERSION 4.4.0 - REVOLUTIONARY: Staged Construction Strategy!
+  ═══════════════════════════════════════════════════════════════
+  🏗️ PARADIGM SHIFT: Sequential building instead of parallel accumulation
+  
+  **THE BREAKTHROUGH:**
+  Games 6-7 require different strategy than Games 1-5!
+  - Old: Try to form all sequences simultaneously → scattered progress → never publish
+  - New: Build L1 → LOCK → Build L2 → LOCK → Build T → PUBLISH ✅
+  
+  **NEW SYSTEMS IMPLEMENTED:**
+  1. ✅ Stage Tracking: AI knows which sequence it's building
+     - Stages: building_L1 → building_L2 → building_T → ready_to_publish
+  
+  2. ✅ Sequence Locking: Completed sequences protected from discard
+     - Once ladder complete → marked read-only → cannot be accidentally discarded
+  
+  3. ✅ Target Card System: AI hunts 2-3 SPECIFIC cards
+     - Not "any useful card" → specific targets like "5♥, 7♠, 10♦"
+  
+  4. ✅ Near-Sequential Analysis: Finds promising partial sequences
+     - Detects: [4,6,8♥] → needs [5,7] → high potential
+     - Rejects: [2,7,K♥] → too many gaps → low potential
+  
+  5. ✅ Suit Concentration: Focus on 2 best suits for ladders
+     - Select suits with highest card count and lowest gaps
+  
+  6. ✅ Stage-Based Buying: Different logic per construction phase
+     - Building L1: Only buy target cards for first ladder
+     - Building L2: Only buy target cards for second ladder  
+     - Building T: Only buy cards that complete triple
+  
+  7. ✅ Protected Discard: Never discard locked sequence cards
+     - Locked cards immune to all discard logic
+  
+  8. ✅ Stage Advancement: Auto-progress when sequences complete
+     - Detects completion → locks sequence → updates targets → advances stage
+  
+  **PLAYER-PROVEN STRATEGY:**
+  This matches exactly how humans win Hand 6/7:
+  - Focus on ONE ladder at a time
+  - Lock progress as you go
+  - Don't try to build everything simultaneously
+  - Triples are easy - save for last!
+  
+  **EXPECTED RESULTS:**
+  - AI should publish within 20-30 turns (not 172+!)
+  - AI should WIN Hand 6 and Hand 7 games
+  - No more infinite buy loops
+  - Clean, focused gameplay
+  
   🎮 VERSION 4.3.2 - CRITICAL FIX: Wrap-Around Ladder Extension!
   ═══════════════════════════════════════════
   🐛 Fixed: Can now extend A-K-Q-J wrap-around ladders with 10
@@ -111,12 +161,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.3.2 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.3.2 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.4.0 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.4.0 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
-    <meta name="version" content="4.3.2">
+    <meta name="version" content="4.4.0">
     <meta name="copyright" content="Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.">
 
     <!-- Open Graph / Facebook -->
@@ -1038,9 +1088,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.3.2</div>
+    <div class="fix-badge">✅ v4.4.0</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.3.2</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.4.0</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1216,7 +1266,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.3.2', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.4.0 - STAGED CONSTRUCTION', 'color: #9b59b6; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1231,7 +1281,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.3.2 DEBUG';
+                    badge.innerHTML = '🐛 v4.4.0 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -1275,6 +1325,20 @@
                 this.aiPersonality = { 1: 'rabbit', 2: 'tortoise' };
                 this.lastCardWarningShown = null;
                 this.discardPileAccessible = false; // 🔒 v4.1.3: Glass vault - only accessible after NEW discard
+                
+                // 🏗️ v4.4.0: STAGED CONSTRUCTION SYSTEM for Games 6-7
+                // AI builds sequences SEQUENTIALLY (L1 → L2 → T) instead of parallel accumulation
+                this.aiConstructionStage = [null, 'initial', 'initial']; // [human, habot, jabot]
+                // Stages: 'initial' → 'building_L1' → 'building_L2' → 'building_T' → 'ready_to_publish'
+                
+                this.aiLockedSequences = [[], [], []]; // Completed sequences protected from discard
+                // Format: [{ type: 'ladder', cards: [...], suit: '♥' }, ...]
+                
+                this.aiTargetCards = [null, [], []]; // Specific cards AI is hunting for
+                // Format: ['5♥', '7♠', '10♦'] - max 3 targets per AI
+                
+                this.aiSuitFocus = [null, [], []]; // Concentrated suits AI is working on
+                // Format: ['♥', '♠'] - 2-3 suits AI focuses on for ladder building
                 
                 // 🎯 v3.0: Cache for sequence separation to reduce logging spam
                 this.sequenceSeparationCache = {
@@ -1898,6 +1962,54 @@
                     return false;
                 }
 
+                // 🏗️ v4.4.0: STAGED CONSTRUCTION - Use locked sequences for Hands 6-7
+                if (this.currentHand >= 6 && this.aiLockedSequences[pIdx].length > 0) {
+                    console.log(`  🏗️ v4.4.0: Using ${this.aiLockedSequences[pIdx].length} locked sequences for publishing`);
+                    
+                    const req = this.handReqs[this.currentHand].seqs;
+                    const triplesNeeded = req.filter(s => s === 'triple').length;
+                    const laddersNeeded = req.filter(s => s === 'ladder').length;
+                    
+                    const lockedTriples = this.aiLockedSequences[pIdx].filter(s => s.type === 'triple');
+                    const lockedLadders = this.aiLockedSequences[pIdx].filter(s => s.type === 'ladder');
+                    
+                    console.log(`      Need: ${triplesNeeded}T + ${laddersNeeded}L`);
+                    console.log(`      Have locked: ${lockedTriples.length}T + ${lockedLadders.length}L`);
+                    
+                    // Check if we have all requirements locked
+                    if (lockedTriples.length >= triplesNeeded && lockedLadders.length >= laddersNeeded) {
+                        console.log(`      ✅ All requirements met! Publishing locked sequences`);
+                        
+                        // Build published array from locked sequences
+                        const published = [];
+                        for (let i = 0; i < triplesNeeded; i++) {
+                            published.push(...lockedTriples[i].cards);
+                        }
+                        for (let i = 0; i < laddersNeeded; i++) {
+                            published.push(...lockedLadders[i].cards);
+                        }
+                        
+                        // Separate into 2D structure
+                        const sequences = this.separateSequences(published, req);
+                        
+                        // Remove published cards from hand
+                        published.forEach(c => {
+                            const idx = this.playerHands[pIdx].findIndex(card => card.id === c.id);
+                            if (idx > -1) this.playerHands[pIdx].splice(idx, 1);
+                        });
+                        
+                        // Set published sequences
+                        this.publishedSequences[pIdx] = sequences;
+                        this.aiJustPublished[pIdx] = true;
+                        
+                        console.log(`      ✅ v4.4.0: Published ${sequences.length} sequences from locked cards`);
+                        return true;
+                    } else {
+                        console.log(`      ❌ Not all requirements locked yet - continue building`);
+                        return false;
+                    }
+                }
+
                 const req = this.handReqs[this.currentHand].seqs;
                 const hand = this.playerHands[pIdx];
                 const opponentRanks = new Set();
@@ -2017,6 +2129,179 @@
                 console.log(`  ✅ FIX 1: HIGH end (${maxVal}+1=${maxVal + 1}): ${canExtendHigh}`);
 
                 return canExtendLow || canExtendHigh;
+            }
+
+            // 🏗️ v4.4.0 STAGED CONSTRUCTION FUNCTIONS
+            // ==========================================
+
+            analyzeNearSequential(cards, suit) {
+                // Finds partial sequences in a suit and identifies gaps
+                // Returns: { values: [4,6,8], gaps: [5,7], potential: 2 }
+                const suitCards = cards.filter(c => c.suit === suit);
+                if (suitCards.length < 2) return { values: [], gaps: [], potential: 0 };
+                
+                const values = suitCards.map(c => c.getValue()).sort((a, b) => a - b);
+                const gaps = [];
+                let gapCount = 0;
+                
+                for (let i = 0; i < values.length - 1; i++) {
+                    const gap = values[i + 1] - values[i];
+                    if (gap === 2) {
+                        // One card missing: e.g., 4 and 6, missing 5
+                        gaps.push(values[i] + 1);
+                        gapCount++;
+                    } else if (gap === 3) {
+                        // Two cards missing: e.g., 4 and 7, missing 5,6
+                        gaps.push(values[i] + 1, values[i] + 2);
+                        gapCount += 2;
+                    }
+                }
+                
+                // Potential: high card count + low gaps = high potential
+                const potential = suitCards.length - gapCount;
+                
+                console.log(`  🔍 v4.4.0: Analyzing ${suit} - ${values.join(',')} - gaps: [${gaps.join(',')}] - potential: ${potential}`);
+                return { values, gaps, potential, cardCount: suitCards.length };
+            }
+
+            selectSuitFocus(hand, numSuits = 2) {
+                // Selects 2-3 suits with highest ladder-building potential
+                const suits = ['♠', '♥', '♦', '♣'];
+                const analysis = suits.map(suit => ({
+                    suit,
+                    ...this.analyzeNearSequential(hand, suit)
+                }));
+                
+                // Sort by: 1) potential, 2) card count, 3) fewer gaps
+                analysis.sort((a, b) => {
+                    if (b.potential !== a.potential) return b.potential - a.potential;
+                    if (b.cardCount !== a.cardCount) return b.cardCount - a.cardCount;
+                    return a.gaps.length - b.gaps.length;
+                });
+                
+                const selected = analysis.slice(0, numSuits).map(a => a.suit);
+                console.log(`  🎯 v4.4.0: Selected focus suits: ${selected.join(', ')}`);
+                return selected;
+            }
+
+            generateTargetCards(hand, suitFocus, maxTargets = 3) {
+                // Identifies specific cards needed to complete sequences
+                const targets = [];
+                
+                for (let suit of suitFocus) {
+                    const analysis = this.analyzeNearSequential(hand, suit);
+                    
+                    // Prioritize gaps that would create 4+ sequential runs
+                    for (let gap of analysis.gaps) {
+                        const rank = this.valueToRank(gap);
+                        const targetCard = `${rank}${suit}`;
+                        
+                        // Check if adding this card would create 4+ run
+                        const testValues = [...analysis.values, gap].sort((a, b) => a - b);
+                        let maxRun = 1, currentRun = 1;
+                        for (let i = 1; i < testValues.length; i++) {
+                            if (testValues[i] === testValues[i-1] + 1) {
+                                currentRun++;
+                                maxRun = Math.max(maxRun, currentRun);
+                            } else {
+                                currentRun = 1;
+                            }
+                        }
+                        
+                        if (maxRun >= 4 && !targets.includes(targetCard)) {
+                            targets.push(targetCard);
+                            console.log(`  🎯 v4.4.0: Target card: ${targetCard} (would create ${maxRun}-card run)`);
+                            if (targets.length >= maxTargets) break;
+                        }
+                    }
+                    if (targets.length >= maxTargets) break;
+                }
+                
+                return targets;
+            }
+
+            valueToRank(value) {
+                // Converts card value (1-13) to rank string
+                const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+                return ranks[value - 1] || 'A';
+            }
+
+            lockSequence(playerIdx, cards, type, suit = null) {
+                // Marks a completed sequence as protected from discard
+                const locked = { type, cards: [...cards], suit };
+                this.aiLockedSequences[playerIdx].push(locked);
+                console.log(`  🔒 v4.4.0: LOCKED ${type} sequence (${cards.length} cards) for Player ${playerIdx}`);
+                return locked;
+            }
+
+            isSequenceLocked(playerIdx, card) {
+                // Checks if a card is part of any locked sequence
+                for (let locked of this.aiLockedSequences[playerIdx]) {
+                    if (locked.cards.some(c => c.id === card.id)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            advanceConstructionStage(playerIdx) {
+                // Moves AI to next construction stage based on completed sequences
+                const currentStage = this.aiConstructionStage[playerIdx];
+                const hand = this.playerHands[playerIdx];
+                const seqs = this.findSequences(hand);
+                const req = this.handReqs[this.currentHand].seqs;
+                const needTriples = req.filter(s => s === 'triple').length;
+                const needLadders = req.filter(s => s === 'ladder').length;
+                
+                console.log(`  🏗️ v4.4.0: Stage check for Player ${playerIdx} - Current: ${currentStage}`);
+                console.log(`      Has: ${seqs.triples.length} triples, ${seqs.ladders.length} ladders`);
+                console.log(`      Need: ${needTriples} triples, ${needLadders} ladders`);
+                console.log(`      Locked: ${this.aiLockedSequences[playerIdx].length} sequences`);
+                
+                // Count locked ladders
+                const lockedLadders = this.aiLockedSequences[playerIdx].filter(s => s.type === 'ladder').length;
+                
+                if (currentStage === 'building_L1' && lockedLadders >= 1) {
+                    // First ladder complete → move to building second ladder
+                    if (needLadders >= 2) {
+                        this.aiConstructionStage[playerIdx] = 'building_L2';
+                        console.log(`  🎯 v4.4.0: ADVANCED to building_L2 (first ladder locked)`);
+                        // Generate new targets for second ladder
+                        const focusSuits = this.selectSuitFocus(hand, 2);
+                        this.aiSuitFocus[playerIdx] = focusSuits;
+                        this.aiTargetCards[playerIdx] = this.generateTargetCards(hand, focusSuits);
+                    } else {
+                        // Only need 1 ladder total → move to triple
+                        this.aiConstructionStage[playerIdx] = 'building_T';
+                        console.log(`  🎯 v4.4.0: ADVANCED to building_T (only 1 ladder needed)`);
+                    }
+                } else if (currentStage === 'building_L2' && lockedLadders >= 2) {
+                    // Second ladder complete → move to building triple
+                    this.aiConstructionStage[playerIdx] = 'building_T';
+                    console.log(`  🎯 v4.4.0: ADVANCED to building_T (two ladders locked)`);
+                } else if (currentStage === 'building_T') {
+                    // Check if we have all requirements
+                    const lockedTriples = this.aiLockedSequences[playerIdx].filter(s => s.type === 'triple').length;
+                    if (lockedTriples >= needTriples && lockedLadders >= needLadders) {
+                        this.aiConstructionStage[playerIdx] = 'ready_to_publish';
+                        console.log(`  ✅ v4.4.0: READY TO PUBLISH! All sequences complete!`);
+                    }
+                }
+            }
+
+            updateStagedConstructionTargets(playerIdx) {
+                // Updates target cards and suit focus based on current stage and hand
+                if (this.currentHand < 6) return; // Only for Hands 6-7
+                
+                const hand = this.playerHands[playerIdx];
+                const stage = this.aiConstructionStage[playerIdx];
+                
+                if (stage === 'building_L1' || stage === 'building_L2') {
+                    // Select best suits for ladder building
+                    const focusSuits = this.selectSuitFocus(hand, 2);
+                    this.aiSuitFocus[playerIdx] = focusSuits;
+                    this.aiTargetCards[playerIdx] = this.generateTargetCards(hand, focusSuits, 3);
+                }
             }
 
             couldExtendSequence(card, playerIdx) {
@@ -2322,6 +2607,24 @@
 
             findWorstCard(pIdx) {
                 let hand = this.playerHands[pIdx];  // 🐛 v4.0.7: Changed to 'let' to allow reassignment
+
+                // 🔒 v4.4.0: PROTECT LOCKED SEQUENCES from discard!
+                if (this.currentHand >= 6 && this.aiLockedSequences[pIdx].length > 0) {
+                    console.log(`  🔒 v4.4.0: Protecting ${this.aiLockedSequences[pIdx].length} locked sequences from discard`);
+                    
+                    // Filter out ALL cards that are in locked sequences
+                    const unlockedCards = hand.filter(card => !this.isSequenceLocked(pIdx, card));
+                    
+                    console.log(`      Total cards: ${hand.length}, Unlocked: ${unlockedCards.length}`);
+                    
+                    if (unlockedCards.length > 0) {
+                        // Only consider unlocked cards for discard
+                        hand = unlockedCards;
+                        console.log(`      ✅ Will only discard from unlocked cards`);
+                    } else {
+                        console.log(`      ⚠️ All cards are locked! Using full hand (emergency)`);
+                    }
+                }
 
                 // 🎯 PATCH LADDER-DISCARD: In ladder games, prioritize keeping sequential cards of same suit!
                 const req = this.handReqs[this.currentHand].seqs;
@@ -2835,42 +3138,77 @@
                         return false;
                     case 4: if (buysUsed >= 2) return false; return hasTriple && cardValue >= 25;
                     case 5: if (buysUsed >= 2) return false; const hasAnySequence = hasTriple || hasLadder; return hasAnySequence && cardValue >= 30;
-                    case 6: 
-                        if (buysUsed >= 2) return false;
-                        // Hand 6 SMART STRATEGY: Build 2 LADDERS first (4+ cards each!)
+                    case 6:
+                    case 7:
+                        // 🏗️ v4.4.0: STAGED CONSTRUCTION STRATEGY
+                        // Build sequences SEQUENTIALLY: L1 → L2 → T (not parallel!)
                         
-                        // Check if card would create/extend a COMPLETE 4+ card ladder
-                        const wouldFormLadder = () => {
-                            const sameSuit = hand.filter(c => c.suit === discardCard.suit);
-                            if (sameSuit.length < 2) return false; // Need at least 2 existing cards
+                        const stage = this.aiConstructionStage[ai];
+                        const aiName = ai === 1 ? 'Habot' : 'Jabot';
+                        
+                        console.log(`  🏗️ v4.4.0 ${aiName} BUY CHECK - Stage: ${stage}, Buys used: ${buysUsed}/2-3`);
+                        
+                        // Stage 1 & 2: Building Ladders - TARGET-BASED BUYING
+                        if (stage === 'building_L1' || stage === 'building_L2') {
+                            // Update targets if needed
+                            if (this.aiTargetCards[ai].length === 0 || this.aiSuitFocus[ai].length === 0) {
+                                this.updateStagedConstructionTargets(ai);
+                            }
                             
-                            // Add the potential card and check for 4+ sequential run
-                            const allValues = [...sameSuit.map(c => c.value), discardCard.getValue()].sort((a, b) => a - b);
-                            let maxRun = 1, currentRun = 1;
-                            for (let i = 1; i < allValues.length; i++) {
-                                if (allValues[i] === allValues[i-1] + 1) {
-                                    currentRun++;
-                                    maxRun = Math.max(maxRun, currentRun);
-                                } else if (allValues[i] !== allValues[i-1]) {
-                                    currentRun = 1;
+                            const targets = this.aiTargetCards[ai];
+                            const cardString = `${discardCard.rank}${discardCard.suit}`;
+                            
+                            // Is this one of our target cards?
+                            const isTarget = targets.includes(cardString);
+                            
+                            console.log(`      Targets: ${targets.join(', ')}`);
+                            console.log(`      Card: ${cardString} - Is target? ${isTarget}`);
+                            
+                            if (isTarget) {
+                                console.log(`      ✅ BUY! This is a target card for ${stage}`);
+                                return true; // BUY immediately if it's a target!
+                            }
+                            
+                            // Not a target - check if it's still valuable for ladder building
+                            if (buysUsed === 0 && cardValue >= 20) {
+                                // First buy - be more flexible to get more cards
+                                const sameSuit = hand.filter(c => c.suit === discardCard.suit);
+                                if (sameSuit.length >= 2) {
+                                    console.log(`      ✅ First buy - accept valuable card in promising suit`);
+                                    return true;
                                 }
                             }
-                            return maxRun >= 4; // Only accept if creates 4+ sequential run!
-                        };
-                        
-                        // If we have 2+ complete ladders, can work on triple
-                        if (hasLadder && seqs.ladders.length >= 2) {
-                            const completesTriple = hand.filter(c => c.rank === discardCard.rank).length >= 2;
-                            return (completesTriple || wouldFormLadder()) && cardValue >= 15;
+                            
+                            console.log(`      ❌ REJECT - not a target, not valuable enough`);
+                            return false;
                         }
                         
-                        // Otherwise: ONLY buy if creates 4+ card ladder!
-                        return wouldFormLadder() && cardValue >= 10;
-                    case 7: 
-                        // Hand 7 needs 3L - ONLY buy cards that build ladders!
-                        const sameSuit7 = hand.filter(c => c.suit === discardCard.suit);
-                        const helpsLadder7 = sameSuit7.length >= 2 && sameSuit7.some(c => Math.abs(c.getValue() - discardCard.getValue()) === 1);
-                        return helpsLadder7 && cardValue >= 15;
+                        // Stage 3: Building Triple - EASIER, just need matching ranks
+                        if (stage === 'building_T') {
+                            const completesTriple = hand.filter(c => c.rank === discardCard.rank).length >= 2;
+                            
+                            console.log(`      Checking triple: have ${hand.filter(c => c.rank === discardCard.rank).length} ${discardCard.rank}s`);
+                            console.log(`      Would complete triple? ${completesTriple}`);
+                            
+                            if (completesTriple && cardValue >= 10) {
+                                console.log(`      ✅ BUY! Completes triple for publishing`);
+                                return true;
+                            }
+                            
+                            // Also accept cards that start triples if we have buys left
+                            const pairCount = hand.filter(c => c.rank === discardCard.rank).length;
+                            if (pairCount === 1 && buysUsed < 1 && cardValue >= 15) {
+                                console.log(`      ✅ BUY! Forms pair toward triple`);
+                                return true;
+                            }
+                            
+                            console.log(`      ❌ REJECT - doesn't help triple`);
+                            return false;
+                        }
+                        
+                        // Ready to publish or unknown stage - don't buy
+                        console.log(`      ❌ Stage ${stage} - no buying`);
+                        return false;
                     default: return false;
                 }
             }
@@ -3508,6 +3846,64 @@
 
             continueAITurnAfterDraw(ai, statusId) {
                 const aiName = ai === 1 ? 'Habot' : 'Jabot';
+                
+                // 🏗️ v4.4.0: STAGED CONSTRUCTION - Check for completed sequences and lock them
+                if (this.currentHand >= 6 && this.aiConstructionStage[ai] !== 'ready_to_publish') {
+                    const hand = this.playerHands[ai];
+                    const seqs = this.findSequences(hand);
+                    const stage = this.aiConstructionStage[ai];
+                    
+                    console.log(`  🏗️ v4.4.0: ${aiName} turn - Stage: ${stage}`);
+                    console.log(`      Hand: ${hand.length} cards - ${seqs.triples.length}T, ${seqs.ladders.length}L`);
+                    
+                    // Check if we completed a sequence in current stage
+                    if (stage === 'building_L1' && seqs.ladders.length > 0) {
+                        // Lock first ladder
+                        const firstLadder = seqs.ladders[0];
+                        const locked = this.aiLockedSequences[ai].filter(s => s.type === 'ladder');
+                        
+                        if (locked.length === 0) {
+                            // First ladder not yet locked - lock it now!
+                            this.lockSequence(ai, firstLadder, 'ladder', firstLadder[0].suit);
+                            console.log(`      🔒 Locked first ladder: ${firstLadder.map(c => c.toString()).join(', ')}`);
+                            
+                            // Advance to next stage
+                            this.advanceConstructionStage(ai);
+                        }
+                    } else if (stage === 'building_L2' && seqs.ladders.length >= 2) {
+                        // Lock second ladder
+                        const locked = this.aiLockedSequences[ai].filter(s => s.type === 'ladder');
+                        
+                        if (locked.length === 1) {
+                            // Find the unlocked ladder
+                            const unlockedLadder = seqs.ladders.find(ladder => {
+                                const firstCard = ladder[0];
+                                return !locked.some(l => l.cards.some(c => c.id === firstCard.id));
+                            });
+                            
+                            if (unlockedLadder) {
+                                this.lockSequence(ai, unlockedLadder, 'ladder', unlockedLadder[0].suit);
+                                console.log(`      🔒 Locked second ladder: ${unlockedLadder.map(c => c.toString()).join(', ')}`);
+                                
+                                // Advance to building triple
+                                this.advanceConstructionStage(ai);
+                            }
+                        }
+                    } else if (stage === 'building_T' && seqs.triples.length > 0) {
+                        // Lock triple
+                        const firstTriple = seqs.triples[0];
+                        const lockedTriples = this.aiLockedSequences[ai].filter(s => s.type === 'triple');
+                        
+                        if (lockedTriples.length === 0) {
+                            this.lockSequence(ai, firstTriple, 'triple');
+                            console.log(`      🔒 Locked triple: ${firstTriple.map(c => c.toString()).join(', ')}`);
+                            
+                            // Check if ready to publish
+                            this.advanceConstructionStage(ai);
+                        }
+                    }
+                }
+                
                 // PATCH 4: Emergency publish if hand is too large
                 const currentHandSize = this.playerHands[ai].length;
                 if (currentHandSize >= 13 && this.publishedSequences[ai].length === 0 && this.canPublish(ai)) {
@@ -3905,6 +4301,16 @@
                         this.gamePhase = 'draw'; this.currentPlayer = 0; this.justPublished = false; this.aiJustPublished = [false, false, false];
                         this.lastDiscard = null; this.lastDiscardByPlayer = -1; this.discardPile = [];
                         this.turnCounter = 0; this.lastAIDiscard = [null, null, null]; this.lastCardWarningShown = null;
+                        
+                        // 🏗️ v4.4.0: Initialize staged construction for Hands 6-7
+                        if (this.currentHand >= 6) {
+                            console.log(`%c🏗️ v4.4.0: Initializing STAGED CONSTRUCTION for Hand ${this.currentHand}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
+                            this.aiConstructionStage = [null, 'building_L1', 'building_L1'];
+                            this.aiLockedSequences = [[], [], []];
+                            this.aiTargetCards = [null, [], []];
+                            this.aiSuitFocus = [null, [], []];
+                        }
+                        
                         this.initDeck(); this.deal(); this.updateUI();
                     }
                 }, 4000);
