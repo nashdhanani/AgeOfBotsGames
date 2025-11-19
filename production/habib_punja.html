@@ -2,11 +2,31 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.3.0 - Ladders First Strategy
+  Version: 4.3.2 - Wrap-Around Ladder Extension Fix
   Release Date: November 16, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
+
+  🎮 VERSION 4.3.2 - CRITICAL FIX: Wrap-Around Ladder Extension!
+  ═══════════════════════════════════════════
+  🐛 Fixed: Can now extend A-K-Q-J wrap-around ladders with 10
+  ✅ canAddToPublishedSequence now uses canCardExtendLadder (handles wrap-around!)
+  ❌ Removed: Broken simple rank array logic that didn't understand A-K-Q-J
+  📊 Result: UI extension validation matches couldExtendSequence logic!
+  
+  Bug: UI said "Invalid Card" even though couldExtendSequence returned true
+  Fix: UI now uses same wrap-around detection as backend logic
+  
+  🎮 VERSION 4.3.1 - CRITICAL FIX: Complete 4+ Card Ladder Check!
+  ═══════════════════════════════════════════
+  🐛 Fixed: AI now ONLY buys cards that create/extend COMPLETE 4+ card ladders
+  ❌ Prevented: Buying scattered fragments (e.g., 4-5-6♥ + 9-10♥ = 2 incomplete)
+  ✅ Required: Card must form sequential run of 4+ cards AFTER adding it
+  📊 Result: AI accumulates cards that actually complete ladders!
+  
+  Previous v4.3.0: Checked "adjacent to any suit card" = scattered fragments ❌
+  New v4.3.1: Verifies complete 4+ sequential run after adding card ✅
 
   🎮 VERSION 4.3.0 - CRITICAL FIX: Ladders First Strategy!
   ═══════════════════════════════════════════
@@ -91,12 +111,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.3.0 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.3.0 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.3.2 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.3.2 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
-    <meta name="version" content="3.2.1">
+    <meta name="version" content="4.3.2">
     <meta name="copyright" content="Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.">
 
     <!-- Open Graph / Facebook -->
@@ -1018,9 +1038,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.3.0</div>
+    <div class="fix-badge">✅ v4.2.9</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.3.0</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.2.9</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1196,7 +1216,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.3.0', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.3.2', 'color: #4CAF50; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1211,7 +1231,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.3.0 DEBUG';
+                    badge.innerHTML = '🐛 v4.1.9 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -2085,10 +2105,8 @@
                     return card.rank === seq[0].rank;
                 }
 
-                // For runs - check if can extend at either end
+                // For ladders - use canCardExtendLadder (handles wrap-around!)
                 if (seq.length >= 3) {
-                    const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
-
                     // 🔧 PATCH S: Check suit consistency in sequence first
                     const suits = [...new Set(seq.map(c => c.suit))];
                     if (suits.length !== 1) {
@@ -2099,24 +2117,10 @@
                     const seqSuit = seq[0].suit;
                     if (card.suit !== seqSuit) return false;
 
-                    const seqRanks = seq.map(c => c.rank);
-                    const firstRank = seqRanks[0];
-                    const lastRank = seqRanks[seqRanks.length - 1];
-
-                    const firstIdx = ranks.indexOf(firstRank);
-                    const lastIdx = ranks.lastIndexOf(lastRank);
-
-                    // Can add before first card?
-                    if (firstIdx > 0 && ranks[firstIdx - 1] === card.rank) {
-                        console.log(`  🔧 PATCH S: ${card.toString()} can extend LOW end of ${seqRanks.join('-')}`);
-                        return true;
-                    }
-
-                    // Can add after last card?
-                    if (lastIdx < ranks.length - 1 && ranks[lastIdx + 1] === card.rank) {
-                        console.log(`  🔧 PATCH S: ${card.toString()} can extend HIGH end of ${seqRanks.join('-')}`);
-                        return true;
-                    }
+                    // ✅ v4.3.2 FIX: Use canCardExtendLadder which handles wrap-around A-K-Q-J
+                    const cardVal = card.getValue();
+                    const ladderValues = seq.map(c => c.getValue());
+                    return this.canCardExtendLadder(cardVal, ladderValues);
                 }
 
                 return false;
@@ -2833,19 +2837,35 @@
                     case 5: if (buysUsed >= 2) return false; const hasAnySequence = hasTriple || hasLadder; return hasAnySequence && cardValue >= 30;
                     case 6: 
                         if (buysUsed >= 2) return false;
-                        // Hand 6 SMART STRATEGY: Build 2 LADDERS first, then triple from leftovers!
-                        // Ladders are harder (4+ sequential same-suit), triples easier (3 matching)
-                        const sameSuit = hand.filter(c => c.suit === discardCard.suit);
-                        const cardHelpsLadder = sameSuit.length >= 2 && sameSuit.some(c => Math.abs(c.getValue() - discardCard.getValue()) === 1);
+                        // Hand 6 SMART STRATEGY: Build 2 LADDERS first (4+ cards each!)
                         
-                        // If we have 2+ ladders already, focus on completing triple
+                        // Check if card would create/extend a COMPLETE 4+ card ladder
+                        const wouldFormLadder = () => {
+                            const sameSuit = hand.filter(c => c.suit === discardCard.suit);
+                            if (sameSuit.length < 2) return false; // Need at least 2 existing cards
+                            
+                            // Add the potential card and check for 4+ sequential run
+                            const allValues = [...sameSuit.map(c => c.value), discardCard.getValue()].sort((a, b) => a - b);
+                            let maxRun = 1, currentRun = 1;
+                            for (let i = 1; i < allValues.length; i++) {
+                                if (allValues[i] === allValues[i-1] + 1) {
+                                    currentRun++;
+                                    maxRun = Math.max(maxRun, currentRun);
+                                } else if (allValues[i] !== allValues[i-1]) {
+                                    currentRun = 1;
+                                }
+                            }
+                            return maxRun >= 4; // Only accept if creates 4+ sequential run!
+                        };
+                        
+                        // If we have 2+ complete ladders, can work on triple
                         if (hasLadder && seqs.ladders.length >= 2) {
                             const completesTriple = hand.filter(c => c.rank === discardCard.rank).length >= 2;
-                            return (completesTriple || cardHelpsLadder) && cardValue >= 15;
+                            return (completesTriple || wouldFormLadder()) && cardValue >= 15;
                         }
                         
-                        // Otherwise: ONLY buy ladder-building cards (ladders first strategy!)
-                        return cardHelpsLadder && cardValue >= 10;
+                        // Otherwise: ONLY buy if creates 4+ card ladder!
+                        return wouldFormLadder() && cardValue >= 10;
                     case 7: 
                         // Hand 7 needs 3L - ONLY buy cards that build ladders!
                         const sameSuit7 = hand.filter(c => c.suit === discardCard.suit);
