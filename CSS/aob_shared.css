@@ -1,0 +1,94 @@
+﻿/* ===========================================
+   Age of Bots – Shared Micro-Styles
+   Version 1.0 – Safe, Non-intrusive
+   =========================================== */
+
+/* Improves text clarity across dark backgrounds */
+body, button, input, textarea {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    color: #e6e6f8;
+}
+
+/* Smooth fade utility */
+.aob-fade {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+    .aob-fade.show {
+        opacity: 1;
+    }
+
+/* Centering helper for buttons */
+.aob-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Consistent button styling (optional override) */
+.aob-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #7c3aed, #4c1d95);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s ease-in-out;
+}
+
+    .aob-btn:hover {
+        transform: scale(1.04);
+        box-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
+    }
+
+/* Light container for story, fable, or advisor text */
+.aob-box {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: blur(6px);
+}
+
+/* Future-proof area for character bubbles */
+.aob-bubble {
+    max-width: 320px;
+    padding: 14px 18px;
+    background: #fff;
+    color: #222;
+    border-radius: 24px;
+    position: relative;
+    box-shadow: 2px 8px 28px rgba(0,0,0,0.12);
+    font-family: "Comic Neue", "Comic Sans MS", sans-serif;
+    display: none; /* will be turned on by JS later */
+}
+
+    /* Left-tail bubble */
+    .aob-bubble.left::after {
+        content: "";
+        position: absolute;
+        left: -16px;
+        top: 18px;
+        border-top: 15px solid transparent;
+        border-bottom: 15px solid transparent;
+        border-right: 16px solid #fff;
+    }
+
+    /* Right-tail bubble */
+    .aob-bubble.right::after {
+        content: "";
+        position: absolute;
+        right: -16px;
+        top: 18px;
+        border-top: 15px solid transparent;
+        border-bottom: 15px solid transparent;
+        border-left: 16px solid #fff;
+    }
+
+    /* Reserve advisor bubble style for Phase 3 */
+    .aob-bubble.center {
+        margin: 0 auto;
+    }

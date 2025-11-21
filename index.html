@@ -5,19 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habib Punja - Strategic AI Card Game | AgeOfBotsGames</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/aob_shared.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
             color: white;
             min-height: 100vh;
         }
-        
+
         nav {
             background: rgba(0,0,0,0.3);
             padding: 20px 40px;
@@ -26,50 +28,60 @@
             align-items: center;
             backdrop-filter: blur(10px);
         }
+
         .logo {
             font-size: 24px;
             font-weight: bold;
             color: #ffd700;
         }
+
         .nav-links {
             list-style: none;
             display: flex;
             gap: 30px;
         }
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s;
-            font-size: 16px;
-        }
-        .nav-links a:hover { color: #ffd700; }
-        
+
+            .nav-links a {
+                color: white;
+                text-decoration: none;
+                transition: color 0.3s;
+                font-size: 16px;
+            }
+
+                .nav-links a:hover {
+                    color: #ffd700;
+                }
+
         .hero {
             text-align: center;
-            padding: 80px 20px 60px;
+            padding: 80px 20px 40px;
         }
-        .hero h1 {
-            font-size: 56px;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
+
+            .hero h1 {
+                font-size: 56px;
+                margin-bottom: 15px;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            }
+
         .tagline {
             font-size: 22px;
             color: #ffd700;
             margin-bottom: 10px;
         }
+
         .version {
             font-size: 16px;
             color: #cbd5e1;
             margin-bottom: 40px;
         }
-        
+
         .cta-buttons {
             display: flex;
             gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
         }
+
         .cta-button {
             display: inline-block;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -82,61 +94,152 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
             font-weight: 700;
         }
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-        .cta-button.secondary {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-        }
-        .cta-button.secondary:hover {
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
-        }
-        
-        .features {
+
+            .cta-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            }
+
+            .cta-button.secondary {
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            }
+
+                .cta-button.secondary:hover {
+                    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+                }
+
+        /* =============== MuBot Fable Section =============== */
+        .mubot-section {
             max-width: 1200px;
-            margin: 60px auto;
-            padding: 0 20px;
+            margin: 40px auto;
+            padding: 0 20px 40px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
             gap: 30px;
+            align-items: center;
         }
-        .feature-card {
-            background: rgba(255,255,255,0.05);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            transition: transform 0.3s, background 0.3s;
-            border: 1px solid rgba(255,255,255,0.1);
+
+        .mubot-card {
+            background: rgba(0,0,0,0.35);
+            border-radius: 18px;
+            padding: 25px 28px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.15);
         }
-        .feature-card:hover { 
-            transform: translateY(-5px);
-            background: rgba(255,255,255,0.08);
-        }
-        .feature-icon { font-size: 48px; margin-bottom: 15px; }
-        .feature-title {
-            font-size: 22px;
-            color: #ffd700;
-            margin-bottom: 12px;
+
+        .mubot-label {
+            font-size: 14px;
             font-weight: 700;
-        }
-        .feature-description {
-            color: #e5e7eb;
-            line-height: 1.6;
-        }
-        .feature-link {
-            display: inline-block;
-            margin-top: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
             color: #7dd3fc;
-            text-decoration: none;
+            margin-bottom: 8px;
+        }
+
+        .mubot-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .mubot-subtitle {
+            font-size: 16px;
+            color: #e5e7eb;
+            margin-bottom: 16px;
+        }
+
+        .mubot-story {
+            font-size: 15px;
+            color: #e5e7eb;
+            line-height: 1.7;
+        }
+
+            .mubot-story p + p {
+                margin-top: 10px;
+            }
+
+        .mubot-lesson {
+            margin-top: 16px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(148,163,184,0.6);
+            font-size: 15px;
+            color: #fbbf24;
             font-weight: 600;
         }
-        .feature-link:hover {
-            color: #bae6fd;
-            text-decoration: underline;
+
+        .mubot-actions {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
         }
-        
+
+        .btn-outline {
+            border-radius: 999px;
+            border: 2px solid #7dd3fc;
+            background: transparent;
+            color: #e0f2fe;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s, color 0.2s, transform 0.2s;
+        }
+
+            .btn-outline:hover {
+                background: rgba(125,211,252,0.15);
+                transform: translateY(-1px);
+            }
+
+            .btn-outline:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+
+            .btn-outline span.icon {
+                font-size: 16px;
+            }
+
+        .mubot-video-shell {
+            background: rgba(15,23,42,0.75);
+            border-radius: 18px;
+            padding: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(148,163,184,0.6);
+            text-align: center;
+        }
+
+            .mubot-video-shell h3 {
+                font-size: 16px;
+                margin-bottom: 10px;
+                color: #cbd5e1;
+            }
+
+            .mubot-video-shell small {
+                display: block;
+                margin-top: 8px;
+                font-size: 12px;
+                color: #94a3b8;
+            }
+
+        .mubot-video {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            background: black;
+        }
+
+            .mubot-video video {
+                width: 100%;
+                display: block;
+                border-radius: 12px;
+            }
+
         .tester-notice {
             max-width: 900px;
             margin: 40px auto;
@@ -146,29 +249,95 @@
             border-radius: 15px;
             text-align: center;
         }
-        .tester-notice h2 {
-            color: #10b981;
+
+            .tester-notice h2 {
+                color: #10b981;
+                margin-bottom: 15px;
+            }
+
+            .tester-notice p {
+                color: #d1fae5;
+                font-size: 18px;
+                line-height: 1.6;
+            }
+
+        .features {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s, background 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+            .feature-card:hover {
+                transform: translateY(-5px);
+                background: rgba(255,255,255,0.08);
+            }
+
+        .feature-icon {
+            font-size: 48px;
             margin-bottom: 15px;
         }
-        .tester-notice p {
-            color: #d1fae5;
-            font-size: 18px;
+
+        .feature-title {
+            font-size: 22px;
+            color: #ffd700;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .feature-description {
+            color: #e5e7eb;
             line-height: 1.6;
         }
-        
+
+        .feature-link {
+            display: inline-block;
+            margin-top: 12px;
+            color: #7dd3fc;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .feature-link:hover {
+                color: #bae6fd;
+                text-decoration: underline;
+            }
+
         footer {
             text-align: center;
             padding: 40px 20px;
-            margin-top: 80px;
+            margin-top: 40px;
             background: rgba(0,0,0,0.3);
             color: #888;
         }
-        footer strong { color: #ffd700; }
-        
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 36px; }
-            .tagline { font-size: 18px; }
-            .features { grid-template-columns: 1fr; }
+
+            footer strong {
+                color: #ffd700;
+            }
+
+        @media (max-width: 900px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .tagline {
+                font-size: 18px;
+            }
+
+            .mubot-section {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -190,66 +359,203 @@
         <h1>🎴 Habib Punja</h1>
         <p class="tagline">Strategic 3-Player Liverpool Rummy</p>
         <p class="version">Version 4.5.3 | Testing Build</p>
-        
+
         <div class="cta-buttons">
-            <a href="production/habib_punja.html" class="cta-button">🎮 Play Now</a>
-            <a href="resources.html" class="cta-button secondary">📚 Learn the Rules</a>
+            <a href="production/habib_punja.html" class="cta-button">🎮 Enter Game</a>
+            <a href="#mubot-fable" class="cta-button secondary">🌿 Hear MuBot’s Wisdom</a>
         </div>
     </div>
 
+    <!-- MuBot Fable / Intro Section -->
+    <section class="mubot-section" id="mubot-fable">
+        <!-- Left: Story + TTS controls -->
+        <div class="mubot-card">
+            <div class="mubot-label">Guided by MuBot · Zen Master of Strategy</div>
+            <div class="mubot-title">The Tale of Habib Punja</div>
+            <p class="mubot-subtitle">
+                Before you sit at the table, MuBot invites you to reflect on how you play the game of risk, reward, and strategy.
+            </p>
+
+            <div class="mubot-story" aria-label="The Tale of Habib Punja, narrated text">
+                <p>
+                    Habib Punja rose quickly, piling up wins through bold, impulsive decisions.
+                    His empire glittered with the rewards of chance, and for a while it seemed
+                    as if fortune had chosen him as its favorite.
+                </p>
+                <p>
+                    But at other tables, different games were being played.
+                    Quiet players tracked each hand, measured each risk, and looked
+                    not at the next card—but at the whole war of seven hands ahead.
+                </p>
+                <p>
+                    When the tides turned, Habib’s shining empire crumbled.
+                    The quick gains built on impulse dissolved. Those who had played with
+                    patience, logic, and foresight walked away with lasting victory.
+                </p>
+                <p class="mubot-lesson">
+                    Impulse fades. Strategy endures.
+                    Play the game that sharpens your logic, strengthens your foresight,
+                    and rewards deliberate, thoughtful decisions.
+                </p>
+            </div>
+
+            <div class="mubot-actions">
+                <button id="mubotPlayBtn" class="btn-outline">
+                    <span class="icon">🔊</span>
+                    <span>Hear MuBot Narrate the Tale</span>
+                </button>
+                <button id="mubotStopBtn" class="btn-outline">
+                    <span class="icon">⏹</span>
+                    <span>Stop Narration</span>
+                </button>
+                <button class="btn-outline" onclick="window.location.href='production/habib_punja.html'">
+                    <span class="icon">🎮</span>
+                    <span>Skip to Game</span>
+                </button>
+            </div>
+
+            <p style="margin-top: 10px; font-size: 12px; color: #9ca3af;">
+                Tip: If your sound is off or your browser doesn’t support speech, you can
+                simply read the tale above. The wisdom still applies.
+            </p>
+        </div>
+
+        <!-- Right: MuBot Video -->
+        <div class="mubot-video-shell">
+            <h3>MuBot welcomes you to the table</h3>
+            <div class="mubot-video">
+                <!-- Adjust src and poster paths to match your /video and /images folders -->
+                <video id="mubotVideo"
+                       src="video/MubotWelcome.mp4"
+                       poster="images/Mubot.png"
+                       autoplay
+                       muted
+                       loop
+                       playsinline></video>
+            </div>
+            <small>
+                Video plays silently by default for accessibility.
+                Audio narration uses your browser’s text-to-speech when you click
+                “Hear MuBot Narrate the Tale”.
+            </small>
+        </div>
+    </section>
+
     <div class="tester-notice">
         <h2>🧪 Testing Version</h2>
-        <p>Welcome Testers! This version includes modular architecture improvements. Please test all 7 hands thoroughly and report any bugs you encounter. See the <strong>Resources</strong> page for complete rules and the <strong>Strategy Guide</strong> for advanced tactics.</p>
+        <p>
+            Welcome Testers! This build includes advanced AI strategies for Habot (Rabbit) and
+            Jabot (Tortoise). Please play multiple full 7-hand runs, note any bugs or odd AI
+            behavior, and share feedback. Visit <strong>Resources</strong> for rules and the
+            <strong>Strategy Guide</strong> for advanced tactics.
+        </p>
     </div>
 
     <div class="features">
         <div class="feature-card">
             <div class="feature-icon">🤖</div>
             <div class="feature-title">AI Opponents</div>
-            <p class="feature-description">Face Habot (Rabbit) and Jabot (Tortoise) - two distinct AI personalities with unique playing styles and strategic depth</p>
+            <p class="feature-description">
+                Face Habot (Rabbit) and Jabot (Tortoise) – two distinct AI personalities with
+                unique playing styles and strategic depth.
+            </p>
             <a href="characters.html" class="feature-link">Meet the Characters →</a>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🎯</div>
-            <div class="feature-title">7-Hand Challenge</div>
-            <p class="feature-description">Progressive difficulty across 7 unique hands - from simple triples to complex three-ladder combinations</p>
-            <a href="resources.html#rules" class="feature-link">View Hand Requirements →</a>
+            <div class="feature-icon">📚</div>
+            <div class="feature-title">Strategy & Rules</div>
+            <p class="feature-description">
+                Learn how triples, ladders, and the 7-hand war fit together. Explore rules,
+                edge cases, and high-level tactics.
+            </p>
+            <a href="resources.html" class="feature-link">Resources & Rules →</a>
         </div>
 
         <div class="feature-card">
             <div class="feature-icon">🧠</div>
-            <div class="feature-title">Strategic Depth</div>
-            <p class="feature-description">Chess-level strategy meets card game excitement - perfect for strategic thinkers who enjoy games like Chess, Go, and Diplomacy</p>
+            <div class="feature-title">Championship Mindset</div>
+            <p class="feature-description">
+                MuBot’s philosophy: one hand is a battle, not the war. Minimize devastation,
+                win the long game, and out-think your AI rivals.
+            </p>
             <a href="strategic-guide.html" class="feature-link">Read Strategy Guide →</a>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon">📖</div>
-            <div class="feature-title">Complete Rules</div>
-            <p class="feature-description">Official rules, quick start guide, and terminology reference - everything you need to master the game</p>
-            <a href="resources.html" class="feature-link">View Resources →</a>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon">⚡</div>
-            <div class="feature-title">Quick or Full Game</div>
-            <p class="feature-description">Play all 7 hands for a 2-hour championship, or practice individual hands for quick 10-15 minute sessions</p>
-            <a href="production/habib_punja.html" class="feature-link">Start Playing →</a>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon">🎓</div>
-            <div class="feature-title">Strategic Advisors</div>
-            <p class="feature-description">Learn from MuBot (The Wise Monk) and Joko (The Daring Provocateur) - two AI advisors with competing philosophies</p>
-            <a href="characters.html#advisors" class="feature-link">Meet Your Advisors →</a>
         </div>
     </div>
 
     <footer>
-        <p><strong>AgeOfBotsGames LLC</strong> | A Division of AgeOfBotsStudios</p>
+        <p><strong>AgeOfBotsGames LLC</strong> · A Division of AgeOfBotsStudios</p>
         <p>© 2025 AgeOfBotsGames LLC. All Rights Reserved.</p>
-        <p style="margin-top: 10px; font-size: 14px;">Habib Punja is a Liverpool Rummy variant originating from the Ismaili Khoja community in East Africa</p>
     </footer>
+
+    <script>
+        // Simple browser-based Text-to-Speech helper for MuBot’s fable
+        (function () {
+            const playBtn = document.getElementById('mubotPlayBtn');
+            const stopBtn = document.getElementById('mubotStopBtn');
+
+            if (!('speechSynthesis' in window)) {
+                // No TTS support – disable button but keep text visible
+                if (playBtn) {
+                    playBtn.disabled = true;
+                    playBtn.innerHTML = '🔇 Narration not supported in this browser';
+                }
+                if (stopBtn) {
+                    stopBtn.disabled = true;
+                }
+                return;
+            }
+
+            let currentUtterance = null;
+
+            const fableText = [
+                "Habib Punja rose quickly, piling up wins through bold, impulsive decisions.",
+                "His empire glittered with the rewards of chance, and for a while it seemed as if fortune had chosen him as its favorite.",
+                "But at other tables, different games were being played.",
+                "Quiet players tracked each hand, measured each risk, and looked not at the next card, but at the whole war of seven hands ahead.",
+                "When the tides turned, Habib’s shining empire crumbled.",
+                "The quick gains built on impulse dissolved, while those who played with patience, logic, and foresight claimed lasting victory.",
+                "Impulse fades. Strategy endures.",
+                "Play the game that sharpens your logic, strengthens your foresight, and rewards deliberate, thoughtful decisions."
+            ].join(" ");
+
+            function stopSpeaking() {
+                if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+                    window.speechSynthesis.cancel();
+                }
+                currentUtterance = null;
+            }
+
+            function speakFable() {
+                stopSpeaking();
+                const utterance = new SpeechSynthesisUtterance(fableText);
+                utterance.rate = 0.95;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                utterance.onend = () => { currentUtterance = null; };
+
+                currentUtterance = utterance;
+                window.speechSynthesis.speak(utterance);
+            }
+
+            if (playBtn) {
+                playBtn.addEventListener('click', () => {
+                    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                        // Still allow audio; motion is already minimal on the page
+                    }
+                    speakFable();
+                });
+            }
+
+            if (stopBtn) {
+                stopBtn.addEventListener('click', () => {
+                    stopSpeaking();
+                });
+            }
+
+            // Stop narration if user navigates away
+            window.addEventListener('beforeunload', stopSpeaking);
+        })();
+    </script>
 </body>
 </html>
