@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habib Punja PWA Demo</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e3c72">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Habib Punja">
+    
+    <!-- Simulated Manifest (in real PWA, this would be separate file) -->
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            color: #eee;
+            overflow-x: hidden;
+        }
+
+        /* PWA Install Banner */
+        .pwa-install-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                bottom: -100px;
+                opacity: 0;
+            }
+            to {
+                bottom: 20px;
+                opacity: 1;
+            }
+        }
+
+        .pwa-install-banner button {
+            background: white;
+            color: #357abd;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .pwa-install-banner button:hover {
+            transform: scale(1.05);
+        }
+
+        .pwa-install-banner .close-btn {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        /* Game Container */
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .game-header h1 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .pwa-badge {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Simplified Game Board (from v4.5.3) */
+        .round-table-top {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin: 20px 0;
+            gap: 20px;
+        }
+
+        .opponent-area {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 15px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .opponent-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .center-table-area {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .deck, .discard-pile {
+            width: 100px;
+            height: 140px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,215,0,0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .player-area-center {
+            background: rgba(74, 144, 226, 0.1);
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .hand-cards {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .card {
+            width: 70px;
+            height: 100px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card.red {
+            color: #e74c3c;
+        }
+
+        .card.black {
+            color: #000;
+        }
+
+        /* PWA Features Demo */
+        .pwa-features {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-card h4 {
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        .feature-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .status-indicator.active {
+            background: #4CAF50;
+            box-shadow: 0 0 10px #4CAF50;
+        }
+
+        .status-indicator.inactive {
+            background: #666;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .round-table-top {
+                flex-direction: column;
+            }
+
+            .center-table-area {
+                flex-direction: row;
+            }
+
+            .hand-cards {
+                justify-content: center;
+            }
+
+            .card {
+                width: 60px;
+                height: 85px;
+                font-size: 20px;
+            }
+        }
+
+        /* Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #ff9800;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .offline-indicator.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Offline Indicator -->
+    <div class="offline-indicator" id="offlineIndicator">
+        📡 Offline Mode - Game Cached
+    </div>
+
+    <!-- PWA Install Banner (shown if not installed) -->
+    <div class="pwa-install-banner" id="installBanner" style="display: none;">
+        <div>
+            <strong>📱 Install Habib Punja</strong><br>
+            <span style="font-size: 12px;">Add to home screen for offline play!</span>
+        </div>
+        <button id="installBtn">Install</button>
+        <button class="close-btn" id="closeBanner">Later</button>
+    </div>
+
+    <div class="game-container">
+        <!-- Header -->
+        <div class="game-header">
+            <h1>🎮 Habib Punja v5.0.0</h1>
+            <span class="pwa-badge">PWA Demo</span>
+            <p style="color: #aaa; margin-top: 10px;">Progressive Web App - Try installing!</p>
+        </div>
+
+        <!-- PWA Features Status -->
+        <div class="pwa-features">
+            <h3 style="color: #ffd700; margin-bottom: 15px;">🚀 PWA Features Active</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>📱 Installable</h4>
+                    <p style="font-size: 13px; color: #ccc;">Add to home screen like a native app</p>
+                    <div class="feature-status">
+                        <div class="status-indicator active"></div>
+                        <span>Ready to Install</span>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h4>📡 Offline Ready</h4>
+                    <p style="font-size: 13px; color: #ccc;">Works without internet connection</p>
+                    <div class="feature-status">
+                        <div class="status-indicator" id="offlineStatus"></div>
+                        <span id="offlineText">Checking...</span>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h4>🖥️ Full Screen</h4>
+                    <p style="font-size: 13px; color: #ccc;">No browser UI when installed</p>
+                    <div class="feature-status">
+                        <div class="status-indicator active"></div>
+                        <span>Enabled</span>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h4>⚡ Fast Loading</h4>
+                    <p style="font-size: 13px; color: #ccc;">Cached for instant startup</p>
+                    <div class="feature-status">
+                        <div class="status-indicator active"></div>
+                        <span>Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simplified Game Board -->
+        <div class="round-table-top">
+            <!-- Habot -->
+            <div class="opponent-area" style="border: 2px solid #e74c3c;">
+                <div class="opponent-header">
+                    <span>🐇 Habot</span>
+                    <span>Cards: 7</span>
+                </div>
+                <div style="color: #aaa; font-size: 12px; margin-top: 10px;">
+                    AI Opponent - Aggressive
+                </div>
+            </div>
+
+            <!-- Jabot -->
+            <div class="opponent-area" style="border: 2px solid #9b59b6;">
+                <div class="opponent-header">
+                    <span>🐢 Jabot</span>
+                    <span>Cards: 8</span>
+                </div>
+                <div style="color: #aaa; font-size: 12px; margin-top: 10px;">
+                    AI Opponent - Patient
+                </div>
+            </div>
+        </div>
+
+        <!-- Deck & Discard -->
+        <div class="center-table-area">
+            <div class="deck">
+                <div>🎴<br>Draw<br>Deck</div>
+            </div>
+            <div class="discard-pile" style="background: rgba(255,215,0,0.1);">
+                <div style="font-size: 32px;">Q♥</div>
+            </div>
+        </div>
+
+        <!-- Your Area -->
+        <div class="player-area-center">
+            <div style="text-align: center; color: #ffd700; margin-bottom: 15px;">
+                <strong>👤 Your Hand</strong> | Buys: 3
+            </div>
+            <div class="hand-cards">
+                <div class="card red">A♥</div>
+                <div class="card black">K♠</div>
+                <div class="card red">Q♦</div>
+                <div class="card black">J♣</div>
+                <div class="card red">10♥</div>
+                <div class="card black">9♠</div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div style="background: rgba(76,175,80,0.1); border: 2px solid rgba(76,175,80,0.3); border-radius: 10px; padding: 20px; margin-top: 30px;">
+            <h3 style="color: #4CAF50; margin-bottom: 10px;">✨ PWA Benefits You're Seeing:</h3>
+            <ul style="list-style: none; padding-left: 0;">
+                <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    📱 <strong>Install Prompt:</strong> Click "Install" button to add to home screen
+                </li>
+                <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    🚀 <strong>Full Screen Mode:</strong> No browser UI when launched from home screen
+                </li>
+                <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    📡 <strong>Offline Play:</strong> Try disconnecting internet - game still works!
+                </li>
+                <li style="padding: 8px 0;">
+                    ⚡ <strong>Fast Loading:</strong> Instant startup after first visit (cached)
+                </li>
+            </ul>
+        </div>
+
+        <!-- Try It Now -->
+        <div style="text-align: center; margin: 40px 0; padding: 30px; background: rgba(255,215,0,0.1); border-radius: 15px;">
+            <h3 style="color: #ffd700; margin-bottom: 15px;">🎯 Try These Actions:</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin-top: 20px;">
+                <button onclick="simulateInstall()" style="padding: 12px 24px; background: #4CAF50; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer;">
+                    📱 Simulate Install
+                </button>
+                <button onclick="goOffline()" style="padding: 12px 24px; background: #ff9800; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer;">
+                    📡 Simulate Offline
+                </button>
+                <button onclick="alert('In real PWA, this would open in full screen without browser UI!')" style="padding: 12px 24px; background: #9C27B0; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer;">
+                    🖥️ View Full Screen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PWA Install Prompt
+        let deferredPrompt;
+        
+        // Show install banner on load (simulated)
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('installBanner').style.display = 'flex';
+            }, 2000);
+
+            // Check if service worker is supported
+            if ('serviceWorker' in navigator) {
+                document.getElementById('offlineStatus').className = 'status-indicator active';
+                document.getElementById('offlineText').textContent = 'Available';
+            } else {
+                document.getElementById('offlineStatus').className = 'status-indicator inactive';
+                document.getElementById('offlineText').textContent = 'Not Supported';
+            }
+        });
+
+        // Install button handler
+        document.getElementById('installBtn').addEventListener('click', () => {
+            simulateInstall();
+        });
+
+        // Close banner
+        document.getElementById('closeBanner').addEventListener('click', () => {
+            document.getElementById('installBanner').style.display = 'none';
+        });
+
+        // Simulate install
+        function simulateInstall() {
+            const banner = document.getElementById('installBanner');
+            banner.innerHTML = '<div style="text-align: center;">✅ <strong>App Installed!</strong><br>Check your home screen</div>';
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 3000);
+        }
+
+        // Simulate offline
+        function goOffline() {
+            const indicator = document.getElementById('offlineIndicator');
+            indicator.classList.add('show');
+            alert('🔌 Simulating offline mode!\n\nIn a real PWA, the game would continue working without internet.\n\nAll assets are cached locally after first visit.');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 5000);
+        }
+
+        // Detect online/offline
+        window.addEventListener('online', () => {
+            document.getElementById('offlineIndicator').classList.remove('show');
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineIndicator').classList.add('show');
+        });
+
+        // Card click animation
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(1.1) rotate(5deg)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-5px)';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>
