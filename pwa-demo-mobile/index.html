@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Habib Punja - Ultra Mobile Optimized</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>Habib Punja - Landscape Fixed</title>
     
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#1e3c72">
@@ -18,23 +18,17 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
             color: #eee;
-            overflow-x: hidden;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Scrollable container */
-        .game-container {
-            height: 100%;
-            overflow-y: auto;
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch;
-            padding: 10px;
         }
 
         /* Orientation Indicator */
@@ -55,6 +49,17 @@
            DESKTOP LAYOUT (1024px+)
            ============================================ */
         @media (min-width: 1024px) {
+            body {
+                overflow: auto;
+                position: static;
+            }
+
+            .game-container {
+                overflow: visible;
+                height: auto;
+                padding: 20px;
+            }
+
             .game-header h1 {
                 font-size: 2rem;
             }
@@ -83,12 +88,32 @@
                 height: 100px;
                 font-size: 24px;
             }
+
+            .controls {
+                position: static;
+                width: auto;
+                background: none;
+                padding: 0;
+            }
         }
 
         /* ============================================
            MOBILE PORTRAIT (up to 767px width)
            ============================================ */
         @media (max-width: 767px) and (orientation: portrait) {
+            body {
+                overflow: auto;
+                position: static;
+            }
+
+            .game-container {
+                padding: 10px;
+                padding-bottom: 80px; /* Space for controls */
+                overflow-y: auto;
+                height: auto;
+                min-height: 100vh;
+            }
+
             .game-header {
                 padding: 10px;
                 margin-bottom: 8px;
@@ -139,8 +164,15 @@
                 font-size: 18px;
             }
 
+            /* Controls fixed at bottom in portrait too */
             .controls {
-                margin: 12px 0;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: linear-gradient(180deg, transparent, rgba(30,60,114,0.95) 20%);
+                padding: 12px 10px 8px;
+                z-index: 100;
             }
 
             .btn {
@@ -150,156 +182,157 @@
         }
 
         /* ============================================
-           MOBILE LANDSCAPE - ULTRA COMPACT!
+           MOBILE LANDSCAPE - FIXED CONTROLS!
            ============================================ */
         @media (max-width: 900px) and (orientation: landscape) {
-            body {
-                overflow: hidden;
-            }
-
             .game-container {
-                padding: 5px;
-                display: grid;
-                grid-template-rows: auto auto 1fr auto;
-                height: 100vh;
-                max-height: 100vh;
-                gap: 3px;
+                padding: 3px 5px 0 5px;
+                height: 100%;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 50px; /* Space for fixed controls */
             }
 
-            /* Header - Minimal */
+            /* Header - Super Minimal */
             .game-header {
-                padding: 4px 8px;
-                margin: 0;
+                padding: 3px 8px;
+                margin-bottom: 3px;
                 border-radius: 6px;
             }
 
             .game-header h1 {
-                font-size: 0.9rem;
+                font-size: 0.85rem;
                 margin: 0;
                 display: inline;
             }
 
             .game-info {
                 display: inline;
-                font-size: 0.65rem;
+                font-size: 0.6rem;
                 margin-left: 8px;
             }
 
             /* Opponents + Deck in ONE ROW */
             .top-row {
                 display: flex;
-                gap: 5px;
-                align-items: center;
+                gap: 4px;
+                align-items: stretch;
+                margin-bottom: 3px;
             }
 
             .opponents-row {
                 display: flex;
                 flex-direction: row;
-                gap: 5px;
+                gap: 4px;
                 margin: 0;
                 flex: 1;
             }
 
             .opponent-card {
                 flex: 1;
-                padding: 5px 8px;
+                padding: 4px 6px;
                 border-radius: 6px;
                 min-width: 0;
             }
 
             .opponent-header {
                 margin-bottom: 2px;
-                font-size: 0.7rem;
+                font-size: 0.65rem;
                 flex-wrap: wrap;
             }
 
             .opponent-name {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
+                white-space: nowrap;
             }
 
             .card-count {
-                padding: 2px 6px;
-                font-size: 0.65rem;
+                padding: 2px 5px;
+                font-size: 0.6rem;
             }
 
             .opponent-info {
-                font-size: 0.6rem !important;
+                font-size: 0.55rem !important;
                 margin-top: 2px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             /* Deck Area - Inline with Opponents */
             .deck-area {
                 display: flex;
-                gap: 5px;
+                gap: 4px;
                 margin: 0;
                 flex-shrink: 0;
             }
 
             .deck, .discard-pile {
-                width: 50px;
-                height: 70px;
-                font-size: 9px;
-                border-radius: 5px;
+                width: 45px;
+                height: 65px;
+                font-size: 8px;
+                border-radius: 4px;
+                border-width: 1px;
             }
 
             .discard-pile .big-card {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             /* Player Area - Compact */
             .player-area {
-                padding: 5px 8px;
-                margin: 0;
+                padding: 4px 6px;
+                margin: 0 0 3px 0;
                 border-radius: 6px;
-                display: flex;
-                flex-direction: column;
-                min-height: 0;
-                overflow: hidden;
             }
 
             .player-header {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
                 margin-bottom: 3px;
-                flex-shrink: 0;
             }
 
             /* Cards - Horizontal Scroll */
             .hand-cards {
                 display: flex;
-                gap: 4px;
+                gap: 3px;
                 overflow-x: auto;
                 overflow-y: hidden;
                 padding: 2px 0;
-                flex: 1;
-                align-items: center;
                 -webkit-overflow-scrolling: touch;
             }
 
             .hand-cards::-webkit-scrollbar {
-                height: 3px;
+                height: 2px;
             }
 
             .hand-cards::-webkit-scrollbar-thumb {
                 background: rgba(255,215,0,0.5);
-                border-radius: 3px;
+                border-radius: 2px;
             }
 
             .card {
-                width: 40px;
-                height: 58px;
-                font-size: 16px;
+                width: 38px;
+                height: 55px;
+                font-size: 15px;
                 flex-shrink: 0;
                 border-radius: 4px;
             }
 
-            /* Controls - Always Visible */
+            /* Controls - FIXED AT BOTTOM */
             .controls {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
                 display: flex;
                 gap: 5px;
                 justify-content: center;
                 margin: 0;
-                flex-shrink: 0;
-                padding: 3px 0;
+                padding: 4px 5px;
+                background: linear-gradient(180deg, transparent, rgba(30,60,114,0.98) 30%);
+                backdrop-filter: blur(10px);
+                z-index: 100;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
             }
 
             .btn {
@@ -316,25 +349,29 @@
 
             /* Orientation badge smaller */
             .orientation-badge {
-                top: 3px;
-                right: 3px;
-                padding: 2px 6px;
-                font-size: 8px;
+                top: 2px;
+                right: 2px;
+                padding: 2px 5px;
+                font-size: 7px;
             }
         }
 
         /* Extra compact for very short screens */
         @media (max-height: 400px) and (orientation: landscape) {
             .game-header h1 {
-                font-size: 0.8rem;
+                font-size: 0.75rem;
             }
 
             .game-info {
-                font-size: 0.6rem;
+                font-size: 0.55rem;
             }
 
             .opponent-card {
-                padding: 3px 6px;
+                padding: 3px 5px;
+            }
+
+            .opponent-name {
+                font-size: 0.65rem;
             }
 
             .card {
@@ -348,11 +385,20 @@
                 font-size: 0.65rem;
                 min-width: 60px;
             }
+
+            .deck, .discard-pile {
+                width: 40px;
+                height: 58px;
+            }
         }
 
         /* ============================================
            BASE COMPONENT STYLES
            ============================================ */
+        .game-container {
+            padding: 10px;
+        }
+
         .game-header {
             text-align: center;
             padding: 12px;
@@ -467,7 +513,7 @@
         }
 
         .card:active {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .card.red {
@@ -514,7 +560,7 @@
             border: 2px solid rgba(76,175,80,0.3);
             border-radius: 10px;
             padding: 15px;
-            margin: 15px 0;
+            margin: 15px 0 80px 0; /* Extra bottom margin for controls */
         }
 
         .info-panel h3 {
@@ -546,7 +592,7 @@
             <div class="game-info">Hand 3: Two Triples • Your Turn</div>
         </div>
 
-        <!-- Top Row: Opponents + Deck (landscape only combines these) -->
+        <!-- Top Row: Opponents + Deck (combined in landscape) -->
         <div class="top-row">
             <!-- Opponents Row -->
             <div class="opponents-row">
@@ -598,23 +644,23 @@
             </div>
         </div>
 
-        <!-- Controls - Always Visible -->
-        <div class="controls">
-            <button class="btn">Discard</button>
-            <button class="btn">Publish</button>
-            <button class="btn">Sort</button>
-        </div>
-
-        <!-- Info Panel (hidden in landscape) -->
+        <!-- Info Panel (visible in portrait) -->
         <div class="info-panel">
-            <h3>✨ Ultra-Compact Landscape</h3>
+            <h3>✨ Fixed Controls Version</h3>
             <ul>
-                <li>🔄 <strong>Landscape:</strong> Everything fits without scrolling!</li>
-                <li>📏 <strong>Grid Layout:</strong> Header → Opponents+Deck → Hand → Controls</li>
-                <li>↔️ <strong>Scroll Cards:</strong> Swipe hand cards horizontally</li>
-                <li>👆 <strong>Always Visible:</strong> Action buttons never hidden</li>
+                <li>📌 <strong>Always Visible:</strong> Buttons fixed at bottom</li>
+                <li>🔄 <strong>Landscape:</strong> Scroll content, buttons stay put</li>
+                <li>📱 <strong>Portrait:</strong> Normal scrolling with fixed controls</li>
+                <li>↔️ <strong>Swipe Cards:</strong> Horizontal scroll in landscape</li>
             </ul>
         </div>
+    </div>
+
+    <!-- Controls - Position changes based on screen -->
+    <div class="controls">
+        <button class="btn">Discard</button>
+        <button class="btn">Publish</button>
+        <button class="btn">Sort</button>
     </div>
 
     <script>
@@ -627,7 +673,7 @@
                 badge.textContent = '🖥️ Desktop';
                 badge.style.background = 'rgba(76,175,80,0.9)';
             } else if (isLandscape) {
-                badge.textContent = '🔄 Landscape COMPACT';
+                badge.textContent = '🔄 Landscape FIXED';
                 badge.style.background = 'rgba(156,39,176,0.9)';
             } else {
                 badge.textContent = '📱 Portrait';
@@ -659,7 +705,8 @@
             lastTouchEnd = now;
         }, false);
 
-        // Log viewport dimensions for debugging
+        // Debug info
+        console.log('📱 Mobile Layout Active');
         console.log('Viewport:', {
             width: window.innerWidth,
             height: window.innerHeight,
