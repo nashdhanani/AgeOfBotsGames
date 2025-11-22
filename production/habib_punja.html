@@ -1666,7 +1666,8 @@
                 this.lastCardAlertShown = [false, false, false];  // ← ADD THIS LINE
 
                 this.deck = []; this.discardPile = [];
-                this.playerHands = [[], [], []]; this.playerBuys = [3, 3, 3];
+                this.playerHands = [[], [], []]; 
+                this.playerBuys = this.currentHand === 7 ? [2, 2, 2] : [3, 3, 3]; // 🎮 v4.5.5: Hand 7 gets 2 buys
                 this.publishedSequences = [[], [], []]; this.gamePhase = 'draw';
                 this.selectedCards = [];
                 this.playerScores = carryOverScores ? [...persistentScores] : [0, 0, 0];
