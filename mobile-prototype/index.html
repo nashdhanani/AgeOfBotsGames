@@ -2,216 +2,452 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AoB Mobile Landscape Prototype</title>
+    <title>Age of Bots — Mobile Prototype + Victory Lap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
     <style>
-             /* ============================================================
-        Color System (Optimized for iPhone Daylight Readability)
-        ============================================================ */
-             :root {
-                 --hp-bg: #050816;
-                 --hp-panel-bg: rgba(11, 23, 49, 0.94);
-                 --hp-panel-border: rgba(120, 196, 255, 0.4);
-                 --hp-accent-cyan: #3fd2ff;
-                 --hp-accent-gold: #ffb340;
-                 --hp-danger: #ff4c5b;
-                 --hp-text-main: #f6f7ff;
-                 --hp-text-muted: #a4adc7;
-                 --hp-card-bg: #11192b;
-                 --hp-card-border: #f5f5ff;
-                 --hp-card-red: #ff6b81;
-                 --hp-card-black: #f7fbff;
-                 /* Card sizes will adjust in landscape */
-                 --hp-card-h: 16vh;
-                 --hp-card-w: 11vh;
-                 --hp-card-radius: 0.6rem;
+         :root {
+             --bg: #020616;
+             --panel: #020b27;
+             --panel-border: #0d3b66;
+             --accent: #00d4ff;
+             --accent-soft: rgba(0, 212, 255, 0.12);
+             --heading: #0ff0ff;
+             --text: #e6f1ff;
+             --gold: #ffb43b;
+             --card-bg: #020821;
+             --card-border: #324d7a;
+             --card-radius: 18px;
+         }
+
+         * {
+             box-sizing: border-box;
+         }
+
+         html,
+         body {
+             margin: 0;
+             padding: 0;
+             background: radial-gradient(circle at top, #07173a 0%, var(--bg) 55%, #000 100%);
+             color: var(--text);
+             font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+             -webkit-font-smoothing: antialiased;
+             overflow-x: hidden;
+         }
+
+         body {
+             min-height: 100vh;
+             display: flex;
+             justify-content: center;
+         }
+
+         .app-shell {
+             width: 100%;
+             max-width: 900px;
+             padding: 16px 12px 24px;
+         }
+
+         .title-panel {
+             background: linear-gradient(135deg, #02132f, #041b46);
+             border-radius: 24px;
+             padding: 14px 18px;
+             border: 1px solid rgba(0, 212, 255, 0.3);
+             box-shadow: 0 0 25px rgba(0, 180, 255, 0.25);
+             margin-bottom: 14px;
+         }
+
+         .title-main {
+             font-size: clamp(22px, 4vw, 28px);
+             font-weight: 750;
+             letter-spacing: 0.06em;
+             color: var(--heading);
+             text-align: center;
+             text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+         }
+
+         .title-sub {
+             margin-top: 4px;
+             font-size: 13px;
+             text-align: center;
+             opacity: 0.7;
+         }
+
+         .panel {
+             background: linear-gradient(135deg, var(--panel), #01071a);
+             border-radius: 24px;
+             border: 1px solid var(--panel-border);
+             padding: 14px 14px 16px;
+             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+             margin-bottom: 12px;
+         }
+
+         .panel-header {
+             font-size: 18px;
+             font-weight: 700;
+             letter-spacing: 0.04em;
+             margin-bottom: 8px;
+             color: var(--gold);
+         }
+
+             .panel-header small {
+                 font-size: 11px;
+                 font-weight: 500;
+                 opacity: 0.75;
+                 margin-left: 6px;
+                 color: var(--accent);
              }
 
-             /* ============================================================
-        Global Layout
-        ============================================================ */
-             body {
-                 margin: 0;
-                 padding: 0;
-                 color: var(--hp-text-main);
-                 background: radial-gradient(circle at top, #101a32 0%, #050816 50%, #020312 100%);
-                 font-family: "Segoe UI", Roboto, sans-serif;
-                 overflow: hidden;
+         .panel-body {
+             font-size: 14px;
+             line-height: 1.4;
+         }
+
+         /* AI status lines */
+         .status-line {
+             margin: 3px 0;
+             font-size: 15px;
+         }
+
+         .status-label {
+             font-weight: 600;
+             color: var(--accent);
+         }
+
+         /* Card layout */
+         .center-piles {
+             display: flex;
+             justify-content: center;
+             gap: 12px;
+             margin-top: 8px;
+         }
+
+         .card {
+             width: 70px;
+             height: 108px;
+             border-radius: var(--card-radius);
+             background: radial-gradient(circle at 20% 0, #102144, var(--card-bg));
+             border: 2px solid var(--card-border);
+             box-shadow: 0 8px 18px rgba(0, 0, 0, 0.6);
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: center;
+             color: #fff;
+             position: relative;
+         }
+
+         .card-rank {
+             font-size: 28px;
+             font-weight: 700;
+             line-height: 1;
+         }
+
+         .card-suit {
+             font-size: 24px;
+             margin-top: 2px;
+         }
+
+         .card--red {
+             color: #ff4b6e;
+         }
+
+         .card--black {
+             color: #9fcbff;
+         }
+
+         /* Hand strip */
+         .hand-strip {
+             margin-top: 8px;
+             display: flex;
+             gap: 8px;
+             overflow-x: auto;
+             padding-bottom: 4px;
+             -webkit-overflow-scrolling: touch;
+         }
+
+             .hand-strip::-webkit-scrollbar {
+                 height: 4px;
              }
 
-             .hp-mobile-shell {
-                 min-height: 100vh;
-                 max-width: 900px;
-                 margin: 0 auto;
-                 padding: 8px 10px;
-                 box-sizing: border-box;
-                 display: flex;
-                 flex-direction: column;
-                 gap: 8px;
+             .hand-strip::-webkit-scrollbar-thumb {
+                 background: rgba(0, 212, 255, 0.4);
+                 border-radius: 999px;
              }
 
-             /* ============================================================
-        Panels
-        ============================================================ */
-             .hp-panel {
-                 background: var(--hp-panel-bg);
-                 border: 1px solid var(--hp-panel-border);
-                 border-radius: 12px;
-                 padding: 10px;
+         .hand-card {
+             flex: 0 0 64px;
+             height: 104px;
+         }
+
+             .hand-card .card-rank {
+                 font-size: 24px;
              }
 
-             .hp-top-bar {
-                 text-align: center;
-                 font-size: 1.4rem;
-                 font-weight: 600;
-                 letter-spacing: 1px;
-                 color: var(--hp-accent-cyan);
+         /* Test controls for prototype */
+         .test-controls {
+             margin-top: 8px;
+             display: flex;
+             gap: 8px;
+             justify-content: center;
+             flex-wrap: wrap;
+         }
+
+         .btn-ghost {
+             border-radius: 999px;
+             padding: 6px 14px;
+             font-size: 13px;
+             border: 1px solid rgba(0, 212, 255, 0.6);
+             background: rgba(0, 212, 255, 0.05);
+             color: var(--accent);
+             cursor: pointer;
+             display: inline-flex;
+             align-items: center;
+             gap: 4px;
+             backdrop-filter: blur(8px);
+         }
+
+             .btn-ghost span {
+                 font-size: 11px;
+                 opacity: 0.75;
              }
 
-             .hp-section-title {
-                 font-size: 1rem;
-                 font-weight: 600;
-                 margin-bottom: 6px;
-                 color: var(--hp-accent-gold);
+             .btn-ghost:active {
+                 transform: translateY(1px) scale(0.99);
+                 box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.3);
              }
 
-             /* ============================================================
-        Cards
-        ============================================================ */
-             .hp-card {
-                 width: var(--hp-card-w);
-                 height: var(--hp-card-h);
-                 border-radius: var(--hp-card-radius);
-                 background: var(--hp-card-bg);
-                 border: 1px solid var(--hp-card-border);
-                 display: flex;
-                 justify-content: center;
-                 align-items: center;
-                 font-size: clamp(1rem, 2.2vh, 1.3rem);
-                 box-shadow: 0 4px 10px rgba(0,0,0,0.45);
+         /* Footnote */
+         .footnote {
+             margin-top: 10px;
+             font-size: 11px;
+             opacity: 0.6;
+             text-align: center;
+         }
+
+         /* ─────────────────────────────
+        Victory Lap Track (Rabbit & Tortoise)
+        ───────────────────────────── */
+
+         #victory-track {
+             position: fixed;
+             left: 0;
+             bottom: 10vh; /* floats over UI in portrait + landscape */
+             width: 100%;
+             height: 80px;
+             pointer-events: none;
+             z-index: 9999;
+         }
+
+             #victory-track img {
+                 position: absolute;
+                 left: -25%;
+                 bottom: 0;
+                 height: 72px;
+                 max-height: 18vh;
+                 opacity: 0;
+                 filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.6));
+                 will-change: transform, opacity;
              }
 
-             .hp-card--red {
-                 color: var(--hp-card-red);
+         #victory-rabbit {
+             height: 80px;
+         }
+
+         #victory-tortoise {
+             height: 70px;
+         }
+
+         @keyframes victory-run-left-to-right {
+             0% {
+                 transform: translateX(0) translateY(0) scale(0.95);
+                 opacity: 0;
              }
 
-             .hp-card--black {
-                 color: var(--hp-card-black);
+             10% {
+                 opacity: 1;
              }
 
-             /* Player hand row */
-             .hp-player-hand {
-                 display: flex;
-                 justify-content: center;
-                 gap: 0.4rem;
-                 overflow: hidden;
+             50% {
+                 transform: translateX(75vw) translateY(-4px) scale(1);
              }
 
-             /* Center piles */
-             .hp-center-row {
-                 display: flex;
-                 justify-content: center;
-                 gap: 1rem;
+             100% {
+                 transform: translateX(115vw) translateY(0) scale(0.98);
+                 opacity: 0;
+             }
+         }
+
+         #victory-track img.victory-show {
+             animation-name: victory-run-left-to-right;
+             animation-timing-function: ease-out;
+             animation-fill-mode: forwards;
+         }
+
+         #victory-rabbit.victory-show {
+             animation-duration: 3.5s;
+         }
+
+         #victory-tortoise.victory-show {
+             animation-duration: 6s;
+         }
+
+         @media (max-width: 600px) {
+             #victory-track {
+                 bottom: 8vh;
+                 height: 64px;
              }
 
-             /* ============================================================
-        Landscape Mode: Full Gameboard Layout
-        ============================================================ */
-             @media (orientation: landscape) {
-
-                 .hp-mobile-shell {
-                     flex-direction: row;
+                 #victory-track img {
+                     height: 64px;
                  }
+         }
 
-                 .hp-col-left {
-                     flex: 0 0 38%;
-                     display: flex;
-                     flex-direction: column;
-                     gap: 8px;
-                 }
-
-                 .hp-col-right {
-                     flex: 1;
-                     display: flex;
-                     flex-direction: column;
-                     gap: 8px;
-                 }
-
-                 .hp-top-bar {
-                     flex: 0 0 16vh;
-                 }
-
-                 .hp-ai-row {
-                     flex: 0 0 18vh;
-                 }
-
-                 .hp-center-zone {
-                     flex: 0 0 26vh;
-                 }
-
-                 .hp-player-panel {
-                     flex: 1;
-                     display: flex;
-                     flex-direction: column;
-                     justify-content: space-between;
-                 }
-
-                 /* Landscape card size bump */
-                 :root {
-                     --hp-card-h: 18vh;
-                     --hp-card-w: 12vh;
-                 }
+         /* Landscape tweak: keep track slightly higher */
+         @media (orientation: landscape) {
+             #victory-track {
+                 bottom: 16vh;
              }
+         }
     </style>
-
 </head>
+
 <body>
-
-    <div class="hp-mobile-shell">
-
-        <!-- LEFT COLUMN -->
-        <div class="hp-col-left">
-            <div class="hp-panel hp-top-bar">Age of Bots — Mobile Layout</div>
-
-            <div class="hp-panel hp-ai-row">
-                <div class="hp-section-title">AI Status</div>
-                <div>Habot: Thinking…</div>
-                <div>Jabot: Calculating…</div>
+    <div class="app-shell">
+        <header class="title-panel">
+            <div class="title-main">Age of Bots — Mobile Layout</div>
+            <div class="title-sub">
+                Prototype: card sizing, spacing & victory lap animation for Habot / Jabot
             </div>
-        </div>
+        </header>
 
-        <!-- RIGHT COLUMN -->
-        <div class="hp-col-right">
-
-            <div class="hp-panel hp-center-zone">
-                <div class="hp-section-title">Center Piles</div>
-                <div class="hp-center-row">
-                    <div class="hp-card hp-card--black">7♣</div>
-                    <div class="hp-card hp-card--red">9♥</div>
+        <!-- AI Status -->
+        <section class="panel" aria-label="AI status">
+            <div class="panel-header">
+                AI Status
+                <small>Habot vs Jabot</small>
+            </div>
+            <div class="panel-body">
+                <div class="status-line">
+                    <span class="status-label">Habot:</span> Thinking…
+                </div>
+                <div class="status-line">
+                    <span class="status-label">Jabot:</span> Calculating…
                 </div>
             </div>
+        </section>
 
-            <div class="hp-panel hp-player-panel">
-                <div class="hp-section-title">Your Hand</div>
-
-                <div class="hp-player-hand">
-                    <div class="hp-card hp-card--black">K♠</div>
-                    <div class="hp-card hp-card--red">5♥</div>
-                    <div class="hp-card hp-card--black">8♣</div>
-                    <div class="hp-card hp-card--red">Q♦</div>
-                    <div class="hp-card hp-card--black">3♠</div>
-                    <div class="hp-card hp-card--red">7♦</div>
-                    <div class="hp-card hp-card--black">6♣</div>
-                    <div class="hp-card hp-card--black">4♠</div>
-                    <div class="hp-card hp-card--red">J♥</div>
-                    <div class="hp-card hp-card--red">2♦</div>
+        <!-- Center piles -->
+        <section class="panel" aria-label="Center piles">
+            <div class="panel-header">Center Piles</div>
+            <div class="panel-body">
+                <div class="center-piles">
+                    <div class="card card--black" aria-label="7 of clubs">
+                        <div class="card-rank">7</div>
+                        <div class="card-suit">♣️</div>
+                    </div>
+                    <div class="card card--red" aria-label="9 of hearts">
+                        <div class="card-rank">9</div>
+                        <div class="card-suit">❤️</div>
+                    </div>
                 </div>
             </div>
+        </section>
 
+        <!-- Player hand -->
+        <section class="panel" aria-label="Your hand">
+            <div class="panel-header">Your Hand</div>
+            <div class="panel-body">
+                <div class="hand-strip" aria-label="Example hand">
+                    <div class="card hand-card card--red">
+                        <div class="card-rank">K</div>
+                        <div class="card-suit">♥️</div>
+                    </div>
+                    <div class="card hand-card card--black">
+                        <div class="card-rank">8</div>
+                        <div class="card-suit">♣️</div>
+                    </div>
+                    <div class="card hand-card card--red">
+                        <div class="card-rank">Q</div>
+                        <div class="card-suit">♦️</div>
+                    </div>
+                    <div class="card hand-card card--black">
+                        <div class="card-rank">3</div>
+                        <div class="card-suit">♠️</div>
+                    </div>
+                    <div class="card hand-card card--red">
+                        <div class="card-rank">7</div>
+                        <div class="card-suit">♦️</div>
+                    </div>
+                    <div class="card hand-card card--black">
+                        <div class="card-rank">6</div>
+                        <div class="card-suit">♣️</div>
+                    </div>
+                    <div class="card hand-card card--black">
+                        <div class="card-rank">4</div>
+                        <div class="card-suit">♠️</div>
+                    </div>
+                    <div class="card hand-card card--red">
+                        <div class="card-rank">J</div>
+                        <div class="card-suit">♥️</div>
+                    </div>
+                </div>
+
+                <!-- TEMP controls: for you to trigger victory on phone -->
+                <div class="test-controls" aria-label="Victory lap test controls">
+                    <button class="btn-ghost" type="button" onclick="triggerVictoryLap('habot')">
+                        🐇 Habot wins
+                        <span>(Rabbit lap)</span>
+                    </button>
+                    <button class="btn-ghost" type="button" onclick="triggerVictoryLap('jabot')">
+                        🐢 Jabot wins
+                        <span>(Tortoise lap)</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div class="footnote">
+            Prototype only — in the real game these laps will trigger from the
+            end-of-hand logic.
         </div>
-
     </div>
 
+    <!-- Victory Track Layer -->
+    <div id="victory-track" aria-hidden="true">
+        <img id="victory-rabbit"
+             src="images/Rabbit64.png"
+             alt="Habot wins — Rabbit victory lap" />
+        <img id="victory-tortoise"
+             src="images/Tortoise64.png"
+             alt="Jabot wins — Tortoise victory lap" />
+    </div>
+
+    <script>
+    // Victory Lap engine – clean, event-driven, easy to reuse
+    (function () {
+      const rabbit = document.getElementById("victory-rabbit");
+      const tortoise = document.getElementById("victory-tortoise");
+
+      function clearVictory() {
+        rabbit.classList.remove("victory-show");
+        tortoise.classList.remove("victory-show");
+      }
+
+      window.triggerVictoryLap = function (winner) {
+        clearVictory();
+
+        if (winner === "habot") {
+          rabbit.classList.add("victory-show");
+        } else if (winner === "jabot") {
+          tortoise.classList.add("victory-show");
+        } else {
+          return;
+        }
+
+        // Auto-reset a bit after the slowest animation
+        setTimeout(clearVictory, 8000);
+      };
+    })();
+    </script>
 </body>
 </html>
