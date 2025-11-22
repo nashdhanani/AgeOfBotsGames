@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AoB Mobile Landscape Prototype</title>
+
+    <style>
+             /* ============================================================
+        Color System (Optimized for iPhone Daylight Readability)
+        ============================================================ */
+             :root {
+                 --hp-bg: #050816;
+                 --hp-panel-bg: rgba(11, 23, 49, 0.94);
+                 --hp-panel-border: rgba(120, 196, 255, 0.4);
+                 --hp-accent-cyan: #3fd2ff;
+                 --hp-accent-gold: #ffb340;
+                 --hp-danger: #ff4c5b;
+                 --hp-text-main: #f6f7ff;
+                 --hp-text-muted: #a4adc7;
+                 --hp-card-bg: #11192b;
+                 --hp-card-border: #f5f5ff;
+                 --hp-card-red: #ff6b81;
+                 --hp-card-black: #f7fbff;
+                 /* Card sizes will adjust in landscape */
+                 --hp-card-h: 16vh;
+                 --hp-card-w: 11vh;
+                 --hp-card-radius: 0.6rem;
+             }
+
+             /* ============================================================
+        Global Layout
+        ============================================================ */
+             body {
+                 margin: 0;
+                 padding: 0;
+                 color: var(--hp-text-main);
+                 background: radial-gradient(circle at top, #101a32 0%, #050816 50%, #020312 100%);
+                 font-family: "Segoe UI", Roboto, sans-serif;
+                 overflow: hidden;
+             }
+
+             .hp-mobile-shell {
+                 min-height: 100vh;
+                 max-width: 900px;
+                 margin: 0 auto;
+                 padding: 8px 10px;
+                 box-sizing: border-box;
+                 display: flex;
+                 flex-direction: column;
+                 gap: 8px;
+             }
+
+             /* ============================================================
+        Panels
+        ============================================================ */
+             .hp-panel {
+                 background: var(--hp-panel-bg);
+                 border: 1px solid var(--hp-panel-border);
+                 border-radius: 12px;
+                 padding: 10px;
+             }
+
+             .hp-top-bar {
+                 text-align: center;
+                 font-size: 1.4rem;
+                 font-weight: 600;
+                 letter-spacing: 1px;
+                 color: var(--hp-accent-cyan);
+             }
+
+             .hp-section-title {
+                 font-size: 1rem;
+                 font-weight: 600;
+                 margin-bottom: 6px;
+                 color: var(--hp-accent-gold);
+             }
+
+             /* ============================================================
+        Cards
+        ============================================================ */
+             .hp-card {
+                 width: var(--hp-card-w);
+                 height: var(--hp-card-h);
+                 border-radius: var(--hp-card-radius);
+                 background: var(--hp-card-bg);
+                 border: 1px solid var(--hp-card-border);
+                 display: flex;
+                 justify-content: center;
+                 align-items: center;
+                 font-size: clamp(1rem, 2.2vh, 1.3rem);
+                 box-shadow: 0 4px 10px rgba(0,0,0,0.45);
+             }
+
+             .hp-card--red {
+                 color: var(--hp-card-red);
+             }
+
+             .hp-card--black {
+                 color: var(--hp-card-black);
+             }
+
+             /* Player hand row */
+             .hp-player-hand {
+                 display: flex;
+                 justify-content: center;
+                 gap: 0.4rem;
+                 overflow: hidden;
+             }
+
+             /* Center piles */
+             .hp-center-row {
+                 display: flex;
+                 justify-content: center;
+                 gap: 1rem;
+             }
+
+             /* ============================================================
+        Landscape Mode: Full Gameboard Layout
+        ============================================================ */
+             @media (orientation: landscape) {
+
+                 .hp-mobile-shell {
+                     flex-direction: row;
+                 }
+
+                 .hp-col-left {
+                     flex: 0 0 38%;
+                     display: flex;
+                     flex-direction: column;
+                     gap: 8px;
+                 }
+
+                 .hp-col-right {
+                     flex: 1;
+                     display: flex;
+                     flex-direction: column;
+                     gap: 8px;
+                 }
+
+                 .hp-top-bar {
+                     flex: 0 0 16vh;
+                 }
+
+                 .hp-ai-row {
+                     flex: 0 0 18vh;
+                 }
+
+                 .hp-center-zone {
+                     flex: 0 0 26vh;
+                 }
+
+                 .hp-player-panel {
+                     flex: 1;
+                     display: flex;
+                     flex-direction: column;
+                     justify-content: space-between;
+                 }
+
+                 /* Landscape card size bump */
+                 :root {
+                     --hp-card-h: 18vh;
+                     --hp-card-w: 12vh;
+                 }
+             }
+    </style>
+
+</head>
+<body>
+
+    <div class="hp-mobile-shell">
+
+        <!-- LEFT COLUMN -->
+        <div class="hp-col-left">
+            <div class="hp-panel hp-top-bar">Age of Bots — Mobile Layout</div>
+
+            <div class="hp-panel hp-ai-row">
+                <div class="hp-section-title">AI Status</div>
+                <div>Habot: Thinking…</div>
+                <div>Jabot: Calculating…</div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="hp-col-right">
+
+            <div class="hp-panel hp-center-zone">
+                <div class="hp-section-title">Center Piles</div>
+                <div class="hp-center-row">
+                    <div class="hp-card hp-card--black">7♣</div>
+                    <div class="hp-card hp-card--red">9♥</div>
+                </div>
+            </div>
+
+            <div class="hp-panel hp-player-panel">
+                <div class="hp-section-title">Your Hand</div>
+
+                <div class="hp-player-hand">
+                    <div class="hp-card hp-card--black">K♠</div>
+                    <div class="hp-card hp-card--red">5♥</div>
+                    <div class="hp-card hp-card--black">8♣</div>
+                    <div class="hp-card hp-card--red">Q♦</div>
+                    <div class="hp-card hp-card--black">3♠</div>
+                    <div class="hp-card hp-card--red">7♦</div>
+                    <div class="hp-card hp-card--black">6♣</div>
+                    <div class="hp-card hp-card--black">4♠</div>
+                    <div class="hp-card hp-card--red">J♥</div>
+                    <div class="hp-card hp-card--red">2♦</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
