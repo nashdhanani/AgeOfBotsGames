@@ -13,8 +13,9 @@
   🐛 Fixed: Extensions now actually save cards to publishedSequences
   🐛 Fixed: Cards no longer disappear when extending sequences
   🐛 Fixed: Proper card accounting maintained throughout game
+  🐛 Fixed: PATCH I now allows taking discard when it extends sequences
   
-  **THE BUG:**
+  **BUG #1: Extension Card Loss**
   Problem: tryAddToPublished() was losing cards during extensions
   - Console logged: "Extended sequence (1 card played)" ✅
   - Card removed from hand: ✅
@@ -47,12 +48,36 @@
   - Ladder extension (lines 5054-5085): Direct sequence push
   - Added logging: "Extended [Player]'s sequence X with [card]"
   
+  **BUG #2: PATCH I Blocking Valid Extensions**
+  Problem: PATCH I blocked taking discard even when it extends sequences
+  - Scenario: Hand 1 (triple-only), Habot published, Q♥ on discard
+  - Q♥ extends published Queen sequence
+  - PATCH I blocked: "Triple-only hand, AI already published"
+  - Habot drew from deck instead → Terrible strategy!
+  
+  **ROOT CAUSE (Line 4512):**
+  ```javascript
+  if (shouldTake && this.publishedSequences[ai].length > 0) {
+      // Blocked ALL taking in triple-only after publishing
+  }
+  ```
+  PATCH I didn't check if card extends sequences!
+  
+  **THE FIX:**
+  ```javascript
+  if (shouldTake && this.publishedSequences[ai].length > 0 && !extendsAnySequence) {
+      // Only block if card DOESN'T extend
+  }
+  ```
+  Now AIs take discard when it extends, improving endgame strategy!
+  
   **Testing Verification:**
   After fix, card accounting should be perfect:
   - Initial: 10 cards
   - 2 buys: +4 cards (2 × +2)
   - Total pool: 14 cards
   - All 14 cards accounted in: published + hand + discarded
+  - AIs take extending cards from discard in triple-only hands ✅
   
   🎮 VERSION 4.5.7 - UI FIX: Sequence Separator Visualization
   ═══════════════════════════════════════════════════════════════
@@ -4508,14 +4533,15 @@
                     console.log(`     forceBuy: ${forceBuy}`);
                     console.log(`     shouldTake: ${shouldTake} ${!shouldTake && (aiHandSize <= 3 || anyPlayerNearWin) ? '(BLOCKED - endgame)' : ''}`);
 
-                    // 🎯 PATCH I v4.1.1: Block ALL buying after publishing in triple-only games
-                    if (shouldTake && this.publishedSequences[ai].length > 0) {
+                    // 🎯 PATCH I v4.1.1: Block buying after publishing in triple-only games
+                    // 🐛 v4.5.7 FIX: EXCEPT when card extends a sequence!
+                    if (shouldTake && this.publishedSequences[ai].length > 0 && !extendsAnySequence) {
                         const req = this.handReqs[this.currentHand].seqs;
                         const needLadders = req.filter(s => s === 'ladder').length;
 
                         if (needLadders === 0) {
-                            // Triple-only game and AI has published - NO MORE BUYING
-                            console.log(`%c  🛑 PATCH I v4.1.1: Blocking buy - Triple-only hand, AI already published`, 'color: #ff9800; font-weight: bold;');
+                            // Triple-only game and AI has published - NO MORE BUYING (unless it extends)
+                            console.log(`%c  🛑 PATCH I v4.1.1: Blocking buy - Triple-only hand, AI already published (card doesn't extend)`, 'color: #ff9800; font-weight: bold;');
                             shouldTake = false;
                         }
                     }
