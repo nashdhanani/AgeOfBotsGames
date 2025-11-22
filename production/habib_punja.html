@@ -1650,11 +1650,13 @@
         class GameState {
             constructor(carryOverScores = false, selectedHand = 'full') {
                 // 🎮 v4.5.5: Hand selection support
+                this.gameMode = selectedHand; // Track if 'full' or specific hand number
+                
                 if (selectedHand === 'full') {
                     this.currentHand = 1; // Start from Hand 1 for full game
                 } else {
                     this.currentHand = parseInt(selectedHand); // Start from selected hand
-                    console.log(`%c🎯 Starting at Hand ${this.currentHand}`, 'color: #ffd700; font-weight: bold; font-size: 16px;');
+                    console.log(`%c🎯 Starting at Hand ${this.currentHand} (Single Hand Mode)`, 'color: #ffd700; font-weight: bold; font-size: 16px;');
                 }
                 
                 this.players = 3;
@@ -5090,7 +5092,26 @@
                     this.playerScores[i] += score;
                 }
                 setTimeout(() => { this.showModal('Hand Complete', `${winnerName} won Hand ${this.currentHand}!`) }, 2000);
-                setTimeout(() => {
+                setTimeout(async () => {
+                    // 🎮 v4.5.5: Check if single hand mode or full game
+                    if (this.gameMode !== 'full') {
+                        // Single hand mode - show hand selection menu again
+                        console.log('%c🎯 Single hand complete! Showing hand selection menu...', 'color: #ffd700; font-weight: bold;');
+                        const selectedHand = await showHandSelectionModal();
+                        
+                        if (selectedHand === null) {
+                            // User cancelled - stay in current game state (show final results)
+                            this.showFinalResults();
+                            return;
+                        }
+                        
+                        // Start new game with selected hand
+                        persistentScores = [0, 0, 0];
+                        game = new GameState(false, selectedHand);
+                        return;
+                    }
+                    
+                    // Full game mode - advance to next hand
                     this.currentHand++;
                     if (this.currentHand > 7) this.showFinalResults();
                     else {
