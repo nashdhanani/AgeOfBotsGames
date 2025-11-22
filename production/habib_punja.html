@@ -2,13 +2,50 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.5.4 - CRITICAL FIX: Overlapping Lock Prevention
+  Version: 4.5.5 - NEW FEATURE: Hand Selection Menu
   Release Date: November 22, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 4.5.4 - CRITICAL HOTFIX: Overlapping Sequence Lock Prevention
+  🎮 VERSION 4.5.5 - NEW FEATURE: Hand Selection Menu
+  ═══════════════════════════════════════════════════════════════
+  ✨ New: Click "New Game" to choose which hand to play
+  ✨ New: Options for Full Game (all 7 hands) or individual hands 1-7
+  ✨ New: Beautiful modal with radio button selection
+  ✨ New: Hands 6-7 auto-initialize staged construction when selected
+  
+  **NEW USER FLOW:**
+  1. Click "New Game" button
+  2. Modal appears with game mode selection:
+     - 🎴 Full Game (All 7 Hands)
+     - Hand 1: Two Triples
+     - Hand 2: Triple + Ladder
+     - Hand 3: Two Ladders
+     - Hand 4: Three Triples
+     - Hand 5: 2 Triples + Ladder
+     - Hand 6: Triple + 2 Ladders
+     - Hand 7: Three Ladders
+  3. Select desired mode and click "Start Game"
+  4. Game starts at selected hand with proper initialization
+  
+  **TECHNICAL IMPLEMENTATION:**
+  - New `showHandSelectionModal()` function
+  - Modified `newGame()` to show selection first
+  - Updated `GameState` constructor to accept `selectedHand` parameter
+  - Auto-initializes staged construction for Hands 6-7:
+    * Sets `aiConstructionStage` to 'building_L1'
+    * Generates initial suit focus
+    * Generates target cards for AIs
+    * Sets stage start turn tracking
+  
+  **BENEFITS:**
+  - Players can practice specific hands
+  - Testing specific scenarios easier
+  - Faster iteration for debugging
+  - Better user experience for learning
+  
+  🎮 VERSION 4.5.5 - CRITICAL HOTFIX: Overlapping Sequence Lock Prevention
   ═══════════════════════════════════════════════════════════════
   🐛 Fixed: AI no longer creates overlapping locked sequences
   🐛 Fixed: HOLD completion check prevents double-locking same cards
@@ -240,8 +277,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.5.4 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.5.4 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.5.5 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.5.5 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description" content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords" content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
@@ -805,6 +842,68 @@
                     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
                 }
 
+        /* Hand Selection Modal Styles */
+        .hand-selection-modal {
+            max-width: 550px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .hand-selection-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .hand-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+            .hand-option:hover {
+                background: rgba(255, 215, 0, 0.1);
+                border-color: rgba(255, 215, 0, 0.6);
+                transform: translateX(5px);
+            }
+
+            .hand-option input[type="radio"] {
+                margin-right: 12px;
+                width: 20px;
+                height: 20px;
+                cursor: pointer;
+            }
+
+            .hand-option input[type="radio"]:checked + .hand-label {
+                color: #ffd700;
+            }
+
+        .hand-label {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+            .hand-label strong {
+                font-size: 16px;
+                color: #fff;
+            }
+
+            .hand-label small {
+                font-size: 13px;
+                color: rgba(255, 255, 255, 0.7);
+            }
+
         .center-area {
             display: flex;
             flex-direction: column;
@@ -1264,9 +1363,9 @@
     </style>
 </head>
 <body>
-    <div class="fix-badge">✅ v4.5.4</div>
+    <div class="fix-badge">✅ v4.5.5</div>
     <div class="game-container">
-        <div class="game-header"><h1>Habib Punja v4.5.4</h1></div>
+        <div class="game-header"><h1>Habib Punja v4.5.5</h1></div>
         <div class="game-info">
             <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two Triples</span></div>
             <div class="requirements" id="detailedRequirements">Two Triples</div>
@@ -1397,6 +1496,76 @@
         </div>
     </div>
 
+    <!-- Hand Selection Modal -->
+    <div id="handSelectionModal" class="modal-overlay">
+        <div class="modal-content hand-selection-modal">
+            <div class="modal-icon">🎮</div>
+            <div class="modal-title">Choose Game Mode</div>
+            <div class="modal-message">Select which game to play:</div>
+            <div class="hand-selection-options">
+                <label class="hand-option">
+                    <input type="radio" name="handSelection" value="full" checked>
+                    <span class="hand-label">
+                        <strong>🎴 Full Game</strong>
+                        <small>All 7 Hands</small>
+                    </span>
+                </label>
+                <label class="hand-option">
+                    <input type="radio" name="handSelection" value="1">
+                    <span class="hand-label">
+                        <strong>Hand 1</strong>
+                        <small>Two Triples</small>
+                    </span>
+                </label>
+                <label class="hand-option">
+                    <input type="radio" name="handSelection" value="2">
+                    <span class="hand-label">
+                        <strong>Hand 2</strong>
+                        <small>Triple + Ladder</small>
+                    </span>
+                </label>
+                <label class="hand-option">
+                    <input type="radio" name="handSelection" value="3">
+                    <span class="hand-label">
+                        <strong>Hand 3</strong>
+                        <small>Two Ladders</small>
+                    </span>
+                </label>
+                <label class="hand-option">
+                    <input type="radio" name="handSelection" value="4">
+                    <span class="hand-label">
+                        <strong>Hand 4</strong>
+                        <small>Three Triples</small>
+                    </span>
+                </label>
+                <label class="hand-option">
+                    <input type="radio" name="handSelection" value="5">
+                    <span class="hand-label">
+                        <strong>Hand 5</strong>
+                        <small>2 Triples + Ladder</small>
+                    </span>
+                </label>
+                <label class="hand-option">
+                    <input type="radio" name="handSelection" value="6">
+                    <span class="hand-label">
+                        <strong>Hand 6</strong>
+                        <small>Triple + 2 Ladders</small>
+                    </span>
+                </label>
+                <label class="hand-option">
+                    <input type="radio" name="handSelection" value="7">
+                    <span class="hand-label">
+                        <strong>Hand 7</strong>
+                        <small>Three Ladders</small>
+                    </span>
+                </label>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="handSelectionCancel">Cancel</button>
+                <button class="modal-btn confirm" id="handSelectionConfirm">Start Game</button>
+            </div>
+        </div>
+    </div>
 
 
     <script>
@@ -1442,7 +1611,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.5.4 - STAGED CONSTRUCTION', 'color: #9b59b6; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.5.5 - STAGED CONSTRUCTION', 'color: #9b59b6; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -1457,7 +1626,7 @@
             setTimeout(() => {
                 const badge = document.querySelector('.fix-badge');
                 if (badge) {
-                    badge.innerHTML = '🐛 v4.5.4 DEBUG';
+                    badge.innerHTML = '🐛 v4.5.5 DEBUG';
                     badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
                 }
             }, 100);
@@ -1479,8 +1648,16 @@
         let persistentScores = [0, 0, 0];
 
         class GameState {
-            constructor(carryOverScores = false) {
-                this.currentHand = 1; this.players = 3;
+            constructor(carryOverScores = false, selectedHand = 'full') {
+                // 🎮 v4.5.5: Hand selection support
+                if (selectedHand === 'full') {
+                    this.currentHand = 1; // Start from Hand 1 for full game
+                } else {
+                    this.currentHand = parseInt(selectedHand); // Start from selected hand
+                    console.log(`%c🎯 Starting at Hand ${this.currentHand}`, 'color: #ffd700; font-weight: bold; font-size: 16px;');
+                }
+                
+                this.players = 3;
 
                 this.startingPlayer = null;  // Will be set by draw
                 this.currentPlayer = 0;      // Temporary, will be updated after draw
@@ -1502,7 +1679,7 @@
                 this.lastCardWarningShown = null;
                 this.discardPileAccessible = false; // 🔒 v4.1.3: Glass vault - only accessible after NEW discard
                 
-                // 🏗️ v4.5.4: STAGED CONSTRUCTION SYSTEM for Games 6-7
+                // 🏗️ v4.5.5: STAGED CONSTRUCTION SYSTEM for Games 6-7
                 // AI builds sequences SEQUENTIALLY (L1 → L2 → T) instead of parallel accumulation
                 this.aiConstructionStage = [null, 'initial', 'initial']; // [human, habot, jabot]
                 // Stages: 'initial' → 'building_L1' → 'building_L2' → 'building_T' → 'ready_to_publish'
@@ -1510,7 +1687,7 @@
                 this.aiLockedSequences = [[], [], []]; // Completed sequences protected from discard
                 // Format: [{ type: 'ladder', cards: [...], suit: '♥' }, ...]
                 
-                // 🔶 v4.5.4: HOLD SYSTEM - Parallel construction breakthrough!
+                // 🔶 v4.5.5: HOLD SYSTEM - Parallel construction breakthrough!
                 this.aiHeldSequences = [[], [], []]; // 3-card "almost ladders" on hold while building others
                 // Format: [{ cards: [Card, Card, Card], suit: '♠', targets: [5, 9], type: 'ladder', createdTurn: 15, priority: 10 }, ...]
                 
@@ -1520,7 +1697,7 @@
                 this.aiSuitFocus = [null, [], []]; // Concentrated suits AI is working on
                 // Format: ['♥', '♠'] - 2-3 suits AI focuses on for ladder building
                 
-                // 💚 v4.5.4: AGGRESSIVE BUY MODE - Track when stages started for scattered card detection
+                // 💚 v4.5.5: AGGRESSIVE BUY MODE - Track when stages started for scattered card detection
                 this.aiStageStartTurn = [null, 0, 0]; // Turn number when current stage started
                 // Used to detect when AI is stuck on same stage too long → activate aggressive mode
                 
@@ -1539,6 +1716,26 @@
                     7: { name: "Three Ladders", seqs: ["ladder", "ladder", "ladder"], cards: 10 }
                 };
                 this.initDeck(); this.deal(); this.updateUI();
+                
+                // 🏗️ v4.5.5: Initialize staged construction when starting at Hands 6-7
+                if (this.currentHand >= 6) {
+                    console.log(`%c🏗️ v4.5.5: Initializing STAGED CONSTRUCTION for Hand ${this.currentHand}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
+                    this.aiConstructionStage = [null, 'building_L1', 'building_L1'];
+                    this.aiStageStartTurn = [null, this.turnCounter, this.turnCounter];
+                    this.aiLockedSequences = [[], [], []];
+                    this.aiTargetCards = [null, [], []];
+                    this.aiSuitFocus = [null, [], []];
+                    
+                    // Generate initial targets and suit focus for AIs
+                    for (let pIdx = 1; pIdx <= 2; pIdx++) {
+                        const hand = this.playerHands[pIdx];
+                        const focusSuits = this.selectSuitFocus(hand, 2);
+                        this.aiSuitFocus[pIdx] = focusSuits;
+                        this.aiTargetCards[pIdx] = this.generateTargetCardsWithHolds(hand, focusSuits, pIdx, 3);
+                        console.log(`    🎯 ${['Human', 'Habot', 'Jabot'][pIdx]}: Focus suits ${focusSuits.join(', ')} - ${this.aiTargetCards[pIdx].length} targets`);
+                    }
+                }
+                
                 console.log('%c====== GAME STARTED ======', 'color:#28a745;font-size:14px;font-weight:bold');
             }
 
@@ -2146,9 +2343,9 @@
                     return false;
                 }
 
-                // 🏗️ v4.5.4: STAGED CONSTRUCTION - Use locked sequences for Hands 6-7
+                // 🏗️ v4.5.5: STAGED CONSTRUCTION - Use locked sequences for Hands 6-7
                 if (this.currentHand >= 6 && this.aiLockedSequences[pIdx].length > 0) {
-                    console.log(`  🏗️ v4.5.4: Using ${this.aiLockedSequences[pIdx].length} locked sequences for publishing`);
+                    console.log(`  🏗️ v4.5.5: Using ${this.aiLockedSequences[pIdx].length} locked sequences for publishing`);
                     
                     const req = this.handReqs[this.currentHand].seqs;
                     const triplesNeeded = req.filter(s => s === 'triple').length;
@@ -2186,7 +2383,7 @@
                         this.publishedSequences[pIdx] = sequences;
                         this.aiJustPublished[pIdx] = true;
                         
-                        console.log(`      ✅ v4.5.4: Published ${sequences.length} sequences from locked cards`);
+                        console.log(`      ✅ v4.5.5: Published ${sequences.length} sequences from locked cards`);
                         return true;
                     } else {
                         console.log(`      ❌ Not all requirements locked yet - continue building`);
@@ -2315,7 +2512,7 @@
                 return canExtendLow || canExtendHigh;
             }
 
-            // 🏗️ v4.5.4 STAGED CONSTRUCTION FUNCTIONS
+            // 🏗️ v4.5.5 STAGED CONSTRUCTION FUNCTIONS
             // ==========================================
 
             analyzeNearSequential(cards, suit) {
@@ -2344,7 +2541,7 @@
                 // Potential: high card count + low gaps = high potential
                 const potential = suitCards.length - gapCount;
                 
-                console.log(`  🔍 v4.5.4: Analyzing ${suit} - ${values.join(',')} - gaps: [${gaps.join(',')}] - potential: ${potential}`);
+                console.log(`  🔍 v4.5.5: Analyzing ${suit} - ${values.join(',')} - gaps: [${gaps.join(',')}] - potential: ${potential}`);
                 return { values, gaps, potential, cardCount: suitCards.length };
             }
 
@@ -2364,12 +2561,12 @@
                 });
                 
                 const selected = analysis.slice(0, numSuits).map(a => a.suit);
-                console.log(`  🎯 v4.5.4: Selected focus suits: ${selected.join(', ')}`);
+                console.log(`  🎯 v4.5.5: Selected focus suits: ${selected.join(', ')}`);
                 return selected;
             }
 
             selectSuitFocusFromSuits(hand, availableSuits, numSuits = 2) {
-                // 🔧 v4.5.4: Select suits from a limited set (excluding locked ladder suits)
+                // 🔧 v4.5.5: Select suits from a limited set (excluding locked ladder suits)
                 const analysis = availableSuits.map(suit => ({
                     suit,
                     ...this.analyzeNearSequential(hand, suit)
@@ -2383,12 +2580,12 @@
                 });
                 
                 const selected = analysis.slice(0, Math.min(numSuits, availableSuits.length)).map(a => a.suit);
-                console.log(`  🎯 v4.5.4: Selected focus suits from ${availableSuits.join(',')}: ${selected.join(', ')}`);
+                console.log(`  🎯 v4.5.5: Selected focus suits from ${availableSuits.join(',')}: ${selected.join(', ')}`);
                 return selected;
             }
 
             getUnlockedCards(hand, playerIdx) {
-                // 🔧 v4.5.4: Get cards not in locked sequences
+                // 🔧 v4.5.5: Get cards not in locked sequences
                 const lockedCardIds = new Set();
                 this.aiLockedSequences[playerIdx].forEach(seq => {
                     seq.cards.forEach(card => lockedCardIds.add(card.id));
@@ -2396,7 +2593,7 @@
                 return hand.filter(card => !lockedCardIds.has(card.id));
             }
 
-            // 🔶 v4.5.4: HOLD SYSTEM - Parallel Construction Functions
+            // 🔶 v4.5.5: HOLD SYSTEM - Parallel Construction Functions
             
             findPotentialHolds(hand, playerIdx) {
                 // Find all 3-card combinations that are "one card away" from a 4-card ladder
@@ -2499,17 +2696,17 @@
                 const cardStr = hold.cards.map(c => c.toString()).join(',');
                 const targetStr = hold.targets.map(t => `${t}${hold.suit}`).join(' or ');
                 
-                console.log(`🔶 v4.5.4: ${aiName} put on HOLD: ${cardStr} - targeting ${targetStr}`);
+                console.log(`🔶 v4.5.5: ${aiName} put on HOLD: ${cardStr} - targeting ${targetStr}`);
             }
 
             checkHeldSequences(playerIdx) {
-                // 🔧 v4.5.4: Check if any held sequences can now be completed
+                // 🔧 v4.5.5: Check if any held sequences can now be completed
                 // Returns: true if ANY hold was completed (prevents double-locking)
                 const hand = this.playerHands[playerIdx];
                 const aiName = playerIdx === 1 ? 'Habot' : 'Jabot';
                 let completedAnyHold = false;
                 
-                // 🔧 v4.5.4: Check for overlapping cards BEFORE locking
+                // 🔧 v4.5.5: Check for overlapping cards BEFORE locking
                 const existingLocked = this.aiLockedSequences[playerIdx];
                 
                 // Iterate backwards to safely remove completed holds
@@ -2527,7 +2724,7 @@
                         const completedLadder = [...hold.cards, targetCard]
                             .sort((a, b) => a.getValue() - b.getValue());
                         
-                        // 🔧 v4.5.4: Check for overlap with existing locked sequences
+                        // 🔧 v4.5.5: Check for overlap with existing locked sequences
                         let hasOverlap = false;
                         for (const locked of existingLocked) {
                             const overlap = completedLadder.some(card => 
@@ -2537,7 +2734,7 @@
                             );
                             if (overlap) {
                                 hasOverlap = true;
-                                console.log(`⚠️ v4.5.4: SKIP HOLD lock - overlaps with existing locked sequence`);
+                                console.log(`⚠️ v4.5.5: SKIP HOLD lock - overlaps with existing locked sequence`);
                                 console.log(`   Attempted: ${completedLadder.map(c => c.toString()).join(',')}`);
                                 console.log(`   Conflicts with: ${locked.cards.map(c => c.toString()).join(',')}`);
                                 break;
@@ -2546,7 +2743,7 @@
                         
                         if (!hasOverlap) {
                             this.lockSequence(playerIdx, completedLadder, 'ladder', hold.suit);
-                            console.log(`✅ v4.5.4: ${aiName} completed HOLD! Got ${targetCard.toString()} → Locked ${completedLadder.map(c => c.toString()).join(',')}`);
+                            console.log(`✅ v4.5.5: ${aiName} completed HOLD! Got ${targetCard.toString()} → Locked ${completedLadder.map(c => c.toString()).join(',')}`);
                             completedAnyHold = true;
                             
                             // Check if ready to publish
@@ -2558,7 +2755,7 @@
                     }
                 }
                 
-                return completedAnyHold; // 🔧 v4.5.4: Return flag for decision tree
+                return completedAnyHold; // 🔧 v4.5.5: Return flag for decision tree
             }
 
             generateTargetCardsWithHolds(hand, suitFocus, playerIdx, maxTargets = 5) {
@@ -2575,7 +2772,7 @@
                         const targetCard = `${rank}${hold.suit}`;
                         if (!targets.includes(targetCard)) {
                             targets.push(targetCard);
-                            console.log(`  🎯 v4.5.4: HOLD target: ${targetCard} (completes ${hold.cards.map(c => c.toString()).join(',')})`);
+                            console.log(`  🎯 v4.5.5: HOLD target: ${targetCard} (completes ${hold.cards.map(c => c.toString()).join(',')})`);
                         }
                     });
                 });
@@ -2583,7 +2780,7 @@
                 return targets.slice(0, maxTargets + 3); // Allow a few extra for holds
             }
 
-            // 💚 v4.5.4: AGGRESSIVE BUY MODE - Detect when AI needs to be more lenient
+            // 💚 v4.5.5: AGGRESSIVE BUY MODE - Detect when AI needs to be more lenient
             isAggressiveBuyMode(playerIdx) {
                 // Detects "scattered card emergency" - when AI is stuck and needs to lower standards
                 const stage = this.aiConstructionStage[playerIdx];
@@ -2611,7 +2808,7 @@
                 
                 if (aggressive) {
                     const aiName = playerIdx === 1 ? 'Habot' : 'Jabot';
-                    console.log(`%c💚 v4.5.4: ${aiName} AGGRESSIVE BUY MODE activated!`, 'color: #27ae60; font-weight: bold;');
+                    console.log(`%c💚 v4.5.5: ${aiName} AGGRESSIVE BUY MODE activated!`, 'color: #27ae60; font-weight: bold;');
                     console.log(`   Reason: Stuck on ${stage} for ${turnsOnStage} turns, ${buysRemaining} buys left, only ${targets.length} targets`);
                 }
                 
@@ -2645,7 +2842,7 @@
                         
                         if (maxRun >= 4 && !targets.includes(targetCard)) {
                             targets.push(targetCard);
-                            console.log(`  🎯 v4.5.4: Target card: ${targetCard} (would create ${maxRun}-card run)`);
+                            console.log(`  🎯 v4.5.5: Target card: ${targetCard} (would create ${maxRun}-card run)`);
                             if (targets.length >= maxTargets) break;
                         }
                     }
@@ -2665,7 +2862,7 @@
                 // Marks a completed sequence as protected from discard
                 const locked = { type, cards: [...cards], suit };
                 this.aiLockedSequences[playerIdx].push(locked);
-                console.log(`  🔒 v4.5.4: LOCKED ${type} sequence (${cards.length} cards) for Player ${playerIdx}`);
+                console.log(`  🔒 v4.5.5: LOCKED ${type} sequence (${cards.length} cards) for Player ${playerIdx}`);
                 return locked;
             }
 
@@ -2688,7 +2885,7 @@
                 const needTriples = req.filter(s => s === 'triple').length;
                 const needLadders = req.filter(s => s === 'ladder').length;
                 
-                console.log(`  🏗️ v4.5.4: Stage check for Player ${playerIdx} - Current: ${currentStage}`);
+                console.log(`  🏗️ v4.5.5: Stage check for Player ${playerIdx} - Current: ${currentStage}`);
                 console.log(`      Has: ${seqs.triples.length} triples, ${seqs.ladders.length} ladders`);
                 console.log(`      Need: ${needTriples} triples, ${needLadders} ladders`);
                 console.log(`      Locked: ${this.aiLockedSequences[playerIdx].length} sequences`);
@@ -2700,13 +2897,13 @@
                     // First ladder complete → move to building second ladder
                     if (needLadders >= 2) {
                         this.aiConstructionStage[playerIdx] = 'building_L2';
-                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.4: Track stage change
-                        console.log(`  🎯 v4.5.4: ADVANCED to building_L2 (first ladder locked)`);
-                        // 🔧 v4.5.4: Exclude suits already used in locked ladders
+                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.5: Track stage change
+                        console.log(`  🎯 v4.5.5: ADVANCED to building_L2 (first ladder locked)`);
+                        // 🔧 v4.5.5: Exclude suits already used in locked ladders
                         const lockedSuits = this.aiLockedSequences[playerIdx]
                             .filter(s => s.type === 'ladder')
                             .map(s => s.suit);
-                        console.log(`      🚫 v4.5.4: Excluding locked ladder suits: ${lockedSuits.join(', ')}`);
+                        console.log(`      🚫 v4.5.5: Excluding locked ladder suits: ${lockedSuits.join(', ')}`);
                         const availableSuits = ['♠', '♥', '♦', '♣'].filter(s => !lockedSuits.includes(s));
                         // Select from UNLOCKED hand only, in different suits
                         const unlockedHand = this.getUnlockedCards(hand, playerIdx);
@@ -2716,21 +2913,21 @@
                     } else {
                         // Only need 1 ladder total → move to triple
                         this.aiConstructionStage[playerIdx] = 'building_T';
-                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.4: Track stage change
-                        console.log(`  🎯 v4.5.4: ADVANCED to building_T (only 1 ladder needed)`);
+                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.5: Track stage change
+                        console.log(`  🎯 v4.5.5: ADVANCED to building_T (only 1 ladder needed)`);
                     }
                 } else if (currentStage === 'building_L2' && lockedLadders >= 2) {
-                    // 🔧 v4.5.4: Check if we need a third ladder or a triple
+                    // 🔧 v4.5.5: Check if we need a third ladder or a triple
                     if (needLadders >= 3) {
                         // Hand 7: Need 3 ladders → build third ladder
                         this.aiConstructionStage[playerIdx] = 'building_L3';
-                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.4: Track stage change
-                        console.log(`  🎯 v4.5.4: ADVANCED to building_L3 (need third ladder)`);
-                        // 🔧 v4.5.4: Exclude suits from L1 and L2
+                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.5: Track stage change
+                        console.log(`  🎯 v4.5.5: ADVANCED to building_L3 (need third ladder)`);
+                        // 🔧 v4.5.5: Exclude suits from L1 and L2
                         const lockedSuits = this.aiLockedSequences[playerIdx]
                             .filter(s => s.type === 'ladder')
                             .map(s => s.suit);
-                        console.log(`      🚫 v4.5.4: Excluding locked ladder suits: ${lockedSuits.join(', ')}`);
+                        console.log(`      🚫 v4.5.5: Excluding locked ladder suits: ${lockedSuits.join(', ')}`);
                         const availableSuits = ['♠', '♥', '♦', '♣'].filter(s => !lockedSuits.includes(s));
                         const unlockedHand = this.getUnlockedCards(hand, playerIdx);
                         const focusSuits = this.selectSuitFocusFromSuits(unlockedHand, availableSuits, 2);
@@ -2739,26 +2936,26 @@
                     } else if (needTriples >= 1) {
                         // Hand 6: Need triple → build triple
                         this.aiConstructionStage[playerIdx] = 'building_T';
-                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.4: Track stage change
-                        console.log(`  🎯 v4.5.4: ADVANCED to building_T (need triple)`);
+                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.5: Track stage change
+                        console.log(`  🎯 v4.5.5: ADVANCED to building_T (need triple)`);
                     } else {
                         // Edge case: already have everything
                         this.aiConstructionStage[playerIdx] = 'ready_to_publish';
-                        console.log(`  ✅ v4.5.4: READY TO PUBLISH! All requirements met!`);
+                        console.log(`  ✅ v4.5.5: READY TO PUBLISH! All requirements met!`);
                     }
                 } else if (currentStage === 'building_L3' && lockedLadders >= 3) {
-                    // 🔧 v4.5.4: Third ladder complete (Hand 7)
+                    // 🔧 v4.5.5: Third ladder complete (Hand 7)
                     const lockedTriples = this.aiLockedSequences[playerIdx].filter(s => s.type === 'triple').length;
                     if (lockedTriples >= needTriples && lockedLadders >= needLadders) {
                         this.aiConstructionStage[playerIdx] = 'ready_to_publish';
-                        console.log(`  ✅ v4.5.4: READY TO PUBLISH! All 3 ladders locked!`);
+                        console.log(`  ✅ v4.5.5: READY TO PUBLISH! All 3 ladders locked!`);
                     }
                 } else if (currentStage === 'building_T') {
                     // Check if we have all requirements
                     const lockedTriples = this.aiLockedSequences[playerIdx].filter(s => s.type === 'triple').length;
                     if (lockedTriples >= needTriples && lockedLadders >= needLadders) {
                         this.aiConstructionStage[playerIdx] = 'ready_to_publish';
-                        console.log(`  ✅ v4.5.4: READY TO PUBLISH! All sequences complete!`);
+                        console.log(`  ✅ v4.5.5: READY TO PUBLISH! All sequences complete!`);
                     }
                 }
             }
@@ -3082,9 +3279,9 @@
             findWorstCard(pIdx) {
                 let hand = this.playerHands[pIdx];  // 🐛 v4.0.7: Changed to 'let' to allow reassignment
 
-                // 🔒 v4.5.4: PROTECT LOCKED SEQUENCES from discard!
+                // 🔒 v4.5.5: PROTECT LOCKED SEQUENCES from discard!
                 if (this.currentHand >= 6 && this.aiLockedSequences[pIdx].length > 0) {
-                    console.log(`  🔒 v4.5.4: Protecting ${this.aiLockedSequences[pIdx].length} locked sequences from discard`);
+                    console.log(`  🔒 v4.5.5: Protecting ${this.aiLockedSequences[pIdx].length} locked sequences from discard`);
                     
                     // Filter out ALL cards that are in locked sequences
                     const unlockedCards = hand.filter(card => !this.isSequenceLocked(pIdx, card));
@@ -3614,13 +3811,13 @@
                     case 5: if (buysUsed >= 2) return false; const hasAnySequence = hasTriple || hasLadder; return hasAnySequence && cardValue >= 30;
                     case 6:
                     case 7:
-                        // 🏗️ v4.5.4: STAGED CONSTRUCTION STRATEGY
+                        // 🏗️ v4.5.5: STAGED CONSTRUCTION STRATEGY
                         // Build sequences SEQUENTIALLY: L1 → L2 → T (not parallel!)
                         
                         const stage = this.aiConstructionStage[ai];
                         const aiName = ai === 1 ? 'Habot' : 'Jabot';
                         
-                        console.log(`  🏗️ v4.5.4 ${aiName} BUY CHECK - Stage: ${stage}, Buys used: ${buysUsed}/2-3`);
+                        console.log(`  🏗️ v4.5.5 ${aiName} BUY CHECK - Stage: ${stage}, Buys used: ${buysUsed}/2-3`);
                         
                         // Stage 1 & 2: Building Ladders - TARGET-BASED BUYING
                         if (stage === 'building_L1' || stage === 'building_L2') {
@@ -3643,7 +3840,7 @@
                                 return true; // BUY immediately if it's a target!
                             }
                             
-                            // 💚 v4.5.4: AGGRESSIVE BUY MODE - Lower standards when stuck with scattered cards
+                            // 💚 v4.5.5: AGGRESSIVE BUY MODE - Lower standards when stuck with scattered cards
                             const aggressiveMode = this.isAggressiveBuyMode(ai);
                             
                             if (aggressiveMode) {
@@ -4341,18 +4538,18 @@
             continueAITurnAfterDraw(ai, statusId) {
                 const aiName = ai === 1 ? 'Habot' : 'Jabot';
                 
-                // 🏗️ v4.5.4: STAGED CONSTRUCTION WITH HOLD SYSTEM + DECISION TREE DEBUG
+                // 🏗️ v4.5.5: STAGED CONSTRUCTION WITH HOLD SYSTEM + DECISION TREE DEBUG
                 if (this.currentHand >= 6 && this.aiConstructionStage[ai] !== 'ready_to_publish') {
                     const hand = this.playerHands[ai];
-                    const unlockedHand = this.getUnlockedCards(hand, ai); // 🔧 v4.5.4: Only check unlocked cards!
+                    const unlockedHand = this.getUnlockedCards(hand, ai); // 🔧 v4.5.5: Only check unlocked cards!
                     const seqs = this.findSequences(unlockedHand);
                     const stage = this.aiConstructionStage[ai];
                     
                     console.log(`%c🌳 DECISION TREE START - ${aiName} - Stage: ${stage}`, 'color: #9c27b0; font-weight: bold; font-size: 14px;');
-                    console.log(`  🏗️ v4.5.4: ${aiName} turn - Stage: ${stage}`);
+                    console.log(`  🏗️ v4.5.5: ${aiName} turn - Stage: ${stage}`);
                     console.log(`      Hand: ${hand.length} total (${unlockedHand.length} unlocked) - ${seqs.triples.length}T, ${seqs.ladders.length}L`);
                     
-                    // 🔧 v4.5.4: NODE 1 - Check held sequences FIRST (returns completion flag!)
+                    // 🔧 v4.5.5: NODE 1 - Check held sequences FIRST (returns completion flag!)
                     console.log(`%c├─ NODE 1: checkHeldSequences() - Checking for HOLD completions`, 'color: #2196f3; font-weight: bold;');
                     const completedHoldThisTurn = this.checkHeldSequences(ai);
                     
@@ -4364,7 +4561,7 @@
                     } else {
                         console.log(`%c│  └─ ℹ️  No holds completed - Proceeding to direct ladder checks`, 'color: #ff9800;');
                         
-                        // 🔧 v4.5.4: NODE 2 - Check for direct ladders (ONLY if no hold completed!)
+                        // 🔧 v4.5.5: NODE 2 - Check for direct ladders (ONLY if no hold completed!)
                         console.log(`%c├─ NODE 2: Direct ladder detection`, 'color: #2196f3; font-weight: bold;');
                         
                         // Check if we completed a sequence in current stage
@@ -4386,7 +4583,7 @@
                             }
                         } else if (stage === 'building_L1' && seqs.ladders.length === 0) {
                             console.log(`%c│  ├─ No complete ladders found - Checking for HOLD opportunities`, 'color: #607d8b;');
-                            // 🔶 v4.5.4: No complete ladder → Check for HOLDS
+                            // 🔶 v4.5.5: No complete ladder → Check for HOLDS
                             const potentialHolds = this.findPotentialHolds(unlockedHand, ai);
                             
                             if (potentialHolds.length > 0 && this.aiHeldSequences[ai].length === 0) {
@@ -4395,7 +4592,7 @@
                                 this.putOnHold(ai, bestHold);
                                 
                                 // IMMEDIATELY advance to L2 (don't wait!)
-                                console.log(`%c│  └─ ⏭️ v4.5.4: Advancing to L2 while L1 on hold`, 'color: #ff9800; font-weight: bold;');
+                                console.log(`%c│  └─ ⏭️ v4.5.5: Advancing to L2 while L1 on hold`, 'color: #ff9800; font-weight: bold;');
                                 this.advanceConstructionStage(ai);
                             } else {
                                 console.log(`%c│  └─ ⏸️  No HOLD opportunities - Continuing to accumulate cards`, 'color: #9e9e9e;');
@@ -4427,7 +4624,7 @@
                             }
                         } else if (stage === 'building_L2' && seqs.ladders.length < 2) {
                             console.log(`%c│  ├─ Less than 2 ladders - Checking for L2 HOLD opportunities`, 'color: #607d8b;');
-                            // 🔶 v4.5.4: No second ladder yet → Check for HOLDS
+                            // 🔶 v4.5.5: No second ladder yet → Check for HOLDS
                             const unlockedHand = this.getUnlockedCards(hand, ai);
                             const potentialHolds = this.findPotentialHolds(unlockedHand, ai);
                             
@@ -4438,14 +4635,14 @@
                                 this.putOnHold(ai, bestHold);
                                 
                                 // Advance to next stage while L2 on hold
-                                console.log(`%c│  └─ ⏭️ v4.5.4: Advancing while L2 on hold`, 'color: #ff9800; font-weight: bold;');
+                                console.log(`%c│  └─ ⏭️ v4.5.5: Advancing while L2 on hold`, 'color: #ff9800; font-weight: bold;');
                                 this.advanceConstructionStage(ai);
                             } else {
                                 console.log(`%c│  └─ ⏸️  No L2 HOLD opportunities or already have hold`, 'color: #9e9e9e;');
                             }
                         } else if (stage === 'building_L3' && seqs.ladders.length >= 3) {
                             console.log(`%c│  ├─ Found ${seqs.ladders.length} ladders - Checking for third ladder to lock`, 'color: #607d8b;');
-                            // 🔧 v4.5.4: Lock third ladder (Hand 7)
+                            // 🔧 v4.5.5: Lock third ladder (Hand 7)
                             const locked = this.aiLockedSequences[ai].filter(s => s.type === 'ladder');
                             
                             if (locked.length === 2) {
@@ -4457,7 +4654,7 @@
                                 
                                 if (unlockedLadder) {
                                     this.lockSequence(ai, unlockedLadder, 'ladder', unlockedLadder[0].suit);
-                                    console.log(`%c│  └─ 🔒 v4.5.4: Locked THIRD ladder: ${unlockedLadder.map(c => c.toString()).join(', ')}`, 'color: #4caf50; font-weight: bold;');
+                                    console.log(`%c│  └─ 🔒 v4.5.5: Locked THIRD ladder: ${unlockedLadder.map(c => c.toString()).join(', ')}`, 'color: #4caf50; font-weight: bold;');
                                     
                                     // Check if ready to publish
                                     this.advanceConstructionStage(ai);
@@ -4469,7 +4666,7 @@
                             }
                         } else if (stage === 'building_L3' && seqs.ladders.length < 3) {
                             console.log(`%c│  ├─ Less than 3 ladders - Checking for L3 HOLD opportunities`, 'color: #607d8b;');
-                            // 🔶 v4.5.4: No third ladder yet → Can put on hold if needed
+                            // 🔶 v4.5.5: No third ladder yet → Can put on hold if needed
                             const unlockedHand = this.getUnlockedCards(hand, ai);
                             const potentialHolds = this.findPotentialHolds(unlockedHand, ai);
                             
@@ -4902,11 +5099,11 @@
                         this.lastDiscard = null; this.lastDiscardByPlayer = -1; this.discardPile = [];
                         this.turnCounter = 0; this.lastAIDiscard = [null, null, null]; this.lastCardWarningShown = null;
                         
-                        // 🏗️ v4.5.4: Initialize staged construction for Hands 6-7
+                        // 🏗️ v4.5.5: Initialize staged construction for Hands 6-7
                         if (this.currentHand >= 6) {
-                            console.log(`%c🏗️ v4.5.4: Initializing STAGED CONSTRUCTION for Hand ${this.currentHand}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
+                            console.log(`%c🏗️ v4.5.5: Initializing STAGED CONSTRUCTION for Hand ${this.currentHand}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
                             this.aiConstructionStage = [null, 'building_L1', 'building_L1'];
-                            this.aiStageStartTurn = [null, this.turnCounter, this.turnCounter]; // 💚 v4.5.4: Track stage start
+                            this.aiStageStartTurn = [null, this.turnCounter, this.turnCounter]; // 💚 v4.5.5: Track stage start
                             this.aiLockedSequences = [[], [], []];
                             this.aiTargetCards = [null, [], []];
                             this.aiSuitFocus = [null, [], []];
@@ -5041,7 +5238,7 @@
                 // Remove card from hand
                 this.playerHands[0].splice(cardIdx, 1);
 
-                // 🎯 v4.5.4 CRITICAL FIX: When forceType specified, ONLY check matching sequence type!
+                // 🎯 v4.5.5 CRITICAL FIX: When forceType specified, ONLY check matching sequence type!
                 let addedToSequence = false;
                 for (let seq of published) {
                     // Determine if this sequence is triple or ladder
@@ -5053,14 +5250,14 @@
                     
                     if (typeMatches && this.canAddToPublishedSequence(card, seq)) {
                         seq.push(card);
-                        console.log(`%c  ✅ v4.5.4: Added ${card.toString()} to ${forceType} sequence: ${seq.map(c => c.toString()).join(' ')}`, 'color:#28a745;font-weight:bold');
+                        console.log(`%c  ✅ v4.5.5: Added ${card.toString()} to ${forceType} sequence: ${seq.map(c => c.toString()).join(' ')}`, 'color:#28a745;font-weight:bold');
                         addedToSequence = true;
                         break;
                     }
                 }
                 
                 if (!addedToSequence) {
-                    console.log(`%c  ⚠️ v4.5.4: Could not add to existing ${forceType} sequence, creating new`, 'color:#f59e0b;');
+                    console.log(`%c  ⚠️ v4.5.5: Could not add to existing ${forceType} sequence, creating new`, 'color:#f59e0b;');
                     published.push([card]);
                 }
                 
@@ -5187,11 +5384,11 @@
                 this.lastCardWarningShown = null;
                 this.buyWindow = { active: false, card: null, discardingPlayer: -1, buyWindowPlayer: -1, expiresAt: 0, timerInterval: null, pendingDeckDraw: null };
                 
-                // 🏗️ v4.5.4 FIX: Initialize staged construction when jumping to Hands 6-7
+                // 🏗️ v4.5.5 FIX: Initialize staged construction when jumping to Hands 6-7
                 if (handNum >= 6) {
-                    console.log(`%c🏗️ v4.5.4: Initializing STAGED CONSTRUCTION for Hand ${handNum}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
+                    console.log(`%c🏗️ v4.5.5: Initializing STAGED CONSTRUCTION for Hand ${handNum}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
                     this.aiConstructionStage = [null, 'building_L1', 'building_L1'];
-                    this.aiStageStartTurn = [null, this.turnCounter, this.turnCounter]; // 💚 v4.5.4: Track stage start
+                    this.aiStageStartTurn = [null, this.turnCounter, this.turnCounter]; // 💚 v4.5.5: Track stage start
                     this.aiLockedSequences = [[], [], []];
                     this.aiTargetCards = [null, [], []];
                     this.aiSuitFocus = [null, [], []];
@@ -5974,6 +6171,60 @@
         }
 
         // ============================================
+        // 🎮 HAND SELECTION MODAL
+        // ============================================
+        function showHandSelectionModal() {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('handSelectionModal');
+                const confirmBtn = document.getElementById('handSelectionConfirm');
+                const cancelBtn = document.getElementById('handSelectionCancel');
+
+                // Show modal
+                modal.classList.add('active');
+
+                // Handle confirm
+                const handleConfirm = () => {
+                    const selectedRadio = document.querySelector('input[name="handSelection"]:checked');
+                    const selection = selectedRadio ? selectedRadio.value : 'full';
+                    
+                    modal.classList.remove('active');
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                    
+                    // Return selection: 'full' or '1'-'7'
+                    resolve(selection);
+                };
+
+                // Handle cancel
+                const handleCancel = () => {
+                    modal.classList.remove('active');
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    cancelBtn.removeEventListener('click', handleCancel);
+                    resolve(null); // null means cancelled
+                };
+
+                confirmBtn.addEventListener('click', handleConfirm);
+                cancelBtn.addEventListener('click', handleCancel);
+
+                // Close on overlay click
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        handleCancel();
+                    }
+                });
+
+                // Close on ESC key
+                const handleEscape = (e) => {
+                    if (e.key === 'Escape') {
+                        handleCancel();
+                        document.removeEventListener('keydown', handleEscape);
+                    }
+                };
+                document.addEventListener('keydown', handleEscape);
+            });
+        }
+
+        // ============================================
         // 🎭 v2.5.0: CHARACTER BANTER SYSTEM
         // ============================================
 
@@ -6152,7 +6403,14 @@
         }
 
         async function newGame() {
-            // ✅ FIX 7B: Custom confirmation modal (no "This page says"!)
+            // Step 1: Show hand selection modal
+            const selectedHand = await showHandSelectionModal();
+            
+            if (selectedHand === null) {
+                return; // User cancelled hand selection
+            }
+
+            // Step 2: ✅ FIX 7B: Custom confirmation modal (no "This page says"!)
             if (game && game.gamePhase !== 'end') {
                 const confirmed = await showConfirmModal(
                     'Start New Game?',
@@ -6165,8 +6423,10 @@
                     return; // User cancelled
                 }
             }
+
+            // Step 3: Start new game with selected hand
             persistentScores = [0, 0, 0];
-            game = new GameState(false);
+            game = new GameState(false, selectedHand);
         }
 
         function drawFromDeck() {
