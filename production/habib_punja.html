@@ -2,18 +2,83 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.5.7 - CRITICAL FIX: Extension Card Loss Bug
+  Version: 4.5.9 - CRITICAL FIX: Buy Window Rotation
   Release Date: November 22, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 4.5.7 - CRITICAL FIX: Extension Card Loss Bug
+  🎮 VERSION 4.5.9 - CRITICAL FIX: Buy Window Rotation Bug
   ═══════════════════════════════════════════════════════════════
-  🐛 Fixed: Extensions now actually save cards to publishedSequences
-  🐛 Fixed: Cards no longer disappear when extending sequences
-  🐛 Fixed: Proper card accounting maintained throughout game
-  🐛 Fixed: PATCH I now allows taking discard when it extends sequences
+  🐛 Fixed: Buy window now rotates to all players with buys remaining
+  🐛 Fixed: Human gets buy opportunity even when AIs have zero buys
+  🐛 Fixed: PATCH I now rotates instead of blocking window entirely
+  
+  **BUG: Buy Window Killed When AI Has No Buys**
+  Problem: Human still had 2 buys left, but buy window never appeared
+  - Scenario: Hand 3, Turn 117, Jabot published
+  - Habot: 0 buys left, Jabot: 0 buys left, Human: 2 buys left
+  - Expected: Human should get buy window opportunity
+  - Actual: Buy window closed entirely, blocking human's chance!
+  
+  **ROOT CAUSE (Line 4272-4276):**
+  ```javascript
+  if (this.playerBuys[aiPlayer] <= 0) {
+      this.closeBuyWindow('no-buys');  // ❌ Killed window!
+      return;
+  }
+  ```
+  
+  When first AI in rotation had no buys, it closed the window entirely,
+  preventing it from rotating to the next player (human) who DID have buys!
+  
+  **THE FIX:**
+  Instead of closing buy window when AI has no buys, ROTATE to next player:
+  ```javascript
+  if (this.playerBuys[aiPlayer] <= 0) {
+      const nextBuyPlayer = (aiPlayer + 2) % 3;
+      if (nextBuyPlayer has buys && isn't discarding player) {
+          this.buyWindow.buyWindowPlayer = nextBuyPlayer;
+          // Continue buy window with next player!
+      }
+  }
+  ```
+  
+  **Buy Window Rotation Order:**
+  - Player 0 discards → Player 2 gets first chance
+  - If Player 2 can't/won't buy → Player 1 gets second chance  
+  - If Player 1 can't/won't buy → Window closes
+  
+  **Example from User's Bug:**
+  1. Habot (P1) discards
+  2. Human (P0) gets first buy chance → (P1 + 2) % 3 = 0 ✓
+  3. Human has 0 buys left → Rotate to Jabot (P2)
+  4. Jabot has 0 buys left → Rotate would go back to Habot
+  5. Habot is discarding player → Close window ✓
+  
+  WAIT - Let me recalculate the user's scenario:
+  - Turn 117, Hand 3 (Two Ladders)
+  - Habot: 0 buys, Jabot: 0 buys (published), Human: 2 buys
+  
+  If Jabot (P2) just discarded:
+  1. Next buy window player: (2 + 2) % 3 = 1 (Habot)
+  2. Habot has 0 buys → OLD CODE: Close window ❌
+  3. NEW CODE: Rotate to (1 + 2) % 3 = 0 (Human) ✓
+  4. Human has 2 buys → Show buy window! ✓
+  
+  If Habot (P1) just discarded:
+  1. Next buy window player: (1 + 2) % 3 = 0 (Human)
+  2. Human has 2 buys → Show buy window directly! ✓
+  
+  **Additional Fix: PATCH I Rotation**
+  PATCH I also had same bug - when AI published in triple-only hand,
+  it closed window instead of rotating to next player who might want to buy.
+  
+  🎮 VERSION 4.5.8 - Bug Fixes from Previous Version
+  ═══════════════════════════════════════════════════════════════
+  🐛 Fixed: Duplicate 10♣ in ladder - canAddToPublishedSequence checks rank+suit
+  🐛 Fixed: AIs not publishing in Hand 2 - Suit focus enabled for ALL ladder hands
+  ✅ Hands 2, 3, 5, 6, 7 now use suit focus for faster ladder building
   
   **BUG #1: Extension Card Loss**
   Problem: tryAddToPublished() was losing cards during extensions
@@ -4268,22 +4333,74 @@
                     return;
                 }
 
-                // 🎯 SAFETY CHECK: If AI has no buys left, don't process buy window
+                // 🐛 v4.5.9 FIX: If AI has no buys left, pass window to next player instead of closing
                 if (this.playerBuys[aiPlayer] <= 0) {
-                    console.log(`%c⏭️ SKIP: ${aiName} has no buys left (${this.playerBuys[aiPlayer]}) - closing buy window`, 'color: #9e9e9e; font-weight: bold;');
-                    this.closeBuyWindow('no-buys');
+                    console.log(`%c⏭️ v4.5.9: ${aiName} has no buys left - rotating to next player`, 'color: #9e9e9e; font-weight: bold;');
+                    
+                    // Find next player who hasn't had a chance yet
+                    const nextBuyPlayer = (aiPlayer + 2) % 3; // Skip to next in rotation
+                    const playerNames = ['Human', 'Habot', 'Jabot'];
+                    
+                    // Make sure next player isn't the discarding player
+                    if (nextBuyPlayer === this.buyWindow.discardingPlayer) {
+                        console.log(`%c⏭️ No more eligible buy window players - closing`, 'color: #9e9e9e;');
+                        this.closeBuyWindow('no-buys');
+                        return;
+                    }
+                    
+                    // Check if next player has buys
+                    if (this.playerBuys[nextBuyPlayer] <= 0) {
+                        console.log(`%c⏭️ ${playerNames[nextBuyPlayer]} also has no buys - closing window`, 'color: #9e9e9e;');
+                        this.closeBuyWindow('no-buys');
+                        return;
+                    }
+                    
+                    // Rotate to next player
+                    console.log(`%c🔄 v4.5.9: Rotating buy window to ${playerNames[nextBuyPlayer]}`, 'color: #ffc107; font-weight: bold;');
+                    this.buyWindow.buyWindowPlayer = nextBuyPlayer;
+                    
+                    // If next player is human, enable buy button
+                    if (nextBuyPlayer === 0) {
+                        document.getElementById('buyBtn').disabled = false;
+                        this.updateBuyTimer();
+                    } else {
+                        // Next player is AI, handle their buy window
+                        this.handleAIBuyWindow(nextBuyPlayer);
+                    }
                     return;
                 }
 
                 // 🎯 PATCH I v4.1.4: Block buying after publishing in triple-only games (buy window version)
+                // 🐛 v4.5.9 FIX: Rotate to next player instead of closing window
                 if (this.publishedSequences[aiPlayer].length > 0) {
                     const req = this.handReqs[this.currentHand].seqs;
                     const needLadders = req.filter(s => s === 'ladder').length;
 
                     if (needLadders === 0) {
-                        // Triple-only game and AI has published - NO MORE BUYING
-                        console.log(`%c  🛑 PATCH I v4.1.4: ${aiName} blocking buy window - Triple-only hand, already published`, 'color: #ff9800; font-weight: bold;');
-                        this.closeBuyWindow('no-buy-after-publish');
+                        // Triple-only game and AI has published - AI shouldn't buy, but pass to next player
+                        console.log(`%c  🛑 PATCH I v4.1.4: ${aiName} won't buy - Triple-only hand, already published`, 'color: #ff9800; font-weight: bold;');
+                        
+                        // Find next player who hasn't had a chance yet
+                        const nextBuyPlayer = (aiPlayer + 2) % 3;
+                        const playerNames = ['Human', 'Habot', 'Jabot'];
+                        
+                        // Check if next player is valid and has buys
+                        if (nextBuyPlayer === this.buyWindow.discardingPlayer || this.playerBuys[nextBuyPlayer] <= 0) {
+                            console.log(`%c⏭️ No more eligible buy window players - closing`, 'color: #9e9e9e;');
+                            this.closeBuyWindow('no-buy-after-publish');
+                            return;
+                        }
+                        
+                        // Rotate to next player
+                        console.log(`%c🔄 v4.5.9: Rotating buy window to ${playerNames[nextBuyPlayer]}`, 'color: #ffc107; font-weight: bold;');
+                        this.buyWindow.buyWindowPlayer = nextBuyPlayer;
+                        
+                        if (nextBuyPlayer === 0) {
+                            document.getElementById('buyBtn').disabled = false;
+                            this.updateBuyTimer();
+                        } else {
+                            this.handleAIBuyWindow(nextBuyPlayer);
+                        }
                         return;
                     }
                 }
