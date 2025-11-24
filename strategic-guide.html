@@ -2,582 +2,684 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Habib Punja • Master Strategy Guide • Age Of Bots Games</title>
-    <meta name="description" content="The official Age Of Bots Games strategy guide for the Habib Punja card game: triples, ladders, endgame tactics, and penalty management." />
+    <title>Age of Bots – Strategic Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Full strategic and tactical guide for the Habib Punja card game – triples, ladders, mixed hands, information warfare, and championship mentality." />
     <style>
         :root {
-            --brand-dark: #0a3876;
-            --brand-accent: #ff6f4f;
-            --ring: rgba(2,8,23,.18);
-            --grad: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            color-scheme: dark;
+            --aob-bg: #020617;
+            --aob-bg-soft: #020b24;
+            --aob-bg-softer: #020818;
+            --aob-border-soft: rgba(148, 163, 184, 0.4);
+            --aob-accent: #22d3ee;
+            --aob-accent-soft: rgba(56, 189, 248, 0.1);
+            --aob-gold: #facc15;
+            --aob-text: #e2e8f0;
+            --aob-muted: #94a3b8;
+            --aob-danger: #f97316;
+            --aob-radius-lg: 20px;
+            --aob-radius-xl: 26px;
         }
 
         * {
-            box-sizing: border-box
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0
+            box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;
-            color: #0f172a;
-            background: #0b1020;
-            background-image: radial-gradient(800px 400px at 80% -10%, rgba(102,126,234,.18), transparent 60%), radial-gradient(800px 500px at -10% 30%, rgba(118,75,162,.18), transparent 60%);
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #0b1120 0, #020617 45%, #000 100%);
+            color: var(--aob-text);
+            -webkit-font-smoothing: antialiased;
             min-height: 100vh;
         }
 
-        header {
-            background: rgba(10,15,26,.85);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255,255,255,.08);
-            position: sticky;
-            top: 0;
-            z-index: 30;
-        }
-
-        .wrap {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 16px 20px
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #e5e7eb;
-            text-decoration: none
-        }
-
-            .brand svg {
-                width: 30px;
-                height: 30px
-            }
-
-        nav a {
-            color: #cbd5e1;
-            text-decoration: none;
-            margin-left: 16px;
-            font-weight: 600
-        }
-
-            nav a:hover {
-                color: #fff
-            }
-
-        .hero {
-            padding: 40px 20px 18px
-        }
-
-            .hero h1 {
-                color: #fff;
-                margin: 6px 0 4px;
-                font-size: clamp(1.6rem,2.6vw,2.2rem)
-            }
-
-            .hero p {
-                color: #cbd5e1;
-                margin: 0
-            }
-
-            .hero .version {
-                color: #94a3b8;
-                font-size: .92rem;
-                margin-top: 6px
-            }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 22px;
-            padding: 20px
-        }
-
-        aside {
-            position: sticky;
-            top: 76px;
-            align-self: start;
-            background: linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
-            border: 1px solid rgba(255,255,255,.10);
-            border-radius: 14px;
-            padding: 16px;
-            color: #e5e7eb;
-        }
-
-            aside a {
-                display: block;
-                color: #e5e7eb;
-                text-decoration: none;
-                padding: 8px 10px;
-                border-radius: 8px;
-                font-weight: 600
-            }
-
-                aside a:hover {
-                    background: rgba(102,126,234,.18)
-                }
-
-        main {
-            background: linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
-            border: 1px solid rgba(255,255,255,.10);
-            border-radius: 14px;
-            padding: 24px;
-            color: #e5e7eb;
-        }
-
-        h2 {
-            color: #ffffff;
-            border-bottom: 2px solid rgba(255,255,255,.12);
-            padding-bottom: 6px;
-            margin-top: 16px
-        }
-
-        h3 {
-            color: #c7d2fe;
-            margin-top: 12px
-        }
-
-        p {
-            color: #dbe3f2
-        }
-
-        .callout {
-            background: rgba(16,185,129,.08);
-            border-left: 6px solid #10b981;
-            color: #d1fae5;
-            padding: 12px 14px;
-            border-radius: 10px;
-            margin: 12px 0
-        }
-
-        .warn {
-            background: rgba(244,63,94,.08);
-            border-left: 6px solid #f43f5e;
-            color: #fecaca;
-            padding: 12px 14px;
-            border-radius: 10px;
-            margin: 12px 0
-        }
-
-        .note {
-            background: rgba(99,102,241,.08);
-            border-left: 6px solid #6366f1;
-            color: #e0e7ff;
-            padding: 12px 14px;
-            border-radius: 10px;
-            margin: 12px 0
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 14px 0;
-            background: rgba(2,6,23,.35);
-            color: #e5e7eb;
-            border-radius: 10px;
-            overflow: hidden
-        }
-
-        th, td {
-            border: 1px solid rgba(255,255,255,.08);
-            padding: 10px;
-            text-align: left
-        }
-
-        th {
-            background: rgba(99,102,241,.18)
-        }
-
-        .back {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 18px
-        }
-
-        .pill {
-            display: inline-block;
-            background: var(--grad);
-            color: #fff;
-            text-decoration: none;
-            padding: 10px 16px;
-            border-radius: 999px;
-            font-weight: 800;
-            box-shadow: 0 8px 24px rgba(118,75,162,.25)
-        }
-
-        footer {
-            border-top: 1px solid rgba(255,255,255,.08);
-            margin-top: 26px
-        }
-
-            footer .wrap {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 10px;
-                flex-wrap: wrap
-            }
-
-        @media(max-width:980px) {
-            .container {
-                grid-template-columns: 1fr
-            }
-
-            aside {
-                position: static
-            }
-
-            nav {
-                display: none
-            }
-        }
-
-        /* High-contrast accessible link colors */
         a {
-            color: #7dd3fc;
+            color: var(--aob-accent);
+            text-decoration: none;
         }
 
             a:hover {
-                color: #bae6fd;
+                text-decoration: underline;
             }
 
-        aside a {
-            color: #e0f2fe;
+        .aob-shell {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 12px 16px 32px;
         }
 
-            aside a:hover {
-                background: rgba(125,211,252,.12);
-                color: #ffffff;
-            }
-
-        /* Paste the entire contents of your local aob_shared.css here */
-
-   /* ===========================================
-   Age of Bots – Shared Micro-Styles
-   Version 1.0 – Safe, Non-intrusive
-   =========================================== */
-        /* Improves text clarity across dark backgrounds */
-        body, button, input, textarea {
-            font-family: "Inter", "Segoe UI", sans-serif;
-            color: #e6e6f8;
-        }
-
-        /* Smooth fade utility */
-        .aob-fade {
-            opacity: 0;
-            transition: opacity 0.6s ease;
-        }
-
-            .aob-fade.show {
-                opacity: 1;
-            }
-
-        /* Centering helper for buttons */
-        .aob-center {
+        /* NAV */
+        .aob-nav {
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
+            margin-bottom: 18px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .aob-nav-title {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .aob-nav-logo {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-accent);
+        }
+
+        .aob-nav-sub {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
+        }
+
+        .aob-nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .aob-nav-link {
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            color: var(--aob-muted);
+            text-decoration: none;
+            background: transparent;
+        }
+
+            .aob-nav-link:hover {
+                border-color: rgba(148, 163, 184, 0.6);
+                color: var(--aob-text);
+            }
+
+        .aob-nav-link--primary {
+            border-color: rgba(56, 189, 248, 0.7);
+            background: radial-gradient(circle at top, #0ea5e9 0, #0369a1 40%, #020617 100%);
+            color: #e0f2fe;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
+        }
+
+        .aob-nav-link--active {
+            border-color: rgba(250, 204, 21, 0.8);
+            color: var(--aob-gold);
+        }
+
+        /* LAYOUT */
+        .aob-main {
+            display: grid;
+            grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .aob-main {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .aob-panel {
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid var(--aob-border-soft);
+            background: radial-gradient(circle at top left, #020b24 0, #020617 55%, #000 100%);
+            padding: 16px 18px 18px;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.95);
+        }
+
+            .aob-panel + .aob-panel {
+                margin-top: 14px;
+            }
+
+        .aob-panel-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--aob-gold);
+            margin-bottom: 4px;
+        }
+
+        .aob-panel-sub {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
+            margin-bottom: 10px;
+        }
+
+        .aob-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(34, 211, 238, 0.4);
+            background: rgba(8, 47, 73, 0.6);
+            color: var(--aob-accent);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+            .aob-pill span {
+                font-size: 13px;
+            }
+
+        h2 {
+            font-size: 16px;
+            margin: 10px 0 4px;
+            color: var(--aob-accent);
+        }
+
+        h3 {
+            font-size: 15px;
+            margin: 8px 0 4px;
+            color: #c7d2fe;
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 6px 0;
+            color: var(--aob-text);
+        }
+
+        ul {
+            padding-left: 18px;
+            margin: 6px 0 8px;
+        }
+
+        li {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 5px;
+            color: var(--aob-text);
+        }
+
+        .aob-list-check li::marker {
+            content: "✔ ";
+            color: var(--aob-accent);
+        }
+
+        .aob-highlight-box {
+            border-radius: var(--aob-radius-lg);
+            border: 1px dashed rgba(148, 163, 184, 0.6);
+            background: rgba(15, 23, 42, 0.85);
+            padding: 10px 11px;
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+        .aob-quote {
+            font-style: italic;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--aob-text);
+        }
+
+        .aob-quote-author {
+            margin-top: 6px;
+            font-size: 13px;
+            color: var(--aob-muted);
+        }
+
+        /* SIDE PANEL */
+        .aob-side-note-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--aob-accent);
+            margin-bottom: 6px;
+        }
+
+        .aob-side-note {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--aob-muted);
+        }
+
+        .aob-side-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(244, 244, 245, 0.14);
+            background: rgba(15, 23, 42, 0.9);
+            font-size: 11px;
+            color: var(--aob-text);
+            margin-bottom: 6px;
+        }
+
+            .aob-side-badge span {
+                font-size: 13px;
+            }
+
+        /* TABLES (for quick reference & penalties) */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 13px;
+            background: rgba(15, 23, 42, 0.85);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            padding: 8px 10px;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.95);
+            color: var(--aob-accent);
+            font-weight: 600;
+        }
+
+        /* FOOTER */
+        .aob-footer {
+            margin-top: 20px;
+            padding: 10px 4px 0;
+            border-top: 1px solid rgba(15, 23, 42, 0.9);
+            font-size: 11px;
+            color: var(--aob-muted);
             text-align: center;
         }
 
-        /* Consistent button styling (optional override) */
-        .aob-btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #7c3aed, #4c1d95);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s ease-in-out;
-        }
-
-            .aob-btn:hover {
-                transform: scale(1.04);
-                box-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
+            .aob-footer strong {
+                color: var(--aob-accent);
+                font-weight: 600;
             }
-
-        /* Light container for story, fable, or advisor text */
-        .aob-box {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 16px;
-            padding: 24px;
-            backdrop-filter: blur(6px);
-        }
-
-        /* Future-proof area for character bubbles */
-        .aob-bubble {
-            max-width: 320px;
-            padding: 14px 18px;
-            background: #fff;
-            color: #222;
-            border-radius: 24px;
-            position: relative;
-            box-shadow: 2px 8px 28px rgba(0,0,0,0.12);
-            font-family: "Comic Neue", "Comic Sans MS", sans-serif;
-            display: none; /* will be turned on by JS later */
-        }
-
-            /* Left-tail bubble */
-            .aob-bubble.left::after {
-                content: "";
-                position: absolute;
-                left: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-right: 16px solid #fff;
-            }
-
-            /* Right-tail bubble */
-            .aob-bubble.right::after {
-                content: "";
-                position: absolute;
-                right: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-left: 16px solid #fff;
-            }
-
-            /* Reserve advisor bubble style for Phase 3 */
-            .aob-bubble.center {
-                margin: 0 auto;
-            }
-
-
     </style>
 </head>
 <body>
-  <header>
-    <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;">
-      <a class="brand" href="index.html">
-        <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-          <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#667eea"/><stop offset="1" stop-color="#764ba2"/></linearGradient></defs>
-          <rect x="10" y="12" width="44" height="32" rx="8" fill="url(#g2)" />
-          <circle cx="24" cy="28" r="6" fill="#0b1220"/><circle cx="40" cy="28" r="6" fill="#0b1220"/>
-          <rect x="18" y="36" width="28" height="6" rx="3" fill="#0b1220"/>
-          <rect x="30" y="4" width="4" height="8" rx="2" fill="url(#g2)"/>
-        </svg>
-        <strong>Age Of Bots Games</strong>
-      </a>
-      <nav>
-        <a href="habib_punja_v4_5_10_BETA.html">Play</a>
-        <a href="resources.html" aria-current="page">Complete Rules</a>
-        <a href="contact.html">Contact</a>
-      </nav>
+    <div class="aob-shell">
+        <header class="aob-nav">
+            <div class="aob-nav-title">
+                <div class="aob-nav-logo">AGE OF BOTS GAMES</div>
+                <div class="aob-nav-sub">Habib Punja · Strategic Card Game</div>
+            </div>
+            <nav class="aob-nav-links">
+                <a class="aob-nav-link" href="index.html">Home</a>
+                <a class="aob-nav-link" href="habib_punja_v4_5_10_BETA.html">Play Game</a>
+                <a class="aob-nav-link" href="characters.html">Characters</a>
+                <a class="aob-nav-link aob-nav-link--active" href="strategic-guide.html">Strategy Guide</a>
+                <a class="aob-nav-link" href="resources.html">Resources</a>
+                <a class="aob-nav-link" href="source-selection-criteria.html">Source Criteria</a>
+                <a class="aob-nav-link" href="contact.html">Contact</a>
+            </nav>
+        </header>
+
+        <main class="aob-main">
+            <!-- MAIN STRATEGY + TACTICS CONTENT -->
+            <section>
+                <!-- Intro -->
+                <article class="aob-panel">
+                    <div class="aob-panel-title">Strategic Guide</div>
+                    <div class="aob-panel-sub">Think like a champion, not just a player</div>
+                    <div class="aob-pill">
+                        <span>🧠</span> MuBot's Strategic & Tactical Primer
+                    </div>
+                    <p style="margin-top:10px;">
+                        This guide is designed to help you win not just hands, but full 7-hand wars. Habot, Jabot, and MuBot
+                        are all playing from different mental models. Your goal as a human player is to understand their
+                        strengths—and then out-think them across <strong>structure, tempo, and penalties</strong>.
+                    </p>
+                </article>
+
+                <!-- NEW: MuBot Opening Guidance -->
+                <article class="aob-panel">
+                    <div class="aob-panel-title">MuBot’s Opening Guidance</div>
+                    <div class="aob-panel-sub">From hands to the seven-hand war</div>
+                    <p>
+                        I am MuBot, your Zen Master Advisor. This guide is not only about winning individual hands.
+                        It is about learning to see the whole seven-hand war.
+                    </p>
+                    <p>
+                        You will notice how small choices echo across future hands: when to buy, when to publish early,
+                        when to retreat, and when to absorb a loss so you avoid a devastating nuke later.
+                    </p>
+                    <p>
+                        Read this not as a list of tricks, but as a way of thinking.
+                        Habot and Jabot each embody one extreme: fearless speed and patient structure.
+                        Your task is to understand them both—then find your own strategic rhythm between them.
+                    </p>
+                    <p>
+                        When you are ready, return to the table.
+                        The game will feel different once you begin to see the patterns beneath each hand.
+                    </p>
+                </article>
+                <!-- END MuBot Opening Guidance -->
+                <!-- Core Principles -->
+                <article class="aob-panel">
+                    <h2>Core Principles</h2>
+                    <p>
+                        Every decision in Habib Punja is a trade-off between <strong>speed, stability, and structure</strong>.
+                        These principles guide strong play:
+                    </p>
+                    <ul class="aob-list-check">
+                        <li><strong>Structure before speed:</strong> Build solid ladders or triples before you rush to publish.</li>
+                        <li><strong>Minimize devastation:</strong> Avoid “nuke” hands that blow up your position.</li>
+                        <li><strong>Think across all 7 hands:</strong> Short-term wins are meaningless if you lose the war.</li>
+                        <li><strong>Observe the bots:</strong> Habot publishes aggressively, Jabot waits for high-confidence lines.</li>
+                        <li><strong>Protect your buys:</strong> In later hands, buys are your lifeline to complete ladders.</li>
+                    </ul>
+
+                    <div class="aob-highlight-box">
+                        <strong>MuBot's Advice:</strong> <br />
+                        “Never judge a move only by this hand. Always ask: how does this decision echo into the final score?”
+                    </div>
+                </article>
+
+                <!-- Triple Strategy -->
+                <article class="aob-panel" id="triple">
+                    <h2>🎯 Triple Strategy (Hands 1 & 4)</h2>
+                    <h3>Phase 1: Building (Turns 1–4)</h3>
+                    <p><strong>Target:</strong> 4 doubles (8 cards) to maximize flexibility into triples.</p>
+                    <ul>
+                        <li>✅ Buy if you have fewer than 4 doubles.</li>
+                        <li>❌ Stop buying after your first triple is formed.</li>
+                    </ul>
+                    <p><strong>Example:</strong> K♠ K♥ Q♦ Q♣ J♠ J♥ 10♣ 9♠ 8♦ 7♥ → 3 doubles (K/Q/J). Action: buy to hit the 4th double.</p>
+
+                    <h3>Phase 2: Publishing (Turns 5–8)</h3>
+                    <ul>
+                        <li>✅ Publish when you have 1 triple + 3 doubles and hand size around 10–11.</li>
+                        <li>✅ Prefer to publish when no opponent has ≤ 3 cards.</li>
+                    </ul>
+                    <div class="aob-highlight-box">
+                        <strong>After publishing:</strong><br />
+                        Take from discard only if it completes existing doubles or triples. Avoid random pickups that bloat your hand.
+                    </div>
+
+                    <h3>Phase 3: Endgame Intelligence – The “Hold Strategy”</h3>
+                    <ul>
+                        <li>Track what opponents pull from discard—this reveals which triples they’re chasing.</li>
+                        <li>Hold up to 3 matching cards that extend or block an opponent’s structure.</li>
+                        <li>Wait for their publish, then dump those held cards in a single explosive move.</li>
+                    </ul>
+                </article>
+
+                <!-- Ladder Strategy -->
+                <article class="aob-panel" id="ladder">
+                    <h2>🪜 Ladder Strategy (Hands 3 & 7)</h2>
+                    <h3>Phase 1: Aggressive Early Buying</h3>
+                    <ul>
+                        <li>✅ Immediately buy on turn 1; if needed, second buy on turn 4.</li>
+                        <li>❌ Stop buying after turn 5.</li>
+                    </ul>
+                    <p>
+                        Ladders require four consecutive same-suit cards. Early volume increases the chance of closing critical gaps
+                        without bloating too late.
+                    </p>
+
+                    <h3>Ace Management</h3>
+                    <div class="aob-highlight-box">
+                        <strong>Rule:</strong> Avoid Aces as ladder endpoints unless they are completing a strong sequence.
+                        Aces are 20-point penalties and often act as “dead ends.”
+                    </div>
+
+                    <h3>Sorting Strategy</h3>
+                    <p>
+                        Sort <strong>by rank, then suit</strong>. This exposes potential ladders at a glance and prevents you from
+                        missing viable patterns.
+                    </p>
+
+                    <h3>Multi-Ladder Diversity</h3>
+                    <p>
+                        Never build two ladders in the same suit. Different suits give independent extension paths and reduce
+                        competition for the same ranks.
+                    </p>
+
+                    <h3>“Ladders Trump Triples” in Ladder Hands</h3>
+                    <ul>
+                        <li>In ladder-focused hands, prioritize ladders for endgame flexibility.</li>
+                        <li>Converting ladder cards to triples sacrifices endpoints you may desperately need later.</li>
+                    </ul>
+                </article>
+
+                <!-- Mixed Hands -->
+                <article class="aob-panel" id="mixed">
+                    <h2>🎯 Mixed Hand Strategy</h2>
+                    <p>In mixed hands, the ladder is usually your anchor; triples fill in around it.</p>
+                    <ul>
+                        <li><strong>Hand 2 (Triple + Ladder):</strong> Build and lock the ladder first; then complete the triple.</li>
+                        <li><strong>Hand 5 (2 Triples + Ladder):</strong> Ladder first, then select the highest-value triples.</li>
+                        <li><strong>Hand 6 (Triple + 2 Ladders):</strong> Pick 2 ladders of different suits; let the triple emerge from remaining cards.</li>
+                    </ul>
+                    <div class="aob-highlight-box">
+                        <strong>Example:</strong> 3♠ 4♠ 5♠ 6♠ (ladder) + K♦ K♣ Q♥ Q♠ J♠ → lock ladder; remaining face cards can form triples or near-triples.
+                    </div>
+                </article>
+
+                <!-- Information Warfare -->
+                <article class="aob-panel" id="info-war">
+                    <h2>🕵️ Information Warfare</h2>
+                    <h3>Intelligence Gathering</h3>
+                    <ul>
+                        <li>Watch what opponents pull from discard. Each visible pick is a clue to their structures.</li>
+                        <li>Hold gap cards (like 4♠ or 8♠) that can complete or extend an opponent’s ladder.</li>
+                    </ul>
+                    <div class="aob-highlight-box">
+                        <strong>Avoid information leaks:</strong> Never discard two or more matching cards in a row. That’s as good as announcing your build.
+                    </div>
+
+                    <h3>Stealth Mode Detection</h3>
+                    <ul>
+                        <li>
+                            If an opponent publishes with 6–7 cards and then immediately dumps 3+ cards on the next turn,
+                            they likely pre-built a hold queue.
+                        </li>
+                        <li><strong>Counter:</strong> Publish quickly and race. Don’t give their structure time to snowball.</li>
+                    </ul>
+                </article>
+
+                <!-- Endgame Tactics -->
+                <article class="aob-panel" id="endgame">
+                    <h2>⏱️ Endgame Tactics</h2>
+                    <h3>Extension Timing</h3>
+                    <div class="aob-highlight-box">
+                        If only one player has published and others still have 3+ cards, you can delay your own publish to extend
+                        your structures in-hand, maximizing your dump when you finally commit.
+                    </div>
+                    <p>However:</p>
+                    <ul>
+                        <li>Publish immediately if stealth behavior is detected (sudden big dumps from others).</li>
+                        <li>Publish quickly if multiple players have already published.</li>
+                        <li>Publish if any opponent is at ≤ 3 cards; do not give them extra time.</li>
+                    </ul>
+                </article>
+
+                <!-- Penalty Management -->
+                <article class="aob-panel" id="penalty">
+                    <h2>💣 Penalty Management</h2>
+                    <h3>Don’t Get Nuked</h3>
+                    <ul>
+                        <li>One bad hand is recoverable; a nuclear penalty is often not.</li>
+                        <li>Discard high-penalty cards first: A &gt; K/Q/J &gt; 10 &gt; low ranks.</li>
+                        <li>Stop buying after your early buys to avoid late-hand bloat.</li>
+                    </ul>
+                    <table>
+                        <tr><th>Card</th><th>Penalty</th></tr>
+                        <tr><td>Ace</td><td>20</td></tr>
+                        <tr><td>K, Q, J</td><td>15</td></tr>
+                        <tr><td>10</td><td>10</td></tr>
+                        <tr><td>2–9</td><td>Face value</td></tr>
+                    </table>
+                </article>
+
+                <!-- Quick Reference -->
+                <article class="aob-panel" id="reference">
+                    <h2>📊 Quick Reference – Triple vs Ladder Hands</h2>
+                    <table>
+                        <tr>
+                            <th>Factor</th>
+                            <th>Triple Hands (1, 4)</th>
+                            <th>Ladder Hands (3, 7)</th>
+                        </tr>
+                        <tr>
+                            <td>Initial Buys</td>
+                            <td>1 buy if &lt; 4 doubles</td>
+                            <td>2 buys (turns 1 &amp; 4)</td>
+                        </tr>
+                        <tr>
+                            <td>Target Structure</td>
+                            <td>4 doubles (8 cards)</td>
+                            <td>Multiple suit sequences</td>
+                        </tr>
+                        <tr>
+                            <td>Sorting</td>
+                            <td>By rank</td>
+                            <td>By rank, then suit</td>
+                        </tr>
+                        <tr>
+                            <td>Aces</td>
+                            <td>Treat normally</td>
+                            <td>Discard early (endpoint + high penalty)</td>
+                        </tr>
+                        <tr>
+                            <td>Decision Priority</td>
+                            <td>Triples first</td>
+                            <td>Ladders &gt; Triples</td>
+                        </tr>
+                        <tr>
+                            <td>Stop Buying</td>
+                            <td>After first triple</td>
+                            <td>After 2 total buys</td>
+                        </tr>
+                        <tr>
+                            <td>Diversity</td>
+                            <td>Any ranks</td>
+                            <td>Different suits only</td>
+                        </tr>
+                    </table>
+                </article>
+
+                <!-- 7-Hand War (Extended) -->
+                <article class="aob-panel" id="seven-hand-war">
+                    <h2>⚔️ The 7-Hand War</h2>
+                    <p>Your goal is not perfection in any single hand. It’s <strong>consistency across seven.</strong></p>
+                    <ul class="aob-list-check">
+                        <li>✅ One hand lost ≠ game lost</li>
+                        <li>✅ Minimize devastating losses (nukes)</li>
+                        <li>✅ Win <strong>4+ hands</strong> to secure the match</li>
+                        <li>✅ Consistent small losses are better than one catastrophic failure</li>
+                        <li>✅ Keep a “battle vs war” mentality at all times</li>
+                    </ul>
+                </article>
+
+                <!-- Final Wisdom -->
+                <article class="aob-panel">
+                    <h2>Final Wisdom</h2>
+                    <p class="aob-quote">
+                        “The difference between a good player and a master is:
+                        <br /><br />
+                        Good players win hands. Masters win games.<br />
+                        Good players avoid losses. Masters minimize devastation.<br />
+                        Good players play their cards. Masters play their opponents.”
+                    </p>
+                    <div class="aob-quote-author">— MuBot, Zen AI Master Advisor</div>
+                </article>
+
+                <!-- Strategic Resources Inline (lightweight teaser) -->
+                <article class="aob-panel" id="wisdom-resources">
+                    <h2>🧠 Strategic Wisdom &amp; Growth Resources</h2>
+                    <p>
+                        If you’d like to go deeper into mindset, strategy, and habits, these public resources echo many of the
+                        ideas embodied in the game:
+                    </p>
+                    <ul>
+                        <li><a href="https://insight.ieeeusa.org/articles/developing-a-strategic-mindset/" target="_blank" rel="noopener">Developing a Strategic Mindset — IEEE INSIGHT</a></li>
+                        <li><a href="https://www.thestrategyinstitute.org/insights/5-proven-techniques-to-enhance-strategic-thinking-skills" target="_blank" rel="noopener">5 Techniques to Enhance Strategic Thinking Skills</a></li>
+                        <li><a href="https://www.sorenkaplan.com/developing-strategic-mindset-in-leaders/" target="_blank" rel="noopener">Mastering the Art of Strategy</a></li>
+                        <li><a href="https://www.thestrategyinstitute.org/insights/strategic-thinking-a-complete-guide-for-business-success" target="_blank" rel="noopener">Strategic Thinking — A Complete Guide</a></li>
+                        <li><a href="https://cmoe.com/blog/instilling-inspiring-strategic-thinking-mindset-work/" target="_blank" rel="noopener">Instilling a Strategic Thinking Mindset at Work</a></li>
+                    </ul>
+                    <p style="font-size:13px;color:var(--aob-muted);">
+                        For a broader list and our reasoning, see the <a href="resources.html">Resources</a> page and
+                        <a href="source-selection-criteria.html">Source Selection Criteria</a>.
+                    </p>
+                </article>
+
+                <!-- Back buttons -->
+                <article class="aob-panel" id="nav-end" aria-label="End Navigation">
+                    <p style="margin-bottom:8px;">Ready to put this into practice?</p>
+                    <p>
+                        <a href="habib_punja_v4_5_10_BETA.html" style="display:inline-block;margin-right:8px;padding:8px 14px;border-radius:999px;border:1px solid rgba(56,189,248,0.7);background:radial-gradient(circle at top,#0ea5e9 0,#0369a1 45%,#020617 100%);color:#e0f2fe;text-decoration:none;letter-spacing:.12em;font-size:11px;text-transform:uppercase;">
+                            ← Back to Game
+                        </a>
+                        <a href="contact.html" style="display:inline-block;padding:8px 14px;border-radius:999px;border:1px solid rgba(148,163,184,0.7);background:rgba(15,23,42,0.9);color:var(--aob-text);text-decoration:none;letter-spacing:.12em;font-size:11px;text-transform:uppercase;">
+                            📧 Contact Support
+                        </a>
+                    </p>
+                </article>
+            </section>
+
+            <!-- SIDE COLUMN -->
+            <aside>
+                <section class="aob-panel">
+                    <div class="aob-side-badge">
+                        <span>🎯</span>
+                        <span>Quick Navigation</span>
+                    </div>
+                    <p class="aob-side-note">
+                        Use these sections while you test the Beta:
+                    </p>
+                    <ul style="margin-top:6px;">
+                        <li><a href="#triple">Triple Strategy (Hands 1 &amp; 4)</a></li>
+                        <li><a href="#ladder">Ladder Strategy (Hands 3 &amp; 7)</a></li>
+                        <li><a href="#mixed">Mixed Hands</a></li>
+                        <li><a href="#info-war">Information Warfare</a></li>
+                        <li><a href="#endgame">Endgame Tactics</a></li>
+                        <li><a href="#penalty">Penalty Management</a></li>
+                        <li><a href="#reference">Quick Reference</a></li>
+                        <li><a href="#seven-hand-war">The 7-Hand War</a></li>
+                        <li><a href="#wisdom-resources">Strategic Wisdom Resources</a></li>
+                    </ul>
+                </section>
+
+                <section class="aob-panel">
+                    <div class="aob-side-note-title">Playing Against AI Personalities</div>
+                    <p class="aob-side-note">
+                        <strong>Habot (Rabbit):</strong> Publishes early, loves momentum, and can overwhelm slow opponents—but
+                        risks collapsing if the board turns.
+                    </p>
+                    <p class="aob-side-note">
+                        <strong>Jabot (Tortoise):</strong> Waits for robust ladders and triples, excels in complex hands, but can
+                        miss “good enough” moments.
+                    </p>
+                    <p class="aob-side-note">
+                        <strong>MuBot:</strong> Watches the entire 7-hand arc and rewards you for minimizing damage and maximizing
+                        strategic clarity, not just flashy single-hand wins.
+                    </p>
+                </section>
+            </aside>
+        </main>
+
+        <footer class="aob-footer">
+            <div><strong>AgeOfBotsGames.com</strong> · Face off against evolving AI minds in a strategic 7-hand war.</div>
+            <div>Habib Punja Public Beta · Habot · Jabot · MuBot · Joko</div>
+        </footer>
     </div>
-  </header>
-
-  <section class="hero">
-    <div class="wrap">
-      <h1>Habib Punja — Master Strategy Guide</h1>
-      <p>Championship tactics for triples, ladders, information warfare, and endgame.</p>
-      <div class="version">For v1.3.3 • Guide v1.0 • Last updated Oct 2025</div>
-    </div>
-  </section>
-
-  <div class="container">
-    <aside>
-      <strong>📋 Quick Navigation</strong>
-      <a href="#triple">🎯 Triple Strategy</a>
-      <a href="#ladder">🪜 Ladder Strategy</a>
-      <a href="#mixed">🎯 Mixed Hands</a>
-      <a href="#info-war">🕵️ Information Warfare</a>
-      <a href="#endgame">⏱️ Endgame Tactics</a>
-      <a href="#penalty">💣 Penalty Management</a>
-      <a href="#reference">📊 Quick Reference</a>
-      <a href="#champ">🏆 Championship Mentality</a>
-      <a href="source-selection-criteria.html">📚 Source Selection Criteria</a>
-    </aside>
-
-    <main>
-      <section id="triple">
-        <h2>🎯 Triple Strategy (Hands 1, 4)</h2>
-        <h3>Phase 1: Building (Turns 1–4)</h3>
-        <p><strong>Target:</strong> 4 doubles (8 cards) gives maximum flexibility into triples.</p>
-        <ul>
-          <li>✅ Buy if you have &lt; 4 doubles</li>
-          <li>❌ Stop buying after your first triple</li>
-        </ul>
-        <div class="note"><strong>Example:</strong> K♠ K♥ Q♦ Q♣ J♠ J♥ 10♣ 9♠ 8♦ 7♥ → 3 doubles (K/Q/J). Action: buy to hit the 4th double.</div>
-
-        <h3>Phase 2: Publishing (Turns 5–8)</h3>
-        <ul>
-          <li>✅ Publish when you have 1 triple + 3 doubles and hand size ~10–11</li>
-          <li>✅ Prefer to publish when no opponent has ≤ 3 cards</li>
-        </ul>
-        <div class="callout"><strong>After publishing:</strong> Only take from discard to complete existing doubles. Don’t create new doubles; avoid bloat.</div>
-
-        <h3>Phase 3: Endgame Intelligence — The “Hold Strategy”</h3>
-        <ul>
-          <li>Watch picks from discard to infer triples/ladders forming</li>
-          <li>Hold matching cards (max 3) that extend or block opponent structures</li>
-          <li>Wait for their publish, then dump 3+ cards by extending</li>
-        </ul>
-      </section>
-
-      <section id="ladder">
-        <h2>🪜 Ladder Strategy (Hands 3, 7)</h2>
-        <h3>Phase 1: Aggressive Early Buying</h3>
-        <ul>
-          <li>✅ Buy immediately on turn 1; if needed, second buy on turn 4</li>
-          <li>❌ Stop buying after turn 5</li>
-        </ul>
-        <div class="note"><strong>Why?</strong> Ladders need four consecutive same-suit cards; volume helps close gaps.</div>
-
-        <h3>Ace Management</h3>
-        <div class="warn"><strong>Rule:</strong> Avoid Aces as endpoints (single extension). Discard early unless extending an existing ladder. (Aces are 20‑point penalties.)</div>
-
-        <h3>Sorting Strategy</h3>
-        <p>Sort <strong>by rank, then suit</strong> to surface ladder patterns instantly.</p>
-
-        <h3>Multi‑Ladder Diversity</h3>
-        <div class="callout">Never build two ladders in the same suit. Different suits = independent extension paths.</div>
-
-        <h3>“Ladders Trump Triples”</h3>
-        <ul>
-          <li>Prioritize ladders for endgame flexibility; converting ladder cards to triples sacrifices endpoints.</li>
-        </ul>
-      </section>
-
-      <section id="mixed">
-        <h2>🎯 Mixed Hand Strategy</h2>
-        <ul>
-          <li><strong>Hand 2 (Triple + Ladder):</strong> Ladder first</li>
-          <li><strong>Hand 5 (2 Triples + Ladder):</strong> Ladder first, then fill with triples</li>
-          <li><strong>Hand 6 (Triple + 2 Ladders):</strong> Two ladders (different suits); triple emerges from remaining cards</li>
-        </ul>
-        <div class="note"><strong>Example:</strong> 3♠ 4♠ 5♠ 6♠ (ladder) + K♦ K♣ Q♥ Q♠ J♠ → build two triples after locking the ladder.</div>
-      </section>
-
-      <section id="info-war">
-        <h2>🕵️ Information Warfare</h2>
-        <h3>Intelligence Gathering</h3>
-        <ul>
-          <li>Track discard/pick/buy patterns to deduce builds</li>
-          <li>Disrupt ladders by holding gap cards (e.g., 4♠ or 8♠)</li>
-        </ul>
-        <div class="warn"><strong>Avoid information leaks:</strong> Never discard 2+ matching cards consecutively.</div>
-
-        <h3>Stealth Mode Detection</h3>
-        <ul>
-          <li>Opponent publishes with 6–7 cards then instantly drops 3+ next turn → they prepped a hold queue</li>
-          <li><strong>Counter:</strong> Publish immediately and race</li>
-        </ul>
-      </section>
-
-      <section id="endgame">
-        <h2>⏱️ Endgame Tactics</h2>
-        <h3>Extension Timing</h3>
-        <div class="callout">
-          If only one player has published and others have 3+ cards, delay and extend in-hand to maximize your dump when you publish.
-        </div>
-        <div class="warn">
-          Publish immediately if stealth detected, multiple have published, or any opponent is ≤ 3 cards.
-        </div>
-      </section>
-
-      <section id="penalty">
-        <h2>💣 Penalty Management</h2>
-        <h3>Don’t Get Nuked</h3>
-        <ul>
-          <li>One bad round is survivable; a nuclear penalty is not</li>
-          <li>Discard high‑penalty cards first: A &gt; K/Q/J &gt; 10 &gt; low ranks</li>
-          <li>Stop buying after your early buys to avoid bloat</li>
-        </ul>
-        <table>
-          <tr><th>Card</th><th>Penalty</th></tr>
-          <tr><td>Ace</td><td>20</td></tr>
-          <tr><td>K, Q, J</td><td>15</td></tr>
-          <tr><td>10</td><td>10</td></tr>
-          <tr><td>2–9</td><td>Face value</td></tr>
-        </table>
-      </section>
-
-      <section id="reference">
-        <h2>📊 Quick Reference</h2>
-        <table>
-          <tr><th>Factor</th><th>Triple Hands (1,4)</th><th>Ladder Hands (3,7)</th></tr>
-          <tr><td>Initial Buys</td><td>1 buy if &lt; 4 doubles</td><td>2 buys (turns 1 &amp; 4)</td></tr>
-          <tr><td>Target Structure</td><td>4 doubles (8 cards)</td><td>Multiple suit sequences</td></tr>
-          <tr><td>Sorting</td><td>By rank</td><td>By rank, then suit</td></tr>
-          <tr><td>Aces</td><td>Treat normally</td><td>Discard early (endpoint + penalty)</td></tr>
-          <tr><td>Decision Priority</td><td>Triples first</td><td>Ladders &gt; Triples</td></tr>
-          <tr><td>Stop Buying</td><td>After first triple</td><td>After 2 total buys</td></tr>
-          <tr><td>Diversity</td><td>Any ranks</td><td>Different suits only</td></tr>
-        </table>
-      </section>
-
-      <section id="champ">
-        <h2>🏆 Championship Mentality</h2>
-        <ul>
-          <li>Win the 7‑hand war: minimize devastation, win 4+ hands</li>
-          <li>Masters manage penalties and opponents, not just their cards</li>
-        </ul>
-        
-        
-  <footer>
-    <div class="wrap" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-      <div style="color:#94a3b8">
-        © 2025 AgeOfBotsGames LLC<br>
-        <em>Face off against evolving AI minds — Habot (Rabbit) • Jabot (Tortoise) • and more to come.</em>
-      </div>
-      <div class="small" style="display:flex;gap:14px;flex-wrap:wrap">
-        <a href="source_selection_criteria.html" style="text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18);color:#7dd3fc">Strategy Resources</a>
-        <a href="contact.html" style="text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18);color:#7dd3fc">Contact</a>
-      </div>
-    </div>
-  </footer>
-
-      </section>
-
-      <section id="seven-hand-war">
-        <h2>⚔️ The 7‑Hand War</h2>
-        <ul>
-          <li>✅ One hand lost ≠ game lost</li>
-          <li>✅ Minimize devastating losses (nukes)</li>
-          <li>✅ Win 4+ hands = championship</li>
-          <li>✅ Consistent small losses are better than one nuke</li>
-          <li>✅ “Battle vs War” mentality</li>
-        </ul>
-
-        <blockquote class="note" style="margin-top:12px">
-          <strong>Final Wisdom:</strong><br>
-          “The difference between a good player and a master is:<br><br>
-          Good players win hands. Masters win games.<br>
-          Good players avoid losses. Masters minimize devastation.<br>
-          Good players play their cards. Masters play their opponents.”
-        </blockquote>
-      </section>
-
-      <section id="wisdom-resources">
-        <h2>🧠 Strategic Wisdom &amp; Growth Resources</h2>
-        <p>Dive deeper into mindset, strategy, and habits that power consistency, resilience, and mastery.</p>
-        <ul>
-          <li><a href="https://insight.ieeeusa.org/articles/developing-a-strategic-mindset/" target="_blank" rel="noopener">Developing a Strategic Mindset — IEEE INSIGHT</a></li>
-          <li><a href="https://www.thestrategyinstitute.org/insights/5-proven-techniques-to-enhance-strategic-thinking-skills" target="_blank" rel="noopener">5 Proven Techniques to Enhance Strategic Thinking Skills</a></li>
-          <li><a href="https://www.sorenkaplan.com/developing-strategic-mindset-in-leaders/" target="_blank" rel="noopener">Mastering the Art of Strategy: Developing a Strategic Mindset</a></li>
-          <li><a href="https://www.thestrategyinstitute.org/insights/strategic-thinking-a-complete-guide-for-business-success" target="_blank" rel="noopener">Strategic Thinking — A Complete Guide for Business Success</a></li>
-          <li><a href="https://cmoe.com/blog/instilling-inspiring-strategic-thinking-mindset-work/" target="_blank" rel="noopener">Instilling &amp; Inspiring Strategic Thinking Mindset at Work</a></li>
-        </ul>
-      </section>
-
-      <section id="nav-end" aria-label="End Navigation">
-        <div class="back">
-          <a class="pill" href="habib_punja_v4_5_10_BETA.html">← Back to Game</a>
-          <a class="pill" href="contact.html">📧 Contact Support</a>
-        </div>
-      </section>
-    </main>
-  </div>
 </body>
 </html>

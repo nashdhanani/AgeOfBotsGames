@@ -6,436 +6,434 @@
     <title>Habib Punja - Strategic AI Card Game | AgeOfBotsGames</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+             * {
+                 margin: 0;
+                 padding: 0;
+                 box-sizing: border-box;
+             }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
-            color: white;
-            min-height: 100vh;
-        }
+             body {
+                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                 background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+                 color: white;
+                 min-height: 100vh;
+             }
 
-        nav {
-            background: rgba(0,0,0,0.3);
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-        }
+             nav {
+                 background: rgba(0,0,0,0.3);
+                 padding: 20px 40px;
+                 display: flex;
+                 justify-content: space-between;
+                 align-items: center;
+                 backdrop-filter: blur(10px);
+             }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ffd700;
-        }
+             .logo {
+                 font-size: 24px;
+                 font-weight: bold;
+                 color: #ffd700;
+             }
 
-        .nav-links {
-            list-style: none;
-            display: flex;
-            gap: 30px;
-        }
+             .nav-links {
+                 list-style: none;
+                 display: flex;
+                 gap: 30px;
+             }
 
-            .nav-links a {
-                color: white;
-                text-decoration: none;
-                transition: color 0.3s;
-                font-size: 16px;
-            }
+                 .nav-links a {
+                     color: white;
+                     text-decoration: none;
+                     transition: color 0.3s;
+                     font-size: 16px;
+                 }
 
-                .nav-links a:hover {
-                    color: #ffd700;
-                }
+                     .nav-links a:hover {
+                         color: #ffd700;
+                     }
 
-        .hero {
-            text-align: center;
-            padding: 80px 20px 40px;
-        }
+             .hero {
+                 text-align: center;
+                 padding: 80px 20px 40px;
+             }
 
-            .hero h1 {
-                font-size: 56px;
-                margin-bottom: 15px;
-                text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            }
+                 .hero h1 {
+                     font-size: 56px;
+                     margin-bottom: 15px;
+                     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+                 }
 
-        .tagline {
-            font-size: 22px;
-            color: #ffd700;
-            margin-bottom: 10px;
-        }
+             .tagline {
+                 font-size: 22px;
+                 color: #ffd700;
+                 margin-bottom: 10px;
+             }
 
-        .version {
-            font-size: 16px;
-            color: #cbd5e1;
-            margin-bottom: 40px;
-        }
+             .version {
+                 font-size: 16px;
+                 color: #cbd5e1;
+                 margin-bottom: 40px;
+             }
 
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+             .cta-buttons {
+                 display: flex;
+                 gap: 20px;
+                 justify-content: center;
+                 flex-wrap: wrap;
+             }
 
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 18px 40px;
-            font-size: 18px;
-            text-decoration: none;
-            border-radius: 50px;
-            transition: transform 0.3s, box-shadow 0.3s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            font-weight: 700;
-        }
+             .cta-button {
+                 display: inline-block;
+                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                 color: white;
+                 padding: 18px 40px;
+                 font-size: 18px;
+                 text-decoration: none;
+                 border-radius: 50px;
+                 transition: transform 0.3s, box-shadow 0.3s;
+                 box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                 font-weight: 700;
+             }
 
-            .cta-button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-            }
+                 .cta-button:hover {
+                     transform: translateY(-2px);
+                     box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+                 }
 
-            .cta-button.secondary {
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-            }
+                 .cta-button.secondary {
+                     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                     box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+                 }
 
-                .cta-button.secondary:hover {
-                    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
-                }
+                     .cta-button.secondary:hover {
+                         box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+                     }
 
-        /* =============== MuBot Fable Section =============== */
-        .mubot-section {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px 40px;
-            display: grid;
-            grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
-            gap: 30px;
-            align-items: center;
-        }
+             /* =============== MuBot Fable Section =============== */
+             .mubot-section {
+                 max-width: 1200px;
+                 margin: 40px auto;
+                 padding: 0 20px 40px;
+                 display: grid;
+                 grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+                 gap: 30px;
+                 align-items: center;
+             }
 
-        .mubot-card {
-            background: rgba(0,0,0,0.35);
-            border-radius: 18px;
-            padding: 25px 28px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-            border: 1px solid rgba(255,255,255,0.15);
-        }
+             .mubot-card {
+                 background: rgba(0,0,0,0.35);
+                 border-radius: 18px;
+                 padding: 25px 28px;
+                 box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+                 border: 1px solid rgba(255,255,255,0.15);
+             }
 
-        .mubot-label {
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #7dd3fc;
-            margin-bottom: 8px;
-        }
+             .mubot-label {
+                 font-size: 14px;
+                 font-weight: 700;
+                 letter-spacing: 0.08em;
+                 text-transform: uppercase;
+                 color: #7dd3fc;
+                 margin-bottom: 8px;
+             }
 
-        .mubot-title {
-            font-size: 26px;
-            font-weight: 800;
-            margin-bottom: 10px;
-            color: #ffd700;
-        }
+             .mubot-title {
+                 font-size: 26px;
+                 font-weight: 800;
+                 margin-bottom: 10px;
+                 color: #ffd700;
+             }
 
-        .mubot-subtitle {
-            font-size: 16px;
-            color: #e5e7eb;
-            margin-bottom: 16px;
-        }
+             .mubot-subtitle {
+                 font-size: 16px;
+                 color: #e5e7eb;
+                 margin-bottom: 16px;
+             }
 
-        .mubot-story {
-            font-size: 15px;
-            color: #e5e7eb;
-            line-height: 1.7;
-        }
+             .mubot-story {
+                 font-size: 15px;
+                 color: #e5e7eb;
+                 line-height: 1.7;
+             }
 
-            .mubot-story p + p {
-                margin-top: 10px;
-            }
+                 .mubot-story p + p {
+                     margin-top: 10px;
+                 }
 
-        .mubot-lesson {
-            margin-top: 16px;
-            padding-top: 10px;
-            border-top: 1px solid rgba(148,163,184,0.6);
-            font-size: 15px;
-            color: #fbbf24;
-            font-weight: 600;
-        }
+             .mubot-lesson {
+                 margin-top: 16px;
+                 padding-top: 10px;
+                 border-top: 1px solid rgba(148,163,184,0.6);
+                 font-size: 15px;
+                 color: #fbbf24;
+                 font-weight: 600;
+             }
 
-        .mubot-actions {
-            margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
+             .mubot-actions {
+                 margin-top: 20px;
+                 display: flex;
+                 flex-wrap: wrap;
+                 gap: 12px;
+             }
 
-        .btn-outline {
-            border-radius: 999px;
-            border: 2px solid #7dd3fc;
-            background: transparent;
-            color: #e0f2fe;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.2s, color 0.2s, transform 0.2s;
-        }
+             .btn-outline {
+                 border-radius: 999px;
+                 border: 2px solid #7dd3fc;
+                 background: transparent;
+                 color: #e0f2fe;
+                 padding: 10px 20px;
+                 font-size: 14px;
+                 font-weight: 600;
+                 cursor: pointer;
+                 display: inline-flex;
+                 align-items: center;
+                 gap: 8px;
+                 transition: background 0.2s, color 0.2s, transform 0.2s;
+             }
 
-            .btn-outline:hover {
-                background: rgba(125,211,252,0.15);
-                transform: translateY(-1px);
-            }
+                 .btn-outline:hover {
+                     background: rgba(125,211,252,0.15);
+                     transform: translateY(-1px);
+                 }
 
-            .btn-outline:disabled {
-                opacity: 0.4;
-                cursor: not-allowed;
-            }
+                 .btn-outline:disabled {
+                     opacity: 0.4;
+                     cursor: not-allowed;
+                 }
 
-            .btn-outline span.icon {
-                font-size: 16px;
-            }
+                 .btn-outline span.icon {
+                     font-size: 16px;
+                 }
 
-        .mubot-video-shell {
-            background: rgba(15,23,42,0.75);
-            border-radius: 18px;
-            padding: 14px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid rgba(148,163,184,0.6);
-            text-align: center;
-        }
+             .mubot-video-shell {
+                 background: rgba(15,23,42,0.75);
+                 border-radius: 18px;
+                 padding: 14px;
+                 box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                 border: 1px solid rgba(148,163,184,0.6);
+                 text-align: center;
+             }
 
-            .mubot-video-shell h3 {
-                font-size: 16px;
-                margin-bottom: 10px;
-                color: #cbd5e1;
-            }
+                 .mubot-video-shell h3 {
+                     font-size: 16px;
+                     margin-bottom: 10px;
+                     color: #cbd5e1;
+                 }
 
-            .mubot-video-shell small {
-                display: block;
-                margin-top: 8px;
-                font-size: 12px;
-                color: #94a3b8;
-            }
+                 .mubot-video-shell small {
+                     display: block;
+                     margin-top: 8px;
+                     font-size: 12px;
+                     color: #94a3b8;
+                 }
 
-        .mubot-video {
-            width: 100%;
-            border-radius: 12px;
-            overflow: hidden;
-            background: black;
-        }
+             .mubot-video {
+                 width: 100%;
+                 border-radius: 12px;
+                 overflow: hidden;
+                 background: black;
+             }
 
-            .mubot-video video {
-                width: 100%;
-                display: block;
-                border-radius: 12px;
-            }
+                 .mubot-video video {
+                     width: 100%;
+                     display: block;
+                     border-radius: 12px;
+                 }
 
-        .tester-notice {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 25px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 2px solid #10b981;
-            border-radius: 15px;
-            text-align: center;
-        }
+             .tester-notice {
+                 max-width: 900px;
+                 margin: 40px auto;
+                 padding: 25px;
+                 background: rgba(16, 185, 129, 0.1);
+                 border: 2px solid #10b981;
+                 border-radius: 15px;
+                 text-align: center;
+             }
 
-            .tester-notice h2 {
-                color: #10b981;
-                margin-bottom: 15px;
-            }
+                 .tester-notice h2 {
+                     color: #10b981;
+                     margin-bottom: 15px;
+                 }
 
-            .tester-notice p {
-                color: #d1fae5;
-                font-size: 18px;
-                line-height: 1.6;
-            }
+                 .tester-notice p {
+                     color: #d1fae5;
+                     font-size: 18px;
+                     line-height: 1.6;
+                 }
 
-        .features {
-            max-width: 1200px;
-            margin: 60px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-        }
+             .features {
+                 max-width: 1200px;
+                 margin: 60px auto;
+                 padding: 0 20px;
+                 display: grid;
+                 grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                 gap: 30px;
+             }
 
-        .feature-card {
-            background: rgba(255,255,255,0.05);
-            padding: 30px;
-            border-radius: 15px;
-            text-align: center;
-            transition: transform 0.3s, background 0.3s;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+             .feature-card {
+                 background: rgba(255,255,255,0.05);
+                 padding: 30px;
+                 border-radius: 15px;
+                 text-align: center;
+                 transition: transform 0.3s, background 0.3s;
+                 border: 1px solid rgba(255,255,255,0.1);
+             }
 
-            .feature-card:hover {
-                transform: translateY(-5px);
-                background: rgba(255,255,255,0.08);
-            }
+                 .feature-card:hover {
+                     transform: translateY(-5px);
+                     background: rgba(255,255,255,0.08);
+                 }
 
-        .feature-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
+             .feature-icon {
+                 font-size: 48px;
+                 margin-bottom: 15px;
+             }
 
-        .feature-title {
-            font-size: 22px;
-            color: #ffd700;
-            margin-bottom: 12px;
-            font-weight: 700;
-        }
+             .feature-title {
+                 font-size: 22px;
+                 color: #ffd700;
+                 margin-bottom: 12px;
+                 font-weight: 700;
+             }
 
-        .feature-description {
-            color: #e5e7eb;
-            line-height: 1.6;
-        }
+             .feature-description {
+                 color: #e5e7eb;
+                 line-height: 1.6;
+             }
 
-        .feature-link {
-            display: inline-block;
-            margin-top: 12px;
-            color: #7dd3fc;
-            text-decoration: none;
-            font-weight: 600;
-        }
+             .feature-link {
+                 display: inline-block;
+                 margin-top: 12px;
+                 color: #7dd3fc;
+                 text-decoration: none;
+                 font-weight: 600;
+             }
 
-            .feature-link:hover {
-                color: #bae6fd;
-                text-decoration: underline;
-            }
+                 .feature-link:hover {
+                     color: #bae6fd;
+                     text-decoration: underline;
+                 }
 
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            margin-top: 40px;
-            background: rgba(0,0,0,0.3);
-            color: #888;
-        }
+             footer {
+                 text-align: center;
+                 padding: 40px 20px;
+                 margin-top: 40px;
+                 background: rgba(0,0,0,0.3);
+                 color: #888;
+             }
 
-            footer strong {
-                color: #ffd700;
-            }
+                 footer strong {
+                     color: #ffd700;
+                 }
 
-        @media (max-width: 900px) {
-            .hero h1 {
-                font-size: 36px;
-            }
+             @media (max-width: 900px) {
+                 .hero h1 {
+                     font-size: 36px;
+                 }
 
-            .tagline {
-                font-size: 18px;
-            }
+                 .tagline {
+                     font-size: 18px;
+                 }
 
-            .mubot-section {
-                grid-template-columns: 1fr;
-            }
-        }
+                 .mubot-section {
+                     grid-template-columns: 1fr;
+                 }
+             }
 
-        /* Paste the entire contents of your local aob_shared.css here */
+             /* Paste the entire contents of your local aob_shared.css here */
 
-   /* ===========================================
-   Age of Bots – Shared Micro-Styles
-   Version 1.0 – Safe, Non-intrusive
-   =========================================== */
-        /* Improves text clarity across dark backgrounds */
-        body, button, input, textarea {
-            font-family: "Inter", "Segoe UI", sans-serif;
-            color: #e6e6f8;
-        }
+             /* ===========================================
+        Age of Bots – Shared Micro-Styles
+        Version 1.0 – Safe, Non-intrusive
+        =========================================== */
+             /* Improves text clarity across dark backgrounds */
+             body, button, input, textarea {
+                 font-family: "Inter", "Segoe UI", sans-serif;
+                 color: #e6e6f8;
+             }
 
-        /* Smooth fade utility */
-        .aob-fade {
-            opacity: 0;
-            transition: opacity 0.6s ease;
-        }
+             /* Smooth fade utility */
+             .aob-fade {
+                 opacity: 0;
+                 transition: opacity 0.6s ease;
+             }
 
-            .aob-fade.show {
-                opacity: 1;
-            }
+                 .aob-fade.show {
+                     opacity: 1;
+                 }
 
-        /* Centering helper for buttons */
-        .aob-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
+             /* Centering helper for buttons */
+             .aob-center {
+                 display: flex;
+                 justify-content: center;
+                 align-items: center;
+                 text-align: center;
+             }
 
-        /* Consistent button styling (optional override) */
-        .aob-btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #7c3aed, #4c1d95);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s ease-in-out;
-        }
+             /* Consistent button styling (optional override) */
+             .aob-btn {
+                 padding: 12px 24px;
+                 background: linear-gradient(135deg, #7c3aed, #4c1d95);
+                 border: none;
+                 border-radius: 50px;
+                 color: white;
+                 cursor: pointer;
+                 font-weight: 600;
+                 transition: 0.2s ease-in-out;
+             }
 
-            .aob-btn:hover {
-                transform: scale(1.04);
-                box-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
-            }
+                 .aob-btn:hover {
+                     transform: scale(1.04);
+                     box-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
+                 }
 
-        /* Light container for story, fable, or advisor text */
-        .aob-box {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 16px;
-            padding: 24px;
-            backdrop-filter: blur(6px);
-        }
+             /* Light container for story, fable, or advisor text */
+             .aob-box {
+                 background: rgba(255,255,255,0.06);
+                 border: 1px solid rgba(255,255,255,0.12);
+                 border-radius: 16px;
+                 padding: 24px;
+                 backdrop-filter: blur(6px);
+             }
 
-        /* Future-proof area for character bubbles */
-        .aob-bubble {
-            max-width: 320px;
-            padding: 14px 18px;
-            background: #fff;
-            color: #222;
-            border-radius: 24px;
-            position: relative;
-            box-shadow: 2px 8px 28px rgba(0,0,0,0.12);
-            font-family: "Comic Neue", "Comic Sans MS", sans-serif;
-            display: none; /* will be turned on by JS later */
-        }
+             /* Future-proof area for character bubbles */
+             .aob-bubble {
+                 max-width: 320px;
+                 padding: 14px 18px;
+                 background: #fff;
+                 color: #222;
+                 border-radius: 24px;
+                 position: relative;
+                 box-shadow: 2px 8px 28px rgba(0,0,0,0.12);
+                 font-family: "Comic Neue", "Comic Sans MS", sans-serif;
+                 display: none; /* will be turned on by JS later */
+             }
 
-            /* Left-tail bubble */
-            .aob-bubble.left::after {
-                content: "";
-                position: absolute;
-                left: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-right: 16px solid #fff;
-            }
+                 /* Left-tail bubble */
+                 .aob-bubble.left::after {
+                     content: "";
+                     position: absolute;
+                     left: -16px;
+                     top: 18px;
+                     border-top: 15px solid transparent;
+                     border-bottom: 15px solid transparent;
+                     border-right: 16px solid #fff;
+                 }
 
-            /* Right-tail bubble */
-            .aob-bubble.right::after {
-                content: "";
-                position: absolute;
-                right: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-left: 16px solid #fff;
-            }
+                 /* Right-tail bubble */
+                 .aob-bubble.right::after {
+                     content: "";
+                     position: absolute;
+                     right: -16px;
+                     top: 18px;
+                     border-top: 15px solid transparent;
+                     border-bottom: 15px solid transparent;
+                     border-left: 16px solid #fff;
+                 }
 
-            /* Reserve advisor bubble style for Phase 3 */
-            .aob-bubble.center {
-                margin: 0 auto;
-            }
-
-
+                 /* Reserve advisor bubble style for Phase 3 */
+                 .aob-bubble.center {
+                     margin: 0 auto;
+                 }
     </style>
 </head>
 <body>
@@ -475,24 +473,23 @@
 
             <div class="mubot-story" aria-label="The Tale of Habib Punja, narrated text">
                 <p>
-                    Habib Punja rose quickly, piling up wins through bold, impulsive decisions.
-                    His empire glittered with the rewards of chance, and for a while it seemed
-                    as if fortune had chosen him as its favorite.
+                    Habib Punja rose quickly, gathering wealth through bold and impulsive choices.
+                    For a while, the world rewarded his speed.
                 </p>
                 <p>
-                    But at other tables, different games were being played.
-                    Quiet players tracked each hand, measured each risk, and looked
-                    not at the next card—but at the whole war of seven hands ahead.
+                    But around him, others moved differently.
+                    They were patient, deliberate, and attentive.
+                    They watched the flow of the game and thought several steps ahead.
                 </p>
                 <p>
-                    When the tides turned, Habib’s shining empire crumbled.
-                    The quick gains built on impulse dissolved. Those who had played with
-                    patience, logic, and foresight walked away with lasting victory.
+                    When the tide finally turned, Habib’s empire crumbled.
+                    His fast gains dissolved, while the players who planned with foresight and discipline
+                    kept their advantage.
                 </p>
                 <p class="mubot-lesson">
-                    Impulse fades. Strategy endures.
-                    Play the game that sharpens your logic, strengthens your foresight,
-                    and rewards deliberate, thoughtful decisions.
+                    Impulse shines for a moment. Strategy endures.
+                    Play the game that sharpens your logic, strengthens your foresight, and rewards
+                    disciplined thinking across all seven hands.
                 </p>
             </div>
 
@@ -606,14 +603,15 @@
             let currentUtterance = null;
 
             const fableText = [
-                "Habib Punja rose quickly, piling up wins through bold, impulsive decisions.",
-                "His empire glittered with the rewards of chance, and for a while it seemed as if fortune had chosen him as its favorite.",
-                "But at other tables, different games were being played.",
-                "Quiet players tracked each hand, measured each risk, and looked not at the next card, but at the whole war of seven hands ahead.",
-                "When the tides turned, Habib’s shining empire crumbled.",
-                "The quick gains built on impulse dissolved, while those who played with patience, logic, and foresight claimed lasting victory.",
-                "Impulse fades. Strategy endures.",
-                "Play the game that sharpens your logic, strengthens your foresight, and rewards deliberate, thoughtful decisions."
+                "Habib Punja rose quickly, gathering wealth through bold and impulsive choices.",
+                "For a while, the world rewarded his speed.",
+                "But around him, others moved differently.",
+                "They were patient and deliberate, watching the flow of the game and thinking several steps ahead.",
+                "When the tide finally turned, Habib's empire crumbled.",
+                "His fast gains dissolved, while the players who planned with foresight and discipline kept their advantage.",
+                "Here is the lesson.",
+                "Impulse shines for a moment. Strategy endures.",
+                "Play the game that sharpens your logic, strengthens your foresight, and rewards disciplined thinking across all seven hands."
             ].join(" ");
 
             function stopSpeaking() {
@@ -626,7 +624,7 @@
             function speakFable() {
                 stopSpeaking();
                 const utterance = new SpeechSynthesisUtterance(fableText);
-                utterance.rate = 0.95;
+                utterance.rate = 0.9;   // slightly slower, calm zen tone
                 utterance.pitch = 1.0;
                 utterance.volume = 1.0;
                 utterance.onend = () => { currentUtterance = null; };
@@ -637,9 +635,6 @@
 
             if (playBtn) {
                 playBtn.addEventListener('click', () => {
-                    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-                        // Still allow audio; motion is already minimal on the page
-                    }
                     speakFable();
                 });
             }

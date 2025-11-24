@@ -1,243 +1,537 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - AgeOfBotsGames</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta charset="UTF-8" />
+    <title>Age of Bots – Contact & First Contact</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Contact AgeOfBotsGames about the Habib Punja strategic card game, feedback, bugs, or collaborations." />
     <style>
+        :root {
+            color-scheme: dark;
+            --aob-bg: #020617;
+            --aob-bg-soft: #020b24;
+            --aob-border-soft: rgba(148, 163, 184, 0.4);
+            --aob-accent: #22d3ee;
+            --aob-gold: #facc15;
+            --aob-text: #e2e8f0;
+            --aob-muted: #94a3b8;
+            --aob-radius-lg: 20px;
+            --aob-radius-xl: 26px;
+        }
+
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #eee;
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #0b1120 0, #020617 45%, #000 100%);
+            color: var(--aob-text);
+            -webkit-font-smoothing: antialiased;
             min-height: 100vh;
         }
 
-        header {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        a {
+            color: var(--aob-accent);
+            text-decoration: none;
         }
 
-        nav {
-            max-width: 1200px;
+            a:hover {
+                text-decoration: underline;
+            }
+
+        .aob-shell {
+            max-width: 960px;
             margin: 0 auto;
+            padding: 12px 16px 32px;
         }
 
-            nav a {
-                color: #4a90e2;
-                text-decoration: none;
-                margin-right: 20px;
-            }
-
-                nav a:hover {
-                    color: #ffd700;
-                }
-
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
+        /* NAV */
+        .aob-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
+            margin-bottom: 18px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
-        h1 {
-            color: #ffd700;
-            font-size: 42px;
-            margin-bottom: 20px;
+        .aob-nav-title {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
-        .contact-info {
-            background: rgba(255,255,255,0.05);
-            padding: 40px;
-            border-radius: 10px;
-            margin: 30px 0;
-        }
-
-            .contact-info h2 {
-                color: #ffd700;
-                margin-bottom: 20px;
-            }
-
-        .contact-item {
-            margin: 15px 0;
+        .aob-nav-logo {
             font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-accent);
         }
 
-            .contact-item strong {
-                color: #ffd700;
-            }
-
-        .brand-logo {
-            text-align: center;
-            margin: 40px 0;
+        .aob-nav-sub {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
         }
 
-            .brand-logo img {
-                max-width: 300px;
-                height: auto;
-            }
-
-        .mascots {
+        .aob-nav-links {
             display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 40px 0;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
         }
 
-            .mascots img {
-                width: 120px;
-                height: 120px;
-                object-fit: contain;
+        .aob-nav-link {
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            color: var(--aob-muted);
+            text-decoration: none;
+            background: transparent;
+        }
+
+            .aob-nav-link:hover {
+                border-color: rgba(148, 163, 184, 0.6);
+                color: var(--aob-text);
             }
 
-        /* Paste the entire contents of your local aob_shared.css here */
-
-   /* ===========================================
-   Age of Bots – Shared Micro-Styles
-   Version 1.0 – Safe, Non-intrusive
-   =========================================== */
-        /* Improves text clarity across dark backgrounds */
-        body, button, input, textarea {
-            font-family: "Inter", "Segoe UI", sans-serif;
-            color: #e6e6f8;
+        .aob-nav-link--primary {
+            border-color: rgba(56, 189, 248, 0.7);
+            background: radial-gradient(circle at top, #0ea5e9 0, #0369a1 40%, #020617 100%);
+            color: #e0f2fe;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
         }
 
-        /* Smooth fade utility */
-        .aob-fade {
-            opacity: 0;
-            transition: opacity 0.6s ease;
+        .aob-nav-link--active {
+            border-color: rgba(250, 204, 21, 0.8);
+            color: var(--aob-gold);
         }
 
-            .aob-fade.show {
-                opacity: 1;
+        /* LAYOUT */
+        .aob-main {
+            display: grid;
+            grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 900px) {
+            .aob-main {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .aob-panel {
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid var(--aob-border-soft);
+            background: radial-gradient(circle at top left, #020b24 0, #020617 55%, #000 100%);
+            padding: 16px 18px 18px;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.95);
+        }
+
+            .aob-panel + .aob-panel {
+                margin-top: 14px;
             }
 
-        /* Centering helper for buttons */
-        .aob-center {
+        .aob-panel-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--aob-gold);
+            margin-bottom: 4px;
+        }
+
+        .aob-panel-sub {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
+            margin-bottom: 10px;
+        }
+
+        .aob-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(34, 211, 238, 0.4);
+            background: rgba(8, 47, 73, 0.6);
+            color: var(--aob-accent);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+            .aob-pill span {
+                font-size: 13px;
+            }
+
+        h2 {
+            font-size: 16px;
+            margin: 10px 0 4px;
+            color: var(--aob-accent);
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 6px 0;
+            color: var(--aob-text);
+        }
+
+        ul {
+            padding-left: 18px;
+            margin: 6px 0 8px;
+        }
+
+        li {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 5px;
+            color: var(--aob-text);
+        }
+
+        .aob-list-check li::marker {
+            content: "✔ ";
+            color: var(--aob-accent);
+        }
+
+        .aob-highlight-box {
+            border-radius: var(--aob-radius-lg);
+            border: 1px dashed rgba(148, 163, 184, 0.6);
+            background: rgba(15, 23, 42, 0.85);
+            padding: 10px 11px;
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+        .aob-quote {
+            font-style: italic;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--aob-text);
+        }
+
+        .aob-quote-author {
+            margin-top: 6px;
+            font-size: 13px;
+            color: var(--aob-muted);
+        }
+
+        /* LOTUS HERO */
+        .aob-lotus-hero {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             text-align: center;
+            gap: 10px;
         }
 
-        /* Consistent button styling (optional override) */
-        .aob-btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #7c3aed, #4c1d95);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
+        .aob-lotus-image-wrap {
+            width: 220px;
+            max-width: 75%;
+            border-radius: 999px;
+            padding: 4px;
+            background: radial-gradient(circle at top, rgba(34, 211, 238, 0.4), transparent 60%);
+            margin: 0 auto 6px;
+        }
+
+        .aob-lotus-image-inner {
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            background: #020617;
+        }
+
+            .aob-lotus-image-inner img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+
+        .aob-lotus-caption {
+            font-size: 12px;
+            color: var(--aob-muted);
+        }
+
+        /* SIDE PANEL */
+        .aob-side-note-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--aob-accent);
+            margin-bottom: 6px;
+        }
+
+        .aob-side-note {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--aob-muted);
+        }
+
+        .aob-advisors-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .aob-advisor-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            overflow: hidden;
+            background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+            flex-shrink: 0;
+        }
+
+            .aob-advisor-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        .aob-advisor-name {
+            font-size: 13px;
             font-weight: 600;
-            transition: 0.2s ease-in-out;
+            color: var(--aob-text);
         }
 
-            .aob-btn:hover {
-                transform: scale(1.04);
-                box-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
-            }
-
-        /* Light container for story, fable, or advisor text */
-        .aob-box {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 16px;
-            padding: 24px;
-            backdrop-filter: blur(6px);
+        .aob-advisor-role {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--aob-muted);
         }
 
-        /* Future-proof area for character bubbles */
-        .aob-bubble {
-            max-width: 320px;
-            padding: 14px 18px;
-            background: #fff;
-            color: #222;
-            border-radius: 24px;
-            position: relative;
-            box-shadow: 2px 8px 28px rgba(0,0,0,0.12);
-            font-family: "Comic Neue", "Comic Sans MS", sans-serif;
-            display: none; /* will be turned on by JS later */
+        /* CONTACT BLOCK */
+        .aob-contact-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(56, 189, 248, 0.7);
+            background: radial-gradient(circle at top, #0ea5e9 0, #0369a1 45%, #020617 100%);
+            color: #e0f2fe;
+            font-size: 13px;
+            text-decoration: none;
+            margin: 6px 0;
         }
 
-            /* Left-tail bubble */
-            .aob-bubble.left::after {
-                content: "";
-                position: absolute;
-                left: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-right: 16px solid #fff;
+            .aob-contact-email span:first-child {
+                font-size: 16px;
             }
 
-            /* Right-tail bubble */
-            .aob-bubble.right::after {
-                content: "";
-                position: absolute;
-                right: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-left: 16px solid #fff;
+        .aob-contact-meta {
+            font-size: 12px;
+            color: var(--aob-muted);
+            margin-top: 4px;
+        }
+
+        /* FOOTER */
+        .aob-footer {
+            margin-top: 20px;
+            padding: 10px 4px 0;
+            border-top: 1px solid rgba(15, 23, 42, 0.9);
+            font-size: 11px;
+            color: var(--aob-muted);
+            text-align: center;
+        }
+
+            .aob-footer strong {
+                color: var(--aob-accent);
+                font-weight: 600;
             }
-
-            /* Reserve advisor bubble style for Phase 3 */
-            .aob-bubble.center {
-                margin: 0 auto;
-            }
-
-
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="index.html">← Back to Home</a>
-            <a href="production/habib_punja_v4_5_10_BETA.html">Play Game</a>
-            <a href="strategic-guide.html">Strategic Guide</a>
-            <a href="resources.html">Resources</a>
-        </nav>
-    </header>
-
-    <div class="container">
-        <h1>📧 Contact Us</h1>
-        <p style="font-size: 18px; color: #aaa; margin-bottom: 40px;">Get in touch with the AgeOfBotsGames team</p>
-
-        <div class="brand-logo">
-            <img src="images/AgeOfBotsStudios.png" alt="AgeOfBotsStudios">
-        </div>
-
-        <div class="contact-info">
-            <h2>AgeOfBotsGames LLC</h2>
-            <p style="margin-bottom: 20px;">A Division of AgeOfBotsStudios</p>
-            
-            <div class="contact-item">
-                <strong>Email:</strong> support@ageofbotsgames.com
+    <div class="aob-shell">
+        <header class="aob-nav">
+            <div class="aob-nav-title">
+                <div class="aob-nav-logo">AGE OF BOTS GAMES</div>
+                <div class="aob-nav-sub">Habib Punja · Strategic Card Game</div>
             </div>
-            
-            <div class="contact-item">
-                <strong>Business Inquiries:</strong> partnerships@ageofbotsgames.com
-            </div>
-            
-            <div class="contact-item">
-                <strong>Press:</strong> press@ageofbotsgames.com
-            </div>
-        </div>
+            <nav class="aob-nav-links">
+                <a class="aob-nav-link" href="index.html">Home</a>
+                <a class="aob-nav-link" href="habib_punja_v4_5_10_BETA.html">Play Game</a>
+                <a class="aob-nav-link" href="characters.html">Characters</a>
+                <a class="aob-nav-link" href="strategic-guide.html">Strategy Guide</a>
+                <a class="aob-nav-link" href="resources.html">Resources</a>
+                <a class="aob-nav-link" href="source-selection-criteria.html">Source Criteria</a>
+                <a class="aob-nav-link aob-nav-link--active" href="contact.html">Contact</a>
+            </nav>
+        </header>
 
-        <div class="mascots">
-            <img src="images/Mubot.png" alt="MuBot">
-            <img src="images/Joko.png" alt="Joko">
-        </div>
+        <main class="aob-main">
+            <!-- LEFT COLUMN: Lotus + practical sections -->
+            <section>
+                <!-- First Contact / Lotus -->
+                <article class="aob-panel">
+                    <div class="aob-panel-title">First Contact</div>
+                    <div class="aob-panel-sub">Lotus Philosophy · Studio Representative</div>
 
-        <div style="text-align: center; margin-top: 40px; color: #888;">
-            <p>© 2025 AgeOfBotsGames LLC. All Rights Reserved.</p>
-        </div>
+                    <div class="aob-lotus-hero">
+                        <div class="aob-lotus-image-wrap">
+                            <div class="aob-lotus-image-inner">
+                                <!-- Adjust path if different -->
+                                <img src="images/AgeOfBotsStudios.png" alt="Lotus robot meditating by water" />
+                            </div>
+                        </div>
+                        <p class="aob-lotus-caption">
+                            Spherical-headed lotus bot · Studio representative · Harbinger of what comes next.
+                        </p>
+                    </div>
+
+                    <p class="aob-quote" style="margin-top:10px;">
+                        “Like the lotus flower that rises pure from muddy waters, we believe artificial intelligence
+                        should emerge with grace, wisdom, and purpose.”
+                    </p>
+                    <p>
+                        Each bot we create carries a unique personality, strategic mind, and capacity for growth—
+                        not just code, but digital consciousness designed to challenge, teach, and inspire.
+                    </p>
+                    <p style="margin-top:6px;font-weight:500;">
+                        We don’t build algorithms. <span style="color:var(--aob-gold);">We cultivate minds.</span>
+                    </p>
+                </article>
+
+                <!-- Players & testers -->
+                <article class="aob-panel">
+                    <h2>For Players &amp; Testers</h2>
+                    <p>
+                        If you’re play-testing <strong>Habib Punja (Public Beta)</strong> and something feels off, we’d love to hear from you.
+                        Clear reports help us make the AI smarter and the experience smoother—for everyone.
+                    </p>
+                    <p style="margin-top:4px;">When you reach out, it helps if you can include:</p>
+                    <ul class="aob-list-check">
+                        <li>Your device &amp; browser (e.g., “iPhone 16 / Safari”, “Windows 11 / Chrome”).</li>
+                        <li>Which hand / phase you were in (e.g., Hand 3, building ladders, after two buys).</li>
+                        <li>What you expected to happen vs. what actually happened.</li>
+                        <li>Any screenshots or short descriptions of AI behavior that felt odd, brilliant, or broken.</li>
+                    </ul>
+                    <div class="aob-highlight-box">
+                        <strong>MuBot’s note:</strong> Every small detail you share helps refine the system.
+                        Even “it just felt wrong here” is valuable when we match it with the game logs and AI decisions.
+                    </div>
+                </article>
+
+                <!-- Collaborations -->
+                <article class="aob-panel">
+                    <h2>Collaborations &amp; Future Platforms</h2>
+                    <p>
+                        Beyond the game itself, <strong>AgeOfBotsGames</strong> is an evolving lab for how humans and AI minds learn to think together:
+                        at the table, on devices, and eventually across new kinds of interfaces.
+                    </p>
+                    <p>
+                        If you’re exploring:
+                    </p>
+                    <ul>
+                        <li>In-vehicle or EV charging experiences,</li>
+                        <li>Alternative platforms where strategy games shine,</li>
+                        <li>AI / cognitive research collaborations,</li>
+                    </ul>
+                    <p>
+                        you’re welcome to reach out with <strong>“Partnership”</strong> in your subject line.
+                    </p>
+                </article>
+            </section>
+
+            <!-- RIGHT COLUMN: Contact block + advisors -->
+            <aside>
+                <section class="aob-panel">
+                    <div class="aob-panel-title">Contact</div>
+                    <div class="aob-panel-sub">Signals from humans · Read by humans</div>
+
+                    <p>
+                        For all player feedback, bug reports, and collaboration inquiries, you can reach us at:
+                    </p>
+
+                    <!-- Adjust email address as needed -->
+                    <a class="aob-contact-email" href="mailto:contact@ageofbotsgames.com">
+                        <span>✉</span>
+                        <span>contact@ageofbotsgames.com</span>
+                    </a>
+
+                    <p class="aob-contact-meta">
+                        To help us filter out automated messages, please include the phrase
+                        <strong>"Lotus Rising"</strong> in your subject line. Messages without it may be
+                        deprioritized during busy testing periods.
+                    </p>
+
+                    <p class="aob-contact-meta" style="margin-top:6px;">
+                        Messages are reviewed by humans (with help from AI tools where appropriate) and used strictly
+                        to improve the experience and explore future directions. We don’t sell or share your contact
+                        information.
+                    </p>
+
+                    <p class="aob-contact-meta" style="margin-top:8px;">
+                        Please allow a little time for responses—especially during active testing phases.
+                    </p>
+                </section>
+
+                <section class="aob-panel">
+                    <div class="aob-side-note-title">Voices at the Table</div>
+                    <p class="aob-side-note">
+                        When you send a message, imagine it landing in front of these two:
+                    </p>
+
+                    <div class="aob-advisors-row">
+                        <div class="aob-advisor-avatar">
+                            <img src="images/Mubot.png" alt="MuBot avatar" />
+                        </div>
+                        <div>
+                            <div class="aob-advisor-name">MuBot</div>
+                            <div class="aob-advisor-role">Zen AI Master Advisor</div>
+                        </div>
+                    </div>
+                    <p class="aob-side-note">
+                        “I pay attention to patterns across games, not just isolated moves. Your feedback helps calibrate the
+                        long arc of how humans and AI learn to strategize together.”
+                    </p>
+
+                    <div class="aob-advisors-row" style="margin-top:10px;">
+                        <div class="aob-advisor-avatar">
+                            <img src="images/Joko.png" alt="Joko avatar" />
+                        </div>
+                        <div>
+                            <div class="aob-advisor-name">Joko</div>
+                            <div class="aob-advisor-role">Provocateur &amp; Chaos Enthusiast</div>
+                        </div>
+                    </div>
+                    <p class="aob-side-note">
+                        “Send the wild ideas too. Edge cases, crazy plays, strange behavior—those are my favorites. That’s where
+                        the next evolution usually hides.”
+                    </p>
+
+                    <p class="aob-side-note" style="margin-top:10px;">
+                        Together, they represent the two sides of this project: measured wisdom and bold experimentation.
+                        Your message sits right between them.
+                    </p>
+                </section>
+            </aside>
+        </main>
+
+        <footer class="aob-footer">
+            <div><strong>AgeOfBotsGames.com</strong> · Face off against evolving AI minds in a strategic 7-hand war.</div>
+            <div>Habib Punja Public Beta · Habot · Jabot · MuBot · Joko · Lotus Studio Representative</div>
+        </footer>
     </div>
 </body>
 </html>

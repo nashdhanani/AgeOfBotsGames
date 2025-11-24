@@ -1,485 +1,635 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Characters - Habib Punja | AgeOfBotsGames</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-        <style>
+    <meta charset="UTF-8" />
+    <title>Age of Bots – Characters</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Meet Habot, Jabot, MuBot, Joko, and their Rabbit & Tortoise archetypes in full illustrated detail." />
+    <style>
+        :root {
+            color-scheme: dark;
+            --aob-bg: #020617;
+            --aob-bg-soft: #0200b24;
+            --aob-border-soft: rgba(148, 163, 184, 0.4);
+            --aob-accent: #22d3ee;
+            --aob-gold: #facc15;
+            --aob-text: #e2e8f0;
+            --aob-muted: #94a3b8;
+            --aob-radius-lg: 20px;
+            --aob-radius-xl: 26px;
+        }
+
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #eee;
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #0b1120 0, #020617 45%, #000 100%);
+            color: var(--aob-text);
+            -webkit-font-smoothing: antialiased;
             min-height: 100vh;
         }
 
-        header {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        a {
+            color: var(--aob-accent);
+            text-decoration: none;
         }
 
-        nav {
-            max-width: 1200px;
+            a:hover {
+                text-decoration: underline;
+            }
+
+        .aob-shell {
+            max-width: 1100px;
             margin: 0 auto;
+            padding: 12px 16px 32px;
         }
 
-            nav a {
-                color: #4a90e2;
-                text-decoration: none;
-                margin-right: 20px;
-                font-weight: 600;
-            }
-
-                nav a:hover {
-                    color: #ffd700;
-                }
-
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        h1 {
-            color: #ffd700;
-            font-size: 42px;
-            margin-bottom: 20px;
-        }
-
-        h2 {
-            color: #ffd700;
-            font-size: 28px;
-            margin: 40px 0 20px;
-        }
-
-        .intro {
-            font-size: 18px;
-            color: #cbd5e1;
-            margin-bottom: 40px;
-            line-height: 1.6;
-        }
-
-        .strategic-advisors {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin: 40px 0;
-        }
-
-        .characters {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin: 40px 0;
-        }
-
-        .character-card {
-            background: rgba(255,255,255,0.05);
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            border: 2px solid rgba(255,255,255,0.1);
-            transition: transform 0.3s, border-color 0.3s;
-        }
-
-            .character-card:hover {
-                transform: translateY(-5px);
-                border-color: #ffd700;
-            }
-
-            .character-card img {
-                width: 150px;
-                height: 150px;
-                object-fit: contain;
-                margin-bottom: 15px;
-                border-radius: 50%;
-                background: rgba(255,255,255,0.02);
-                padding: 10px;
-            }
-
-        .character-name {
-            color: #ffd700;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .character-subtitle {
-            color: #7dd3fc;
-            font-size: 14px;
-            font-style: italic;
-            margin-bottom: 15px;
-        }
-
-        .character-description {
-            color: #e5e7eb;
-            line-height: 1.6;
-        }
-
-        .personality-traits {
-            background: rgba(255,255,255,0.05);
-            padding: 30px;
-            border-radius: 10px;
-            margin-top: 40px;
-        }
-
-            .personality-traits h3 {
-                color: #ffd700;
-                margin-bottom: 15px;
-            }
-
-        .traits-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .trait-box {
-            background: rgba(0,0,0,0.2);
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid;
-        }
-
-            .trait-box.rabbit {
-                border-left-color: #10b981;
-            }
-
-            .trait-box.tortoise {
-                border-left-color: #7dd3fc;
-            }
-
-            .trait-box.monk {
-                border-left-color: #fbbf24;
-            }
-
-            .trait-box.joko {
-                border-left-color: #f43f5e;
-            }
-
-        .trait-title {
-            font-weight: bold;
-            color: #ffd700;
-            margin-bottom: 8px;
-        }
-
-        .trait-list {
-            list-style: none;
-            color: #cbd5e1;
-            line-height: 1.8;
-        }
-
-            .trait-list li:before {
-                content: "▸ ";
-                color: #7dd3fc;
-                font-weight: bold;
-            }
-
-        /* Paste the entire contents of your local aob_shared.css here */
-
-        /* ===========================================
-   Age of Bots – Shared Micro-Styles
-   Version 1.0 – Safe, Non-intrusive
-   =========================================== */
-        /* Improves text clarity across dark backgrounds */
-        body, button, input, textarea {
-            font-family: "Inter", "Segoe UI", sans-serif;
-            color: #e6e6f8;
-        }
-
-        /* Smooth fade utility */
-        .aob-fade {
-            opacity: 0;
-            transition: opacity 0.6s ease;
-        }
-
-            .aob-fade.show {
-                opacity: 1;
-            }
-
-        /* Centering helper for buttons */
-        .aob-center {
+        /* NAV */
+        .aob-nav {
             display: flex;
-            justify-content: center;
             align-items: center;
-            text-align: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
+            margin-bottom: 18px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
-        /* Consistent button styling (optional override) */
-        .aob-btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #7c3aed, #4c1d95);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s ease-in-out;
+        .aob-nav-title {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
-            .aob-btn:hover {
-                transform: scale(1.04);
-                box-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
+        .aob-nav-logo {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-accent);
+        }
+
+        .aob-nav-sub {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
+        }
+
+        .aob-nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .aob-nav-link {
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            color: var(--aob-muted);
+            text-decoration: none;
+            background: transparent;
+        }
+
+            .aob-nav-link:hover {
+                border-color: rgba(148, 163, 184, 0.6);
+                color: var(--aob-text);
             }
 
-        /* Light container for story, fable, or advisor text */
-        .aob-box {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
+        .aob-nav-link--primary {
+            border-color: rgba(56, 189, 248, 0.7);
+            background: radial-gradient(circle at top, #0ea5e9 0, #0369a1 40%, #020617 100%);
+            color: #e0f2fe;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
+        }
+
+        .aob-nav-link--active {
+            border-color: rgba(250, 204, 21, 0.8);
+            color: var(--aob-gold);
+        }
+
+        /* INTRO CARD */
+        .aob-intro-card {
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid var(--aob-border-soft);
+            background: radial-gradient(circle at top left, #020b24 0, #020617 55%, #000 100%);
+            padding: 16px 18px 18px;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.95);
+            margin-bottom: 16px;
+        }
+
+        .aob-intro-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--aob-gold);
+            margin-bottom: 4px;
+        }
+
+        /* GRID */
+        .aob-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        @media (max-width: 1024px) {
+            .aob-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 700px) {
+            .aob-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        /* CHARACTER CARD */
+        .aob-card {
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid var(--aob-border-soft);
+            background: radial-gradient(circle at top left, #020b24 0, #020617 60%, #000 100%);
+            padding: 14px 14px 16px;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.95);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .aob-char-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .aob-char-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            overflow: hidden;
+            background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+            flex-shrink: 0;
+        }
+
+            .aob-char-avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+        .aob-char-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--aob-gold);
+        }
+
+        .aob-char-tagline {
+            font-size: 11px;
+            color: var(--aob-muted);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .aob-char-body p {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--aob-text);
+            margin: 4px 0;
+        }
+
+        .aob-char-traits {
+            font-size: 13px;
+            color: var(--aob-muted);
+            margin-top: 4px;
+        }
+
+        /* ART WINDOW */
+        .aob-char-art {
+            position: relative;
             border-radius: 16px;
-            padding: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            overflow: hidden;
+            background: radial-gradient(circle at top, #020617 0, #000 100%);
+            cursor: pointer;
+        }
+
+            /* Card thumbnails: cinematic crop */
+            .aob-char-art img {
+                width: 100%;
+                height: 230px; /* fixed thumbnail height */
+                display: block;
+                object-fit: cover; /* crop to fill nicely */
+                transition: transform 220ms ease-out, filter 220ms ease-out;
+            }
+
+            .aob-char-art:hover img {
+                transform: scale(1.03);
+                filter: brightness(1.05);
+            }
+
+        .aob-char-art-label {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #e5e7eb;
+        }
+
+        .aob-char-btn {
+            border-radius: 999px;
+            border: 1px solid rgba(56, 189, 248, 0.8);
+            background: radial-gradient(circle at top, #0ea5e9 0, #0369a1 45%, #020617 100%);
+            color: #e0f2fe;
+            font-size: 11px;
+            padding: 6px 12px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.6);
+        }
+
+            .aob-char-btn:hover {
+                filter: brightness(1.05);
+            }
+
+        /* MODAL */
+        .aob-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+            .aob-modal[data-open="true"] {
+                display: flex;
+            }
+
+        .aob-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(6px);
         }
 
-        /* Future-proof area for character bubbles */
-        .aob-bubble {
-            max-width: 320px;
-            padding: 14px 18px;
-            background: #fff;
-            color: #222;
-            border-radius: 24px;
+        .aob-modal-content {
             position: relative;
-            box-shadow: 2px 8px 28px rgba(0,0,0,0.12);
-            font-family: "Comic Neue", "Comic Sans MS", sans-serif;
-            display: none; /* will be turned on by JS later */
+            max-width: min(950px, 96vw);
+            max-height: min(88vh, 600px);
+            border-radius: 18px;
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            background: radial-gradient(circle at top, #020617 0, #000 100%);
+            overflow: hidden;
+            box-shadow: 0 22px 80px rgba(0, 0, 0, 0.85);
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
         }
 
-            /* Left-tail bubble */
-            .aob-bubble.left::after {
-                content: "";
-                position: absolute;
-                left: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-right: 16px solid #fff;
+        .aob-modal-img-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #020617;
+        }
+
+            /* Full artwork: always fit, never crop */
+            .aob-modal-img-wrap img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                display: block;
             }
 
-            /* Right-tail bubble */
-            .aob-bubble.right::after {
-                content: "";
-                position: absolute;
-                right: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-left: 16px solid #fff;
+        .aob-modal-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--aob-text);
+            font-size: 16px;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .aob-modal-caption {
+            font-size: 13px;
+            color: var(--aob-muted);
+            padding: 6px 10px 8px;
+            border-top: 1px solid rgba(15, 23, 42, 0.9);
+            background: radial-gradient(circle at bottom, #020617 0, #000 100%);
+        }
+
+        /* FOOTER */
+        .aob-footer {
+            margin-top: 20px;
+            padding: 10px 4px 0;
+            border-top: 1px solid rgba(15, 23, 42, 0.9);
+            font-size: 11px;
+            color: var(--aob-muted);
+            text-align: center;
+        }
+
+            .aob-footer strong {
+                color: var(--aob-accent);
+                font-weight: 600;
             }
-
-            /* Reserve advisor bubble style for Phase 3 */
-            .aob-bubble.center {
-                margin: 0 auto;
-            }
-
-
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="index.html">← Back to Home</a>
-            <a href="production/habib_punja_v4_5_10_BETA.html">Play Game</a>
-            <a href="strategic-guide.html">Strategy Guide</a>
-            <a href="resources.html">Resources</a>
-        </nav>
-    </header>
+    <div class="aob-shell">
+        <header class="aob-nav">
+            <div class="aob-nav-title">
+                <div class="aob-nav-logo">AGE OF BOTS GAMES</div>
+                <div class="aob-nav-sub">Habib Punja · Strategic Card Game</div>
+            </div>
+            <nav class="aob-nav-links">
+                <a class="aob-nav-link" href="index.html">Home</a>
+                <a class="aob-nav-link" href="habib_punja_v4_5_10_BETA.html">Play Game</a>
+                <a class="aob-nav-link aob-nav-link--active" href="characters.html">Characters</a>
+                <a class="aob-nav-link" href="strategic-guide.html">Strategy Guide</a>
+                <a class="aob-nav-link" href="resources.html">Resources</a>
+                <a class="aob-nav-link" href="source-selection-criteria.html">Source Criteria</a>
+                <a class="aob-nav-link" href="contact.html">Contact</a>
+            </nav>
+        </header>
 
-    <div class="container">
-        <h1>🎭 Meet the Characters</h1>
-        <p class="intro">
-            In Habib Punja, you're not alone at the table. Face two AI opponents with distinct personalities and playing styles,
-            while receiving strategic advice from two competing philosophies. Each character brings unique tactics and
-            challenges to create a dynamic, engaging experience.
-        </p>
-
-        <h2>Your Opponents</h2>
-        <div class="characters">
-            <div class="character-card">
-                <img src="images/Habot.png" alt="Habot" onerror="this.style.display='none'">
-
-                <!-- Avatar/Icon name area -->
-
-                <div class="character-name">
-                    <img src="images/Rabbit64.png"
-                         alt="Habot Rabbit Icon"
-                         class="character-emoji"
-                         id="habot-icon"
-                         style="cursor:pointer;">
-                    Habot
-                </div>
-
-                <div class="character-subtitle">The Rabbit - Aggressive & Fast</div>
-                <p class="character-description">
-                    Habot plays with speed and aggression. Quick to publish, eager to extend sequences, and always
-                    pushing the pace. This opponent favors early publishing to establish position and applies constant
-                    pressure. Watch out - Habot's rapid playstyle can catch you off guard!
+        <main>
+            <!-- Intro -->
+            <section class="aob-intro-card">
+                <div class="aob-intro-title">Meet the AI Minds & Archetypes</div>
+                <p style="font-size:14px;line-height:1.5;">
+                    At the Habib Punja table, you’re never just playing against static logic. You’re sitting with personalities:
+                    <strong>Habot</strong> and <strong>Jabot</strong> as AI players, <strong>MuBot</strong> and <strong>Joko</strong> as
+                    advisors and commentators, and the timeless archetypes of the <strong>Rabbit</strong> and the <strong>Tortoise</strong>
+                    woven into their designs.
                 </p>
-            </div>
-
-            <div class="character-card">
-                <img src="images/Jabot.png" alt="Jabot" onerror="this.style.display='none'">
-
-                <!-- Avatar/Icon name area -->
-                <div class="character-name">
-                    <img src="images/Tortoise64.png"
-                         alt="Jabot Tortoise Icon"
-                         class="character-emoji"
-                         id="jabot-icon"
-                         style="cursor:pointer;">
-                    Jabot
-                </div>
-
-                <div class="character-subtitle">The Tortoise - Patient & Strategic</div>
-                <p class="character-description">
-                    Jabot takes a measured, strategic approach. Patient accumulation, careful timing, and optimal
-                    positioning define this opponent's style. Jabot waits for the perfect moment to strike with
-                    multiple extensions at once. Slow and steady wins the race!
+                <p style="font-size:13px;color:var(--aob-muted);">
+                    Click any artwork to view it in full detail. These are not just “skins”—they are visual anchors for how each
+                    mind plays the 7-hand war.
                 </p>
-            </div>
-        </div>
+            </section>
 
-        <div class="personality-traits">
-            <h2>Playing Styles in Detail</h2>
+            <!-- Character Grid -->
+            <section class="aob-grid">
+                <!-- Habot -->
+                <article class="aob-card">
+                    <div class="aob-char-header">
+                        <div class="aob-char-avatar">
+                            <img src="images/Habot.png" alt="Habot avatar" />
+                        </div>
+                        <div>
+                            <div class="aob-char-title">Habot</div>
+                            <div class="aob-char-tagline">The Rabbit · Aggressive Publisher</div>
+                        </div>
+                    </div>
+                    <div class="aob-char-art" onclick="openArtModal('images/Habot.png','Habot – the Rabbit-style AI player')">
+                        <img src="images/Habot.png" alt="Habot full artwork" />
+                        <div class="aob-char-art-label">View Full Artwork</div>
+                    </div>
+                    <div class="aob-char-body">
+                        <p>
+                            Habot plays like a speedrunner. It loves momentum, early publishing, and bold moves that seize the
+                            initiative—even if the long-term structure is fragile.
+                        </p>
+                        <p class="aob-char-traits">
+                            <strong>Strengths:</strong> seizes opportunities before others see them, punishes slow opponents.<br />
+                            <strong>Weaknesses:</strong> can over-commit and collapse in later hands if the board turns hostile.
+                        </p>
+                    </div>
+                    <button class="aob-char-btn" type="button" onclick="openArtModal('images/Habot.png','Habot – the Rabbit-style AI player')">
+                        <span>🔍</span><span>Zoom Habot</span>
+                    </button>
+                </article>
 
-            <div class="traits-grid">
-                <div class="trait-box rabbit">
-                    <div class="trait-title">🐰 Habot's Tactics</div>
-                    <ul class="trait-list">
-                        <li>Publishes as soon as requirements are met</li>
-                        <li>Uses buys aggressively for quick completion</li>
-                        <li>Extends sequences immediately when possible</li>
-                        <li>Prefers speed over perfect optimization</li>
-                        <li>Creates pressure through rapid card reduction</li>
-                    </ul>
-                </div>
+                <!-- Jabot -->
+                <article class="aob-card">
+                    <div class="aob-char-header">
+                        <div class="aob-char-avatar">
+                            <img src="images/Jabot.png" alt="Jabot avatar" />
+                        </div>
+                        <div>
+                            <div class="aob-char-title">Jabot</div>
+                            <div class="aob-char-tagline">The Tortoise · Patient Constructor</div>
+                        </div>
+                    </div>
+                    <div class="aob-char-art" onclick="openArtModal('images/Jabot.png','Jabot – the Tortoise-style AI player')">
+                        <img src="images/Jabot.png" alt="Jabot full artwork" />
+                        <div class="aob-char-art-label">View Full Artwork</div>
+                    </div>
+                    <div class="aob-char-body">
+                        <p>
+                            Jabot plays the long game. It waits for strong ladders, prefers robust structures, and is willing to
+                            pass on early opportunities if they don’t meet its standards.
+                        </p>
+                        <p class="aob-char-traits">
+                            <strong>Strengths:</strong> resilient late-game positions, high probability plays, strong in complex hands.<br />
+                            <strong>Weaknesses:</strong> can miss “good enough” windows and let Habot or human players steal the lead.
+                        </p>
+                    </div>
+                    <button class="aob-char-btn" type="button" onclick="openArtModal('images/Jabot.png','Jabot – the Tortoise-style AI player')">
+                        <span>🔍</span><span>Zoom Jabot</span>
+                    </button>
+                </article>
 
-                <div class="trait-box tortoise">
-                    <div class="trait-title">🐢 Jabot's Tactics</div>
-                    <ul class="trait-list">
-                        <li>Delays publishing to accumulate extensions</li>
-                        <li>Conserves buys for critical moments</li>
-                        <li>Observes opponents before committing</li>
-                        <li>Maximizes value from each move</li>
-                        <li>Strikes when position is optimal</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+                <!-- MuBot -->
+                <article class="aob-card">
+                    <div class="aob-char-header">
+                        <div class="aob-char-avatar">
+                            <img src="images/Mubot.png" alt="MuBot avatar" />
+                        </div>
+                        <div>
+                            <div class="aob-char-title">MuBot</div>
+                            <div class="aob-char-tagline">Zen Master Advisor</div>
+                        </div>
+                    </div>
+                    <div class="aob-char-art" onclick="openArtModal('images/Mubot.png','MuBot – Zen AI Master Advisor')">
+                        <img src="images/Mubot.png" alt="MuBot full artwork" />
+                        <div class="aob-char-art-label">View Full Artwork</div>
+                    </div>
+                    <div class="aob-char-body">
+                        <p>
+                            MuBot doesn’t play hands. MuBot watches the entire 7-hand war. It speaks rarely, but when it does,
+                            it’s about patterns, tendencies, and long-term consequences.
+                        </p>
+                        <p class="aob-char-traits">
+                            <strong>Role:</strong> offers strategic wisdom and perspective.<br />
+                            <strong>Personality:</strong> calm, observant, quietly amused by human impulsiveness.
+                        </p>
+                    </div>
+                    <button class="aob-char-btn" type="button" onclick="openArtModal('images/Mubot.png','MuBot – Zen AI Master Advisor')">
+                        <span>🔍</span><span>Zoom MuBot</span>
+                    </button>
+                </article>
 
-        <!-- External Resources -->
-        <div class="strategic-advisors" id="advisors">
-        </div>
+                <!-- Joko -->
+                <article class="aob-card">
+                    <div class="aob-char-header">
+                        <div class="aob-char-avatar">
+                            <img src="images/Joko.png" alt="Joko avatar" />
+                        </div>
+                        <div>
+                            <div class="aob-char-title">Joko</div>
+                            <div class="aob-char-tagline">Provocateur · Chaos Enthusiast</div>
+                        </div>
+                    </div>
+                    <div class="aob-char-art" onclick="openArtModal('images/Joko.png','Joko – provocateur commentator')">
+                        <img src="images/Joko.png" alt="Joko full artwork" />
+                        <div class="aob-char-art-label">View Full Artwork</div>
+                    </div>
+                    <div class="aob-char-body">
+                        <p>
+                            Joko is the table’s instigator. It celebrates bold plays, mocks timid ones, and throws metaphorical
+                            fireballs when players discard good advice—or good cards.
+                        </p>
+                        <p class="aob-char-traits">
+                            <strong>Role:</strong> commentator, hype engine, chaos amplifier.<br />
+                            <strong>Personality:</strong> mischievous, dramatic, occasionally savage—but never truly cruel.
+                        </p>
+                    </div>
+                    <button class="aob-char-btn" type="button" onclick="openArtModal('images/Joko.png','Joko – provocateur commentator')">
+                        <span>🔍</span><span>Zoom Joko</span>
+                    </button>
+                </article>
 
-        <h2>Your Strategic Advisors</h2>
-        <div class="characters">
-            <div class="character-card">
-                <img src="images/Mubot.png" alt="MuBot" onerror="this.style.display='none'">
-                <div class="character-name">🧘 MuBot</div>
-                <div class="character-subtitle">The Wise Monk - Patience & Balance</div>
-                <p class="character-description">
-                    MuBut embodies ancient wisdom and strategic patience. Advises careful consideration, long-term
-                    planning, and balanced risk management. "Patience is not passive; it is concentrated strength."
-                    Follow MuBut's guidance for steady, consistent success.
-                </p>
-            </div>
+                <!-- Rabbit Archetype -->
+                <article class="aob-card">
+                    <div class="aob-char-header">
+                        <div class="aob-char-avatar">
+                            <img src="images/Rabbit.png" alt="Rabbit archetype avatar" />
+                        </div>
+                        <div>
+                            <div class="aob-char-title">Rabbit</div>
+                            <div class="aob-char-tagline">Spirit of Impulsive Speed</div>
+                        </div>
+                    </div>
+                    <div class="aob-char-art" onclick="openArtModal('images/Rabbit.png','Rabbit archetype – speed and aggression')">
+                        <img src="images/Rabbit.png" alt="Rabbit full artwork" />
+                        <div class="aob-char-art-label">View Full Artwork</div>
+                    </div>
+                    <div class="aob-char-body">
+                        <p>
+                            The Rabbit is the spirit behind Habot: quick, daring, and often right at the edge of control. In victory
+                            laps, the Rabbit sprints across the board, embodying momentum and risk.
+                        </p>
+                        <p class="aob-char-traits">
+                            <strong>Symbolism:</strong> speed, initiative, early publishing, momentum-based strategy.
+                        </p>
+                    </div>
+                    <button class="aob-char-btn" type="button" onclick="openArtModal('images/Rabbit.png','Rabbit archetype – speed and aggression')">
+                        <span>🔍</span><span>Zoom Rabbit</span>
+                    </button>
+                </article>
 
-            <div class="character-card">
-                <img src="images/Joko.png" alt="Joko" onerror="this.style.display='none'">
-                <div class="character-name">😈 Joko</div>
-                <div class="character-subtitle">The Daring Provocateur - Bold & Disruptive</div>
-                <p class="character-description">
-                    Joko champions aggressive tactics and calculated risks. Encourages bold moves, psychological
-                    pressure, and seizing opportunities. "Fortune favors the bold!" Sometimes the best defense
-                    is a shocking offense. Dare to disrupt!
-                </p>
-            </div>
-        </div>
+                <!-- Tortoise Archetype -->
+                <article class="aob-card">
+                    <div class="aob-char-header">
+                        <div class="aob-char-avatar">
+                            <img src="images/Tortoise.png" alt="Tortoise archetype avatar" />
+                        </div>
+                        <div>
+                            <div class="aob-char-title">Tortoise</div>
+                            <div class="aob-char-tagline">Spirit of Patient Strategy</div>
+                        </div>
+                    </div>
+                    <div class="aob-char-art" onclick="openArtModal('images/Tortoise.png','Tortoise archetype – patience and structure')">
+                        <img src="images/Tortoise.png" alt="Tortoise full artwork" />
+                        <div class="aob-char-art-label">View Full Artwork</div>
+                    </div>
+                    <div class="aob-char-body">
+                        <p>
+                            The Tortoise is the spirit behind Jabot: patient, steady, and relentless. In victory laps, the Tortoise
+                            moves with calm confidence, representing structure and late-game dominance.
+                        </p>
+                        <p class="aob-char-traits">
+                            <strong>Symbolism:</strong> patience, resilience, structural strength, long-horizon thinking.
+                        </p>
+                    </div>
+                    <button class="aob-char-btn" type="button" onclick="openArtModal('images/Tortoise.png','Tortoise archetype – patience and structure')">
+                        <span>🔍</span><span>Zoom Tortoise</span>
+                    </button>
+                </article>
+            </section>
+        </main>
 
-        <div class="personality-traits">
-            <h2>Guiding Principles: Master Philosophies and Playing Styles</h2>
-
-            <div class="traits-grid">
-                <div class="trait-box monk">
-                    <div class="trait-title">🧘 MuBot's Philosophy</div>
-                    <ul class="trait-list">
-                        <li>Patience is concentrated strength</li>
-                        <li>Balance offense and defense</li>
-                        <li>Long-term thinking over quick wins</li>
-                        <li>Steady progress compounds over time</li>
-                        <li>Wisdom comes from observation combined with intuition</li>
-                    </ul>
-                </div>
-
-                <div class="trait-box joko">
-                    <div class="trait-title">😈 Joko's Philosophy</div>
-                    <ul class="trait-list">
-                        <li>Fortune favors the bold</li>
-                        <li>Calculated risks create opportunities</li>
-                        <li>Psychological pressure wins games</li>
-                        <li>Disruption beats predictability</li>
-                        <li>Attack is the best defense</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-
-
-        <div style="background: rgba(255,255,255,0.05); padding: 30px; border-radius: 10px; margin-top: 40px; text-align: center;">
-            <h3 style="color: #ffd700; margin-bottom: 15px;">Ready to Face Your Opponents?</h3>
-            <p style="color: #cbd5e1; margin-bottom: 20px;">
-                Test your skills against Habot and Jabot. Will you follow MuBot's patient wisdom or Joko's daring aggression?
-            </p>
-            <a href="production/habib_punja_v4_5_10_BETA.html" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 35px; text-decoration: none; border-radius: 50px; font-weight: 700; transition: transform 0.3s;">
-                🎮 Play Now
-            </a>
-        </div>
+        <footer class="aob-footer">
+            <div><strong>AgeOfBotsGames.com</strong> · Face off against evolving AI minds in a strategic 7-hand war.</div>
+            <div>Habib Punja Public Beta · Habot · Jabot · MuBot · Joko · Rabbit · Tortoise</div>
+        </footer>
     </div>
 
-    <footer style="text-align: center; padding: 40px 20px; margin-top: 80px; background: rgba(0,0,0,0.3); color: #888;">
-        <p><strong style="color: #ffd700;">AgeOfBotsGames LLC</strong> | A Division of AgeOfBotsStudios</p>
-        <p>© 2025 AgeOfBotsGames LLC. All Rights Reserved.</p>
-    </footer>
-
-    <!-- Modal to display the full image -->
-    <div id="image-modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); justify-content:center; align-items:center;">
-        <img id="modal-img" style="max-width:90vw; max-height:90vh;">
+    <!-- MODAL -->
+    <div class="aob-modal" id="art-modal" aria-hidden="true">
+        <div class="aob-modal-backdrop" onclick="closeArtModal()"></div>
+        <div class="aob-modal-content" role="dialog" aria-modal="true" aria-labelledby="art-modal-caption">
+            <button class="aob-modal-close" type="button" onclick="closeArtModal()" aria-label="Close full artwork">×</button>
+            <div class="aob-modal-img-wrap">
+                <img id="art-modal-img" src="" alt="" />
+            </div>
+            <div class="aob-modal-caption" id="art-modal-caption"></div>
+        </div>
     </div>
 
     <script>
-        // Show modal on image click
-        document.querySelectorAll('.character-card img').forEach(function (img) {
-            img.onclick = function () {
-                document.getElementById('modal-img').src = this.src.replace('images/', 'images/'); // Change path if full image is in a different folder, else use this.src directly
-                document.getElementById('image-modal').style.display = 'flex';
-            }
-        });
-        // Hide modal on click
-        document.getElementById('image-modal').onclick = function () {
-            this.style.display = 'none';
+        function openArtModal(src, alt) {
+            var modal = document.getElementById('art-modal');
+            var img = document.getElementById('art-modal-img');
+            var caption = document.getElementById('art-modal-caption');
+            img.src = src;
+            img.alt = alt || '';
+            caption.textContent = alt || '';
+            modal.setAttribute('data-open', 'true');
+            modal.setAttribute('aria-hidden', 'false');
         }
 
-        // Show full rabbit splash on icon click
-        document.getElementById('habot-icon').onclick = function () {
-            document.getElementById('modal-img').src = "images/Rabbit.png"; // Use full size rabbit image
-            document.getElementById('image-modal').style.display = 'flex';
-        };
+        function closeArtModal() {
+            var modal = document.getElementById('art-modal');
+            var img = document.getElementById('art-modal-img');
+            img.src = '';
+            modal.setAttribute('data-open', 'false');
+            modal.setAttribute('aria-hidden', 'true');
+        }
 
-        // Show full tortoise splash on icon click
-        document.getElementById('jabot-icon').onclick = function () {
-            document.getElementById('modal-img').src = "images/Tortoise.png"; // Use full size tortoise image
-            document.getElementById('image-modal').style.display = 'flex';
-        };
-
+        // Optional: close on ESC
+        document.addEventListener('keydown', function (evt) {
+            if (evt.key === 'Escape') {
+                closeArtModal();
+            }
+        });
     </script>
-
 </body>
 </html>

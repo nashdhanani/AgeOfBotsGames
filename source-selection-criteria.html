@@ -2,360 +2,271 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Source Selection Criteria • Age Of Bots Games</title>
-    <meta name="description" content="How Age Of Bots selects and curates external resources: credibility, relevance, practicality, accessibility, and recency." />
+    <title>Age of Bots – Source Selection Criteria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="How Age of Bots chooses external sources to recommend for strategic thinking and habit building." />
     <style>
         :root {
-            --grad: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
-            --ring: rgba(255,255,255,.10);
+            color-scheme: dark;
+            --aob-bg: #020617;
+            --aob-bg-soft: #020b24;
+            --aob-border-soft: rgba(148, 163, 184, 0.4);
+            --aob-accent: #22d3ee;
+            --aob-gold: #facc15;
+            --aob-text: #e2e8f0;
+            --aob-muted: #94a3b8;
+            --aob-radius-lg: 20px;
+            --aob-radius-xl: 26px;
         }
 
         * {
-            box-sizing: border-box
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0
+            box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;
-            color: #e5e7eb;
-            background: #0b1020;
-            background-image: radial-gradient(800px 400px at 80% -10%, rgba(102,126,234,.18), transparent 60%), radial-gradient(800px 500px at -10% 30%, rgba(118,75,162,.18), transparent 60%);
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #0b1120 0, #020617 45%, #000 100%);
+            color: var(--aob-text);
+            -webkit-font-smoothing: antialiased;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         a {
-            color: #7dd3fc
+            color: var(--aob-accent);
+            text-decoration: none;
         }
 
             a:hover {
-                color: #bae6fd
+                text-decoration: underline;
             }
 
-        header {
-            background: rgba(10,15,26,.85);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255,255,255,.08);
-            position: sticky;
-            top: 0;
-            z-index: 30;
-        }
-
-        .wrap {
-            max-width: 1100px;
+        .aob-shell {
+            max-width: 800px;
             margin: 0 auto;
-            padding: 16px 20px
+            padding: 12px 16px 32px;
         }
-
-        .brand {
+        /* NAV */
+        .aob-nav {
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: #e5e7eb;
-            text-decoration: none
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
+            margin-bottom: 18px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
-            .brand svg {
-                width: 30px;
-                height: 30px
-            }
+        .aob-nav-title {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
 
-        nav a {
-            color: #cbd5e1;
+        .aob-nav-logo {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-accent);
+        }
+
+        .aob-nav-sub {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
+        }
+
+        .aob-nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .aob-nav-link {
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            color: var(--aob-muted);
             text-decoration: none;
-            margin-left: 16px;
-            font-weight: 600
+            background: transparent;
         }
 
-            nav a:hover {
-                color: #fff
+            .aob-nav-link:hover {
+                border-color: rgba(148, 163, 184, 0.6);
+                color: var(--aob-text);
             }
 
-        .hero {
-            padding: 40px 20px 18px
+        .aob-nav-link--primary {
+            border-color: rgba(56, 189, 248, 0.7);
+            background: radial-gradient(circle at top, #0ea5e9 0, #0369a1 40%, #020617 100%);
+            color: #e0f2fe;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
         }
 
-            .hero h1 {
-                color: #fff;
-                margin: 6px 0 4px;
-                font-size: clamp(1.6rem,2.6vw,2.2rem)
-            }
+        .aob-nav-link--active {
+            border-color: rgba(250, 204, 21, 0.8);
+            color: var(--aob-gold);
+        }
 
-            .hero p {
-                color: #cbd5e1;
-                margin: 0
-            }
+        .aob-panel {
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid var(--aob-border-soft);
+            background: radial-gradient(circle at top left, #020b24 0, #020617 55%, #000 100%);
+            padding: 16px 18px 18px;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.95);
+        }
 
-        main {
-            background: linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
-            border: 1px solid var(--ring);
-            border-radius: 14px;
-            padding: 24px;
-            color: #e5e7eb;
-            max-width: 1100px;
-            margin: 20px auto;
+        .aob-panel-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--aob-gold);
+            margin-bottom: 4px;
+        }
+
+        .aob-panel-sub {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
+            margin-bottom: 10px;
         }
 
         h2 {
-            color: #ffffff;
-            border-bottom: 2px solid rgba(255,255,255,.12);
-            padding-bottom: 6px;
-            margin-top: 16px
+            font-size: 16px;
+            margin: 10px 0 4px;
+            color: var(--aob-accent);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 14px 0;
-            background: rgba(2,6,23,.35);
-            color: #e5e7eb;
-            border-radius: 10px;
-            overflow: hidden
+        p {
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 6px 0;
+            color: var(--aob-text);
         }
 
-        th, td {
-            border: 1px solid rgba(255,255,255,.08);
-            padding: 10px;
-            text-align: left
+        ul {
+            padding-left: 18px;
+            margin: 6px 0 8px;
         }
 
-        th {
-            background: rgba(99,102,241,.18)
+        li {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 5px;
+            color: var(--aob-text);
         }
 
-        .card {
-            border: 1px solid var(--ring);
-            border-radius: 14px;
-            padding: 16px;
-            margin: 12px 0;
-            background: linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.02));
-        }
-
-        footer {
-            border-top: 1px solid rgba(255,255,255,.08);
-            margin-top: auto
-        }
-
-            footer .wrap {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 10px;
-                flex-wrap: wrap
-            }
-
-        .pill {
-            display: inline-block;
-            background: var(--grad);
-            color: #fff;
-            text-decoration: none;
-            padding: 10px 16px;
-            border-radius: 999px;
-            font-weight: 800;
-            box-shadow: 0 8px 24px rgba(118,75,162,.25)
-        }
-
-        .back {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 18px
-        }
-
-        /* Paste the entire contents of your local aob_shared.css here */
-
-   /* ===========================================
-   Age of Bots – Shared Micro-Styles
-   Version 1.0 – Safe, Non-intrusive
-   =========================================== */
-        /* Improves text clarity across dark backgrounds */
-        body, button, input, textarea {
-            font-family: "Inter", "Segoe UI", sans-serif;
-            color: #e6e6f8;
-        }
-
-        /* Smooth fade utility */
-        .aob-fade {
-            opacity: 0;
-            transition: opacity 0.6s ease;
-        }
-
-            .aob-fade.show {
-                opacity: 1;
-            }
-
-        /* Centering helper for buttons */
-        .aob-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .aob-footer {
+            margin-top: 20px;
+            padding: 10px 4px 0;
+            border-top: 1px solid rgba(15, 23, 42, 0.9);
+            font-size: 11px;
+            color: var(--aob-muted);
             text-align: center;
         }
 
-        /* Consistent button styling (optional override) */
-        .aob-btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #7c3aed, #4c1d95);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s ease-in-out;
-        }
-
-            .aob-btn:hover {
-                transform: scale(1.04);
-                box-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
+            .aob-footer strong {
+                color: var(--aob-accent);
+                font-weight: 600;
             }
-
-        /* Light container for story, fable, or advisor text */
-        .aob-box {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 16px;
-            padding: 24px;
-            backdrop-filter: blur(6px);
-        }
-
-        /* Future-proof area for character bubbles */
-        .aob-bubble {
-            max-width: 320px;
-            padding: 14px 18px;
-            background: #fff;
-            color: #222;
-            border-radius: 24px;
-            position: relative;
-            box-shadow: 2px 8px 28px rgba(0,0,0,0.12);
-            font-family: "Comic Neue", "Comic Sans MS", sans-serif;
-            display: none; /* will be turned on by JS later */
-        }
-
-            /* Left-tail bubble */
-            .aob-bubble.left::after {
-                content: "";
-                position: absolute;
-                left: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-right: 16px solid #fff;
-            }
-
-            /* Right-tail bubble */
-            .aob-bubble.right::after {
-                content: "";
-                position: absolute;
-                right: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-left: 16px solid #fff;
-            }
-
-            /* Reserve advisor bubble style for Phase 3 */
-            .aob-bubble.center {
-                margin: 0 auto;
-            }
-
-
     </style>
 </head>
 <body>
-  <header>
-    <div class="wrap" style="display:flex;align-items:center;justify-content:space-between;">
-      <a class="brand" href="index.html">
-        <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
-          <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#667eea"/><stop offset="1" stop-color="#764ba2"/></linearGradient></defs>
-          <rect x="10" y="12" width="44" height="32" rx="8" fill="url(#g2)" />
-          <circle cx="24" cy="28" r="6" fill="#0b1220"/><circle cx="40" cy="28" r="6" fill="#0b1220"/>
-          <rect x="18" y="36" width="28" height="6" rx="3" fill="#0b1220"/>
-          <rect x="30" y="4" width="4" height="8" rx="2" fill="url(#g2)"/>
-        </svg>
-        <strong>Age Of Bots Games</strong>
-      </a>
-      <nav>
-        <a href="habib_punja_v4_5_10_BETA.html">Play</a>
-        <a href="strategy_guide.html">Strategy Guide</a>
-        <a href="contact.html">Contact</a>
-      </nav>
+    <div class="aob-shell">
+        <header class="aob-nav">
+            <div class="aob-nav-title">
+                <div class="aob-nav-logo">AGE OF BOTS GAMES</div>
+                <div class="aob-nav-sub">Habib Punja · Strategic Card Game</div>
+            </div>
+            <nav class="aob-nav-links">
+                <a class="aob-nav-link" href="index.html">Home</a>
+                <a class="aob-nav-link" href="habib_punja_v4_5_10_BETA.html">Play Game</a>
+                <a class="aob-nav-link" href="characters.html">Characters</a>
+                <a class="aob-nav-link" href="strategic-guide.html">Strategy Guide</a>
+                <a class="aob-nav-link" href="resources.html">Resources</a>
+                <a class="aob-nav-link aob-nav-link--active" href="source-selection-criteria.html">Source Criteria</a>
+                <a class="aob-nav-link" href="contact.html">Contact</a>
+            </nav>
+        </header>
+
+        <main>
+            <section class="aob-panel">
+                <div class="aob-panel-title">Source Selection Criteria</div>
+                <div class="aob-panel-sub">How we choose what to recommend</div>
+                <p>
+                    The resources listed on the <a href="resources.html">Resources</a> page are not random links. They were chosen
+                    to support the core themes of the Habib Punja game: <strong>
+                        strategy, critical thinking, habit formation, and
+                        decision-making under uncertainty.
+                    </strong>
+                </p>
+
+                <h2>1. Relevance to Strategic Thinking</h2>
+                <p>
+                    Every recommended source must help you think more clearly about decisions—whether in games, work, or life.
+                    We avoid content that is purely inspirational without offering any real tools or frameworks.
+                </p>
+
+                <h2>2. Practical, Not Just Theoretical</h2>
+                <p>
+                    We favor resources that give you <em>usable</em> frameworks: mental models, habit loops, probabilistic
+                    thinking, and techniques you can apply while playing a 7-hand war or when making real-world decisions.
+                </p>
+
+                <h2>3. Accessible & Public</h2>
+                <p>
+                    All resources are publicly accessible (articles, talks, summaries, or widely-available books). We avoid
+                    paywalled, niche, or obscure materials that would make learning harder instead of easier.
+                </p>
+
+                <h2>4. Alignment with the Game’s Philosophy</h2>
+                <p>
+                    The Habib Punja game emphasizes:
+                </p>
+                <ul>
+                    <li>reducing catastrophic losses instead of chasing one perfect win,</li>
+                    <li>thinking across multiple hands—not just the current turn,</li>
+                    <li>balancing bold moves with structural safety.</li>
+                </ul>
+                <p>
+                    Recommended sources reinforce those themes rather than contradict them.
+                </p>
+
+                <h2>5. Respect for Human Agency</h2>
+                <p>
+                    We deliberately avoid manipulative “hacks” or content that encourages exploiting others. Strategy and
+                    intelligence should be used to elevate thinking, not to dominate or diminish other people.
+                </p>
+
+                <h2>6. Update Over Time</h2>
+                <p>
+                    As the game evolves and new phases develop, the resource list and these criteria may be refined. If a source
+                    stops being helpful—or better, clearer explanations appear—we will update what we recommend.
+                </p>
+
+                <p style="margin-top:10px;font-size:13px;color:var(--aob-muted);">
+                    If you discover a resource that you think belongs on the list, you’re welcome to share it via the
+                    <a href="contact.html">Contact</a> page. MuBot will review it for alignment and usefulness.
+                </p>
+            </section>
+        </main>
+
+        <footer class="aob-footer">
+            <div><strong>AgeOfBotsGames.com</strong> · Face off against evolving AI minds in a strategic 7-hand war.</div>
+            <div>Habib Punja Public Beta · Habot · Jabot · MuBot · Joko</div>
+        </footer>
     </div>
-  </header>
-
-  <section class="hero">
-    <div class="wrap">
-      <h1>Source Selection Criteria</h1>
-      <p>How we pick public resources that help players build strategic mindset and winning habits.</p>
-    </div>
-  </section>
-
-  <main class="wrap">
-    <section>
-      <h2>Our Criteria</h2>
-      <table>
-        <tr><th>Criterion</th><th>What it means for you</th></tr>
-        <tr><td><strong>Credibility & Expertise</strong></td><td>We prefer professional bodies, established institutes, or experts with a track record.</td></tr>
-        <tr><td><strong>Relevance</strong></td><td>Resources must address strategic thinking, habit formation, or decision‑making under pressure.</td></tr>
-        <tr><td><strong>Practicality</strong></td><td>Actionable frameworks, exercises, or step‑by‑step guidance — not just motivation.</td></tr>
-        <tr><td><strong>Accessibility</strong></td><td>Free, publicly available resources without paywalls or sign‑ups.</td></tr>
-        <tr><td><strong>Recency</strong></td><td>Generally from the last 3–4 years to reflect current thinking.</td></tr>
-      </table>
-    </section>
-
-    <section>
-      <h2>Why These Sources?</h2>
-
-      <div class="card">
-        <h3><a href="https://insight.ieeeusa.org/articles/developing-a-strategic-mindset/" target="_blank" rel="noopener">Developing a Strategic Mindset — IEEE INSIGHT</a></h3>
-        <p><em>Why it’s here:</em> IEEE is a professional association known for rigorous standards and applied problem‑solving — strong fit for building disciplined strategic habits.</p>
-      </div>
-
-      <div class="card">
-        <h3><a href="https://www.thestrategyinstitute.org/insights/5-proven-techniques-to-enhance-strategic-thinking-skills" target="_blank" rel="noopener">5 Proven Techniques to Enhance Strategic Thinking Skills — The Strategy Institute</a></h3>
-        <p><em>Why it’s here:</em> Clear, actionable techniques that players can adapt to pre‑game prep and post‑game reviews.</p>
-      </div>
-
-      <div class="card">
-        <h3><a href="https://www.sorenkaplan.com/developing-strategic-mindset-in-leaders/" target="_blank" rel="noopener">Mastering the Art of Strategy — Soren Kaplan</a></h3>
-        <p><em>Why it’s here:</em> Focuses on mindset shifts and uncertainty — mirrors match dynamics where incomplete information matters.</p>
-      </div>
-
-      <div class="card">
-        <h3><a href="https://www.thestrategyinstitute.org/insights/strategic-thinking-a-complete-guide-for-business-success" target="_blank" rel="noopener">Strategic Thinking — A Complete Guide — The Strategy Institute</a></h3>
-        <p><em>Why it’s here:</em> Broad frameworks and examples; players can translate models into decision rules for hands and rounds.</p>
-      </div>
-
-      <div class="card">
-        <h3><a href="https://cmoe.com/blog/instilling-inspiring-strategic-thinking-mindset-work/" target="_blank" rel="noopener">Instilling & Inspiring a Strategic Thinking Mindset at Work — CMOE</a></h3>
-        <p><em>Why it’s here:</em> Emphasizes habit‑building and culture — useful for squads or friends who play regularly and want shared language.</p>
-      </div>
-
-      <div class="back">
-        <a class="pill" href="strategic-guide.html">← Strategy Guide</a>
-        <a class="pill" href="contact.html">📧 Contact Support</a>
-      </div>
-    </section>
-  </main>
-
-  
-  <footer>
-    <div class="wrap" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-      <div style="color:#94a3b8">
-        © 2025 AgeOfBotsGames LLC<br>
-        <em>Face off against evolving AI minds — Habot (Rabbit) • Jabot (Tortoise) • and more to come.</em>
-      </div>
-      <div class="small" style="display:flex;gap:14px;flex-wrap:wrap">
-          <a href="resources.html" style="text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18);color:#7dd3fc">Resources & Game Rules</a>
-        <a href="contact.html" style="text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18);color:#7dd3fc">Contact</a>
-      </div>
-    </div>
-  </footer>
-
 </body>
 </html>

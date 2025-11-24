@@ -1,575 +1,453 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resources - Habib Punja | AgeOfBotsGames</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta charset="UTF-8" />
+    <title>Age of Bots – MuBot’s Curated Resources</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Curated resources selected to deepen strategic thinking, habits, and decision-making for the Habib Punja 7-hand war." />
     <style>
+        :root {
+            color-scheme: dark;
+            --aob-bg: #020617;
+            --aob-bg-soft: #020b24;
+            --aob-border-soft: rgba(148, 163, 184, 0.4);
+            --aob-accent: #22d3ee;
+            --aob-gold: #facc15;
+            --aob-text: #e2e8f0;
+            --aob-muted: #94a3b8;
+            --aob-radius-lg: 20px;
+            --aob-radius-xl: 26px;
+        }
+
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #eee;
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #0b1120 0, #020617 45%, #000 100%);
+            color: var(--aob-text);
+            -webkit-font-smoothing: antialiased;
             min-height: 100vh;
         }
 
-        header {
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        a {
+            color: var(--aob-accent);
+            text-decoration: none;
         }
 
-        nav {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-            nav a {
-                color: #4a90e2;
-                text-decoration: none;
-                margin-right: 20px;
-                font-weight: 600;
+            a:hover {
+                text-decoration: underline;
             }
 
-                nav a:hover {
-                    color: #ffd700;
-                }
-
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
+        .aob-shell {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 12px 16px 32px;
         }
 
-        h1 {
-            color: #ffd700;
-            font-size: 42px;
-            margin-bottom: 20px;
+        /* NAV */
+        .aob-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
+            margin-bottom: 18px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .aob-nav-title {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .aob-nav-logo {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-accent);
+        }
+
+        .aob-nav-sub {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
+        }
+
+        .aob-nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .aob-nav-link {
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            color: var(--aob-muted);
+            text-decoration: none;
+            background: transparent;
+        }
+
+            .aob-nav-link:hover {
+                border-color: rgba(148, 163, 184, 0.6);
+                color: var(--aob-text);
+            }
+
+        .aob-nav-link--primary {
+            border-color: rgba(56, 189, 248, 0.7);
+            background: radial-gradient(circle at top, #0ea5e9 0, #0369a1 40%, #020617 100%);
+            color: #e0f2fe;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
+        }
+
+        .aob-nav-link--active {
+            border-color: rgba(250, 204, 21, 0.8);
+            color: var(--aob-gold);
+        }
+
+        /* PANELS */
+        .aob-panel {
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid var(--aob-border-soft);
+            background: radial-gradient(circle at top left, #020b24 0, #020617 55%, #000 100%);
+            padding: 16px 18px 18px;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.95);
+            margin-bottom: 16px;
+        }
+
+        .aob-panel-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--aob-gold);
+            margin-bottom: 4px;
+        }
+
+        .aob-panel-sub {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
+            margin-bottom: 10px;
         }
 
         h2 {
-            color: #ffd700;
-            font-size: 28px;
-            margin: 40px 0 20px;
-        }
-
-        h3 {
-            color: #7dd3fc;
-            font-size: 22px;
-            margin: 25px 0 15px;
+            font-size: 16px;
+            margin: 10px 0 4px;
+            color: var(--aob-accent);
         }
 
         p {
-            color: #cbd5e1;
-            line-height: 1.6;
-            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 6px 0;
+            color: var(--aob-text);
         }
 
-        .rules-section {
-            background: rgba(255,255,255,0.05);
-            padding: 30px;
-            border-radius: 10px;
-            margin: 30px 0;
-            border-left: 4px solid #ffd700;
+        ul {
+            padding-left: 18px;
+            margin: 6px 0 8px;
         }
 
-        .game-overview {
-            background: rgba(102,126,234,0.1);
-            padding: 25px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border: 2px solid rgba(102,126,234,0.3);
+        li {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            color: var(--aob-text);
         }
 
-        .requirements-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: rgba(0,0,0,0.2);
+        .aob-tagline {
+            font-size: 13px;
+            color: var(--aob-muted);
+            margin-top: 4px;
         }
 
-            .requirements-table th,
-            .requirements-table td {
-                padding: 12px;
-                border: 1px solid rgba(255,255,255,0.1);
-                text-align: left;
-            }
-
-            .requirements-table th {
-                background: rgba(102,126,234,0.2);
-                color: #ffd700;
-                font-weight: 700;
-            }
-
-        .term-box {
-            background: rgba(0,0,0,0.2);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 3px solid #7dd3fc;
-        }
-
-        .term-title {
-            color: #ffd700;
-            font-weight: 700;
+        .aob-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(34, 211, 238, 0.4);
+            background: rgba(8, 47, 73, 0.6);
+            color: var(--aob-accent);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
             margin-bottom: 8px;
         }
 
-        .resource-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .resource-card {
-            background: rgba(255,255,255,0.05);
-            padding: 25px;
-            border-radius: 10px;
-            border-left: 4px solid #ffd700;
-            transition: transform 0.3s;
-        }
-
-            .resource-card:hover {
-                transform: translateY(-3px);
-                background: rgba(255,255,255,0.08);
+            .aob-pill span {
+                font-size: 13px;
             }
 
-            .resource-card h3 {
-                color: #ffd700;
-                margin-bottom: 10px;
-            }
-
-            .resource-card a {
-                color: #7dd3fc;
-                text-decoration: none;
-            }
-
-                .resource-card a:hover {
-                    color: #bae6fd;
-                    text-decoration: underline;
-                }
-
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 35px;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: 700;
-            margin: 20px 10px 20px 0;
-            transition: transform 0.3s;
+        .aob-resource-list {
+            list-style: none;
+            padding-left: 0;
         }
 
-            .cta-button:hover {
-                transform: translateY(-2px);
+            .aob-resource-list li::before {
+                content: "➤ ";
+                color: var(--aob-accent);
+                margin-right: 2px;
             }
 
-        /* Paste the entire contents of your local aob_shared.css here */
-
-   /* ===========================================
-   Age of Bots – Shared Micro-Styles
-   Version 1.0 – Safe, Non-intrusive
-   =========================================== */
-        /* Improves text clarity across dark backgrounds */
-        body, button, input, textarea {
-            font-family: "Inter", "Segoe UI", sans-serif;
-            color: #e6e6f8;
+        .aob-resource-meta {
+            font-size: 12px;
+            color: var(--aob-muted);
+            margin-top: 2px;
         }
 
-        /* Smooth fade utility */
-        .aob-fade {
-            opacity: 0;
-            transition: opacity 0.6s ease;
+        .aob-note {
+            font-size: 12px;
+            color: var(--aob-muted);
+            margin-top: 8px;
         }
 
-            .aob-fade.show {
-                opacity: 1;
-            }
-
-        /* Centering helper for buttons */
-        .aob-center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .aob-footer {
+            margin-top: 20px;
+            padding: 10px 4px 0;
+            border-top: 1px solid rgba(15, 23, 42, 0.9);
+            font-size: 11px;
+            color: var(--aob-muted);
             text-align: center;
         }
 
-        /* Consistent button styling (optional override) */
-        .aob-btn {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #7c3aed, #4c1d95);
-            border: none;
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s ease-in-out;
-        }
-
-            .aob-btn:hover {
-                transform: scale(1.04);
-                box-shadow: 0 0 12px rgba(124, 58, 237, 0.45);
+            .aob-footer strong {
+                color: var(--aob-accent);
+                font-weight: 600;
             }
-
-        /* Light container for story, fable, or advisor text */
-        .aob-box {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 16px;
-            padding: 24px;
-            backdrop-filter: blur(6px);
-        }
-
-        /* Future-proof area for character bubbles */
-        .aob-bubble {
-            max-width: 320px;
-            padding: 14px 18px;
-            background: #fff;
-            color: #222;
-            border-radius: 24px;
-            position: relative;
-            box-shadow: 2px 8px 28px rgba(0,0,0,0.12);
-            font-family: "Comic Neue", "Comic Sans MS", sans-serif;
-            display: none; /* will be turned on by JS later */
-        }
-
-            /* Left-tail bubble */
-            .aob-bubble.left::after {
-                content: "";
-                position: absolute;
-                left: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-right: 16px solid #fff;
-            }
-
-            /* Right-tail bubble */
-            .aob-bubble.right::after {
-                content: "";
-                position: absolute;
-                right: -16px;
-                top: 18px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-left: 16px solid #fff;
-            }
-
-            /* Reserve advisor bubble style for Phase 3 */
-            .aob-bubble.center {
-                margin: 0 auto;
-            }
-
-
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="index.html">← Back to Home</a>
-            <a href="production/habib_punja_v4_5_10_BETA.html">Play Game</a>
-            <a href="strategic-guide.html">Strategy Guide</a>
-            <a href="characters.html">Characters</a>
-        </nav>
-    </header>
-
-    <div class="container">
-        <h1 id="top">📖 Resources & Game Rules</h1>
-        <p style="font-size: 18px; margin-bottom: 40px;">
-            Everything you need to master Habib Punja - from complete rules to strategic resources
-        </p>
-
-        <!-- Quick Navigation -->
-        <div class="game-overview">
-            <h3 style="margin-top: 0;">Quick Navigation</h3>
-            <p>
-                <a href="#overview" style="color: #7dd3fc; margin-right: 15px;">Game Overview</a> |
-                <a href="#rules" style="color: #7dd3fc; margin: 0 15px;">Official Rules</a> |
-                <a href="#terminology" style="color: #7dd3fc; margin: 0 15px;">Terminology</a> |
-                <a href="#external" style="color: #7dd3fc; margin-left: 15px;">External Resources</a>
-            </p>
-        </div>
-
-        <!-- Game Overview -->
-        <div class="rules-section" id="overview">
-            <h2>🎮 Game Overview</h2>
-            <p>
-                The Habib Punja game is entirely fictional, has no historical context, and does not resemble or reference any person, living or deceased.
-            </p>
-            <p>
-                The Habib Punja game requires thought yet is engaging and enjoyable. In terms of strategy and tactics required, 
-                it will appeal to players of strategic games like Chess, Go, Diplomacy, and Civ6/7 who are looking for a fun way to 
-                sharpen their critical thinking skills and competitive spirit.
-            </p>
-            <p>
-                This online version is played against two AI players with distinct personalities and has implemented all the rules and 
-                mechanics of the card game.
-            </p>
-        </div>
-
-        <!-- Structure -->
-        <div class="rules-section" id="structure">
-            <h2>🏗️ Game Structure</h2>
-            <p>
-                Habib Punja is a multiplayer and multiround strategic card game where the objective is to build matching cards of 
-                <strong>Triples</strong> or <strong>Ladders</strong>, required for the Hand being played, by drawing cards, publishing them 
-                as quickly as possible, extending those published sequences with remaining cards, and discarding cards.
-            </p>
-            <p>
-                The winner of each hand is the player who discards their last remaining card before the opponents.
-            </p>
-
-            <h3>Duration</h3>
-            <p>
-                Each hand lasts 10-15 minutes, and playing all 7 rounds provides a couple of hours of competitive fun. 
-                In the online version, you can play the full 7 rounds or click "New Game" to choose a quick combination 
-                of specific hands to practice advanced tactics.
-            </p>
-
-            <h3>Scoring</h3>
-            <p>
-                There are seven rounds. In each round, the winner is the player who goes out first by discarding their last card. 
-                Other players accumulate penalty points equal to the total value of cards still in their hand.
-            </p>
-            <p>
-                The winner of all seven rounds is <strong>Crowned</strong>. The player with the most penalty points is the 
-                <strong>Pumpkin</strong> (think Jack O'Lantern), or as in the fable from MuBot, <strong>Habib Punja</strong>.
-            </p>
-        </div>
-
-        <!-- Official Rules -->
-        <div class="rules-section" id="rules">
-            <h2>📋 Official Rules & Hand Requirements</h2>
-            
-            <h3>Setup</h3>
-            <p>
-                The game uses two standard 52-card decks shuffled in random order (no Jokers). Each player receives 10 cards at the start.
-            </p>
-
-            <h3>Seven Hands</h3>
-            <table class="requirements-table">
-                <tr>
-                    <th>Hand</th>
-                    <th>Requirements</th>
-                    <th>Buys Available</th>
-                </tr>
-                <tr>
-                    <td><strong>Hand 1</strong></td>
-                    <td>2 Triples</td>
-                    <td>3</td>
-                </tr>
-                <tr>
-                    <td><strong>Hand 2</strong></td>
-                    <td>1 Triple + 1 Ladder</td>
-                    <td>3</td>
-                </tr>
-                <tr>
-                    <td><strong>Hand 3</strong></td>
-                    <td>2 Ladders</td>
-                    <td>3</td>
-                </tr>
-                <tr>
-                    <td><strong>Hand 4</strong></td>
-                    <td>3 Triples</td>
-                    <td>3</td>
-                </tr>
-                <tr>
-                    <td><strong>Hand 5</strong></td>
-                    <td>2 Triples + 1 Ladder</td>
-                    <td>3</td>
-                </tr>
-                <tr>
-                    <td><strong>Hand 6</strong></td>
-                    <td>1 Triple + 2 Ladders</td>
-                    <td>3</td>
-                </tr>
-                <tr>
-                    <td><strong>Hand 7</strong></td>
-                    <td>3 Ladders</td>
-                    <td>2 (⚠️ Only 2 buys!)</td>
-                </tr>
-            </table>
-
-            <h3>Gameplay Flow</h3>
-            <p>The online game simulates a Bridge or Poker table setup:</p>
-            <ul style="color: #cbd5e1; line-height: 1.8; margin-left: 20px;">
-                <li><strong>Habot</strong> sits to your left (aggressive "Rabbit" style)</li>
-                <li><strong>Jabot</strong> sits to your right (patient "Tortoise" style)</li>
-                <li>Play proceeds clockwise</li>
-                <li>First player determined by draw (highest card starts, like Bridge)</li>
-            </ul>
-
-            <h3>Each Turn</h3>
-            <ol style="color: #cbd5e1; line-height: 1.8; margin-left: 20px;">
-                <li>Draw a card from either the discard pile (face-up) or the deck</li>
-                <li>Use tools to sort your cards or arrange them manually</li>
-                <li>Publish sequences if you meet the hand requirements (optional)</li>
-                <li>Extend your own or opponents' published sequences (if you've published)</li>
-                <li>Discard one card to end your turn</li>
-            </ol>
-
-            <h3>Buy Window</h3>
-            <p>
-                When a player discards, the next player in turn has first chance at it. If they don't take it, 
-                other players get a 5-second buy window to take the discarded card. Taking a card this way is called a 
-                <strong>"Buy"</strong> and comes with a penalty: you must also draw an additional card from the deck.
-            </p>
-
-            <h3>Publishing</h3>
-            <p>
-                When you have the required sequences for the current hand, the Publish button enables. You can choose to publish 
-                immediately or delay to accumulate extension cards. Once any player publishes, they gain the right to extend 
-                sequences on subsequent turns.
-            </p>
-
-            <h3>Extending Sequences</h3>
-            <p>
-                After publishing, you can extend your own sequences or any opponent's published sequences. This is how players 
-                rapidly reduce their hand size. You cannot extend sequences in the same turn you publish them.
-            </p>
-
-            <h3>Winning</h3>
-            <p>
-                The first player to discard their last card wins the hand and scores zero points. All other players add up 
-                the value of their remaining cards as penalty points.
-            </p>
-        </div>
-
-        <!-- Terminology -->
-        <div class="rules-section" id="terminology">
-            <h2>📚 Basic Concepts & Terminology</h2>
-
-            <div class="term-box">
-                <div class="term-title">Triple</div>
-                <p>3 cards sharing the same rank. Example: 3♦ 3♥ 3♣</p>
+    <div class="aob-shell">
+        <header class="aob-nav">
+            <div class="aob-nav-title">
+                <div class="aob-nav-logo">AGE OF BOTS GAMES</div>
+                <div class="aob-nav-sub">Habib Punja · Strategic Card Game</div>
             </div>
+            <nav class="aob-nav-links">
+                <a class="aob-nav-link" href="index.html">Home</a>
+                <a class="aob-nav-link" href="habib_punja_v4_5_10_BETA.html">Play Game</a>
+                <a class="aob-nav-link" href="characters.html">Characters</a>
+                <a class="aob-nav-link" href="strategic-guide.html">Strategy Guide</a>
+                <a class="aob-nav-link aob-nav-link--active" href="resources.html">Resources</a>
+                <a class="aob-nav-link" href="source-selection-criteria.html">Source Criteria</a>
+                <a class="aob-nav-link" href="contact.html">Contact</a>
+            </nav>
+        </header>
 
-            <div class="term-box">
-                <div class="term-title">Ladder</div>
-                <p>4 cards in sequence, sharing the same suit. Ace can be used as either low or high, but not both in the same sequence.</p>
-                <p>Examples: 6♠ 7♠ 8♠ 9♠  |  A♥ 2♥ 3♥ 4♥  |  J♣ Q♣ K♣ A♣</p>
-            </div>
-
-            <div class="term-box">
-                <div class="term-title">Lower Limit</div>
-                <p>The lowest point below which a ladder cannot be extended. Example: A♥ 2♥ 3♥ 4♥ can only be extended with 5♥ (higher direction).</p>
-            </div>
-
-            <div class="term-box">
-                <div class="term-title">Higher Limit</div>
-                <p>The highest point above which a ladder cannot be extended. Example: A♣ K♣ Q♣ J♣ can only be extended with 10♣ (lower direction).</p>
-            </div>
-
-            <div class="term-box">
-                <div class="term-title">Deck</div>
-                <p>The shuffled deck (face-down) from which cards are drawn. If the deck runs out, the discard pile is shuffled and becomes the new deck.</p>
-            </div>
-
-            <div class="term-box">
-                <div class="term-title">Discard Pile</div>
-                <p>The pile of face-up discarded cards. After drawing, a player must discard one card to end their turn. You can select from the discard pile and discard the same card again in the same turn.</p>
-            </div>
-
-            <div class="term-box">
-                <div class="term-title">Buys</div>
-                <p>When a player discards and the next player doesn't take it, other players can "buy" the card during a 5-second window. Maximum 3 buys for Hands 1-6, only 2 buys for Hand 7.</p>
-            </div>
-
-            <div class="term-box">
-                <div class="term-title">Penalty</div>
-                <p>When buying a discarded card out of turn, you must draw an additional card from the deck. This reveals information to opponents about what you're collecting.</p>
-            </div>
-
-            <div class="term-box">
-                <div class="term-title">Ranking</div>
-                <p>Low to high: A, 2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K, A (high). An Ace cannot be part of a ladder that wraps (K-A-2 is invalid).</p>
-            </div>
-
-            <div class="term-box">
-                <div class="term-title">Card Values</div>
+        <main>
+            <!-- Intro / framing -->
+            <section class="aob-panel">
+                <div class="aob-panel-title">MuBot’s Curated Library</div>
+                <div class="aob-panel-sub">Strategy · Habits · Decision-Making</div>
                 <p>
-                    Cards 2-10: Face value<br>
-                    J, Q, K: 15 points each<br>
-                    Ace: 20 points<br>
-                    <strong>Tip:</strong> Avoid holding high cards when opponents are close to winning!
+                    These resources were selected to align with the principles described on the
+                    <a href="source-selection-criteria.html">Source Selection Criteria</a> page:
+                    <strong>strategy, critical thinking, habit formation, and decision-making under uncertainty.</strong>
                 </p>
-            </div>
-        </div>
+                <p class="aob-tagline">
+                    Think of this as a reading room where MuBot points you toward ideas that sharpen your play,
+                    not just your score.
+                </p>
+                <p class="aob-note">
+                    All links below go to public, widely accessible resources (articles, essays, talks, or
+                    book home pages). If any become unavailable, replacements may be added over time.
+                </p>
+            </section>
 
-        <!-- Difficulty & Ease -->
-        <div class="rules-section">
-            <h2>⚖️ Difficulty & Ease of Play</h2>
-            
-            <h3>Difficulty Factors</h3>
-            <ul style="color: #cbd5e1; line-height: 1.8; margin-left: 20px;">
-                <li>No Jokers to act as wild cards</li>
-                <li>Observing discarded and bought cards gives strategic information</li>
-                <li>Publishing timing creates strategic tension (publish early vs. accumulate extensions)</li>
-                <li>Hand 7 only allows 2 buys - one must be used to get 12 cards needed for 3 ladders</li>
-            </ul>
-
-            <h3>Ease of Play Features</h3>
-            <ul style="color: #cbd5e1; line-height: 1.8; margin-left: 20px;">
-                <li>Sort tools quickly organize your cards</li>
-                <li>Visual indicators show available triples and ladders</li>
-                <li>Clear publishing and extension interfaces</li>
-                <li>Can discard the same card you just picked from the discard pile</li>
-                <li>Game distinguishes between multiple ladders of the same suit</li>
-            </ul>
-        </div>
-
-        <!-- External Resources -->
-        <div class="rules-section" id="external">
-            <h2>🌐 External Strategic Resources</h2>
-            <p>
-                Enhance your strategic thinking with curated external resources. We carefully select high-quality, 
-                accessible sources that help players develop the strategic mindset needed to excel at Habib Punja.
-            </p>
-
-            <div class="resource-grid">
-                <div class="resource-card">
-                    <h3>📖 Source Selection Criteria</h3>
-                    <p>Learn how we choose strategic resources - credibility, relevance, practicality, and accessibility.</p>
-                    <a href="source-selection-criteria.html">View Our Criteria →</a>
+            <!-- Strategic Thinking & Game Theory -->
+            <section class="aob-panel">
+                <div class="aob-pill">
+                    <span>♟</span><span>Strategic Thinking &amp; Game Theory</span>
                 </div>
-                
-                <div class="resource-card">
-                    <h3>🎯 Strategic Guide</h3>
-                    <p>Master advanced publishing strategies, buy window decisions, and hand-by-hand tactical advice.</p>
-                    <a href="strategic-guide.html">Read Strategy Guide →</a>
-                </div>
-                
-                <div class="resource-card">
-                    <h3>🤖 AI Opponents</h3>
-                    <p>Understand Habot's aggressive style and Jabot's patient approach to improve your gameplay.</p>
-                    <a href="characters.html">Meet the Characters →</a>
-                </div>
-            </div>
-        </div>
+                <p>
+                    These sources deepen your ability to think in terms of opponents, incentives, and multi-stage
+                    games—exactly the mindset needed for a 7-hand war.
+                </p>
+                <ul class="aob-resource-list">
+                    <li>
+                        <a href="https://fs.blog/mental-models/" target="_blank" rel="noopener">
+                            Farnam Street – Mental Models &amp; Decision Making
+                        </a>
+                        <div class="aob-resource-meta">
+                            A practical gateway into game theory, probability, and strategic thinking frameworks
+                            you can apply directly at the table.
+                        </div>
+                    </li>
+                    <li>
+                        <a href="https://en.wikipedia.org/wiki/Game_theory" target="_blank" rel="noopener">
+                            Overview of Game Theory (Concept Primer)
+                        </a>
+                        <div class="aob-resource-meta">
+                            A foundational map of how mathematicians and economists think about strategy, payoffs,
+                            and anticipating others.
+                        </div>
+                    </li>
+                </ul>
+            </section>
 
-        <!-- Call to Action -->
-        <div style="text-align: center; margin: 50px 0;">
-            <h2>Ready to Play?</h2>
-            <p style="margin: 20px 0;">Put these rules into practice and test your strategic skills!</p>
-            <a href="production/habib_punja_v4_5_10_BETA.html" class="cta-button">🎮 Play Habib Punja Now</a>
-            <a href="strategic-guide.html" class="cta-button" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">📚 View Strategy Guide</a>
-        </div>
+            <!-- Habits, Consistency & Small Wins -->
+            <section class="aob-panel">
+                <div class="aob-pill">
+                    <span>🔁</span><span>Habits, Consistency &amp; Small Wins</span>
+                </div>
+                <p>
+                    Habib Punja isn’t just about winning one hand—it’s about minimizing nukes, stacking edges,
+                    and letting consistency compound over 7 hands.
+                </p>
+                <ul class="aob-resource-list">
+                    <li>
+                        <a href="https://jamesclear.com" target="_blank" rel="noopener">
+                            James Clear – Atomic Habits &amp; Systems Thinking
+                        </a>
+                        <div class="aob-resource-meta">
+                            Clear, practical writing on habits and systems—how small, repeatable behaviors
+                            outperform one heroic effort.
+                        </div>
+                    </li>
+                    <li>
+                        <a href="https://www.youtube.com/results?search_query=atomic+habits+james+clear+talk" target="_blank" rel="noopener">
+                            Talks on Atomic Habits (Video)
+                        </a>
+                        <div class="aob-resource-meta">
+                            Short talks that reinforce the idea that sustainable habits beat one-time bursts of willpower—
+                            just like consistent small losses beat one catastrophic nuke.
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Decision-Making Under Uncertainty -->
+            <section class="aob-panel">
+                <div class="aob-pill">
+                    <span>🎲</span><span>Decisions, Bets &amp; Uncertainty</span>
+                </div>
+                <p>
+                    These resources help you separate decision quality from outcome luck—critical when you can
+                    play perfectly and still lose a hand.
+                </p>
+                <ul class="aob-resource-list">
+                    <li>
+                        <a href="https://www.annieduke.com" target="_blank" rel="noopener">
+                            Annie Duke – Thinking in Bets (Site &amp; Resources)
+                        </a>
+                        <div class="aob-resource-meta">
+                            A former professional poker player on how to make better decisions when you don’t have
+                            all the information—and why “good decision, bad outcome” still counts.
+                        </div>
+                    </li>
+                    <li>
+                        <a href="https://fs.blog/probabilistic-thinking/" target="_blank" rel="noopener">
+                            Probabilistic Thinking – Farnam Street
+                        </a>
+                        <div class="aob-resource-meta">
+                            A practical introduction to thinking in probabilities instead of certainties—directly
+                            applicable to card distributions and risk management.
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Cognitive Biases & Pattern Recognition -->
+            <section class="aob-panel">
+                <div class="aob-pill">
+                    <span>🧠</span><span>Cognitive Biases &amp; Pattern Recognition</span>
+                </div>
+                <p>
+                    To win the 7-hand war, you must see your own blind spots as clearly as your opponent’s tendencies.
+                </p>
+                <ul class="aob-resource-list">
+                    <li>
+                        <a href="https://www.khanacademy.org/test-prep/praxis-math/praxis-math-lessons/gtp/v/biases" target="_blank" rel="noopener">
+                            Introductory Material on Cognitive Biases
+                        </a>
+                        <div class="aob-resource-meta">
+                            Gentle introductions to how our brains systematically misjudge risk, probability,
+                            and patterns.
+                        </div>
+                    </li>
+                    <li>
+                        <a href="https://waitbutwhy.com" target="_blank" rel="noopener">
+                            Wait But Why – Long-Form Thinking Pieces
+                        </a>
+                        <div class="aob-resource-meta">
+                            Deep, visual essays that train long-horizon thinking and pattern recognition across complex systems.
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Human–AI Co-Learning & Philosophy -->
+            <section class="aob-panel">
+                <div class="aob-pill">
+                    <span>🌸</span><span>Human–AI Co-Learning</span>
+                </div>
+                <p>
+                    These are not required to enjoy the game—but if you’re curious about the deeper question
+                    of how humans and AI minds might learn together, they’re a good starting point.
+                </p>
+                <ul class="aob-resource-list">
+                    <li>
+                        <a href="https://openai.com/research" target="_blank" rel="noopener">
+                            OpenAI Research &amp; Reflections
+                        </a>
+                        <div class="aob-resource-meta">
+                            A window into how modern AI systems are built, evaluated, and aligned with human goals.
+                        </div>
+                    </li>
+                    <li>
+                        <a href="https://www.edge.org" target="_blank" rel="noopener">
+                            Edge.org – Conversations on Mind &amp; Intelligence
+                        </a>
+                        <div class="aob-resource-meta">
+                            Long-running conversations with scientists and thinkers on cognition, complexity,
+                            and the future of intelligence.
+                        </div>
+                    </li>
+                </ul>
+                <p class="aob-note">
+                    This section hints at where AgeOfBotsStudios may eventually go: beyond static games, toward
+                    shared systems where human and AI strategies evolve together.
+                </p>
+            </section>
+
+            <!-- Closing note -->
+            <section class="aob-panel">
+                <h2>Suggest a Resource</h2>
+                <p>
+                    If you discover a resource you believe belongs here—something that genuinely sharpens strategy,
+                    improves decision-making, or deepens the philosophy of play—you’re welcome to share it via the
+                    <a href="contact.html">Contact</a> page.
+                </p>
+                <p class="aob-note">
+                    MuBot will review it for alignment with the
+                    <a href="source-selection-criteria.html">Source Selection Criteria</a> and how well it supports
+                    the spirit of the Habib Punja 7-hand war.
+                </p>
+            </section>
+        </main>
+
+        <footer class="aob-footer">
+            <div><strong>AgeOfBotsGames.com</strong> · Face off against evolving AI minds in a strategic 7-hand war.</div>
+            <div>Habib Punja Public Beta · Habot · Jabot · MuBot · Joko</div>
+        </footer>
     </div>
-
-    <footer style="text-align: center; padding: 40px 20px; margin-top: 80px; background: rgba(0,0,0,0.3); color: #888;">
-        <p><strong style="color: #ffd700;">AgeOfBotsGames LLC</strong> | A Division of AgeOfBotsStudios</p>
-        <p>© 2025 AgeOfBotsGames LLC. All Rights Reserved.</p>
-        <p style="margin-top: 15px; font-size: 14px;">
-            Habib Punja is a Liverpool Rummy variant originating from the Ismaili Khoja community in East Africa
-        </p>
-    </footer>
 </body>
 </html>
