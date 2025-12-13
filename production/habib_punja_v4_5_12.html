@@ -720,56 +720,6 @@
     <meta property="twitter:description" content="Challenge AI opponents in this strategic Liverpool Rummy variant. Can you outsmart Habot and Jabot?">
     <style>
         /* [Previous CSS remains exactly the same - keeping it brief for space] */
-
-        /* --- NEW: Full Portrait Scaling (Risk-Style Fit) --- */
-
-        /* --- NEW: AI Collapse Styles --- */
-        .ai-header {
-            cursor: pointer;
-            padding: 8px 10px;
-            background-color: var(--aob-bg-soft);
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-            user-select: none; /* Prevent text selection on click */
-        }
-
-        .ai-indicator {
-            font-weight: bold;
-            color: var(--aob-gold);
-        }
-
-        .collapse-icon {
-            transition: transform 0.3s ease;
-        }
-
-        /* State: Collapsed (Hides content and rotates icon) */
-        .ai-content.collapsed {
-            max-height: 0;
-            overflow: hidden;
-            opacity: 0;
-            padding: 0 10px; /* Remove padding when hidden */
-            transition: max-height 0.4s ease-out, opacity 0.4s ease-out;
-        }
-
-        /* State: Expanded */
-        .ai-content {
-            max-height: 500px; /* Large value to accommodate content */
-            opacity: 1;
-            transition: max-height 0.4s ease-in, opacity 0.4s ease-in;
-        }
-
-        /* Icon Rotation */
-        .ai-header[data-expanded="true"] .collapse-icon {
-            transform: rotate(180deg);
-        }
-
-        .ai-header[data-expanded="false"] .collapse-icon {
-            transform: rotate(0deg);
-        }
-
         :root {
             --bg-1: #0b1b13;
             --bg-2: #0f2a1c;
@@ -791,21 +741,16 @@
             box-sizing: border-box
         }
 
+        html, body {
+            height: 100%
+        }
 
         body {
-            /* Safe Reset */
-            margin: 0;
-            padding: 24px; /* RESTORES YOUR DESKTOP PADDING (24px) */
-            /* Existing Styles */
             font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,'Helvetica Neue',Arial,'Noto Sans',sans-serif;
             background: radial-gradient(1200px 800px at 30% -10%,#154d34 0%,transparent 60%),radial-gradient(1400px 900px at 120% 10%,#0b3d28 0%,transparent 55%),linear-gradient(180deg,var(--bg-1),var(--bg-2));
             color: #fff;
-            min-height: 100vh; /* Keep for full-page background */
-            /* NEW: Display Flex for better vertical centering/management on desktop */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* REMOVED: height: 100vh; and overflow: hidden; */
+            min-height: 100vh;
+            padding: 24px
         }
 
         .game-container {
@@ -1836,161 +1781,6 @@
                 margin: 0 auto;
             }
 
-        /* ========================================================================= */
-        /* --- NEW: RESPONSIVE LAYOUT BASE (MOBILE / YOUTUBE PLAYABLES) --- */
-        /* (Default Styles: Portrait < 800px) */
-        /* ========================================================================= */
-
-        /* Mobile-First: Stack all game elements vertically */
-        #gameContainer {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            max-width: 600px; /* Mobile constraint */
-            margin: 0 auto;
-            padding: 10px;
-        }
-
-        /* AI areas are full width, stacked near the top */
-        .opponent-area {
-            width: 95%;
-            margin: 5px auto;
-            order: 2; /* Put AI areas near the top */
-            /* Ensure only score/info is visible, not card art */
-        }
-
-            /* Condense the AI hands to save vertical space on mobile */
-            .opponent-area .hand-cards {
-                display: none; /* Hide the actual card visuals on mobile */
-            }
-
-        /* Central Deck/Discard/Messages Area */
-        .central-game-area {
-            width: 95%;
-            order: 1; /* Place at the top */
-        }
-
-        .deck-discard-container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-
-        /* Player area goes to the bottom */
-        .player-area-center {
-            width: 95%;
-            order: 4; /* Force player area to the bottom */
-            margin-top: 15px;
-        }
-
-            /* Player Hand: Aggressive overlap for small screens (Mobile/Playables) */
-            .player-area-center .hand-cards {
-                /* Use dynamic sizing for cards based on viewport width (vw) */
-                --card-mobile-width: 15vw;
-                --card-mobile-overlap: 5vw;
-                width: 100%;
-                overflow-x: scroll; /* Allow horizontal scrolling for large hands */
-                white-space: nowrap;
-                padding-bottom: 5px;
-                /* Apply aggressive overlap using negative margins */
-                .card
-
-        {
-            width: var(--card-mobile-width);
-            margin-right: calc(-1 * var(--card-mobile-overlap));
-        }
-
-        }
-
-
-        /* ========================================================================= */
-        /* --- NEW: RESPONSIVE OVERRIDE (TABLET / TESLA LANDSCAPE) --- */
-        /* (Activates for screens >= 800px wide, landscape orientation) */
-        /* ========================================================================= */
-
-        @media (min-width: 800px) and (orientation: landscape) {
-
-            /* Revert to the original, spread-out layout using CSS Grid */
-            #gameContainer {
-                display: grid;
-                grid-template-areas:
-                    "opponent-left central-game-area opponent-right"
-                    "player-area-center player-area-center player-area-center";
-                grid-template-columns: 1fr 2.5fr 1fr; /* Central board is wider */
-                grid-template-rows: auto 1fr; /* AI and center on top row, player on bottom */
-                max-width: 1200px; /* Set a max width for large screens */
-                padding: 20px;
-            }
-
-            /* Assign Grid Areas */
-            .opponent-left {
-                grid-area: opponent-left;
-                order: initial; /* Reset order */
-                width: auto;
-            }
-
-            .opponent-right {
-                grid-area: opponent-right;
-                order: initial; /* Reset order */
-                width: auto;
-            }
-
-            .central-game-area {
-                grid-area: central-game-area;
-                order: initial; /* Reset order */
-            }
-
-            .player-area-center {
-                grid-area: player-area-center;
-                order: initial; /* Reset order */
-                margin-top: 25px; /* Add some separation */
-            }
-
-            /* Show AI hands again (assuming they are small card backs) */
-            .opponent-area .hand-cards {
-                display: flex;
-            }
-
-            /* Reset Player Hand for larger screens */
-            .player-area-center .hand-cards {
-                overflow-x: hidden; /* No scrolling */
-                white-space: normal;
-                /* Less aggressive card overlap */
-                .card
-
-        {
-            width: 80px; /* Fixed card width for desktop */
-            margin-right: -15px;
-        }
-
-        }
-        }
-
-        /* --- NEW: Targeted Mobile/Portrait Overrides (iPhone Fix) --- */
-        @media only screen and (max-width: 768px) and (orientation: portrait) {
-            body {
-                /* CRITICAL: Remove all padding for maximum space */
-                padding: 0;
-                /* Ensure the body itself doesn't scroll */
-                overflow-y: hidden;
-                overflow-x: hidden;
-                /* Force content to top/start for better mobile layout */
-                align-items: flex-start;
-            }
-
-            /* Target the main game wrapper using your class selector */
-            .game-container {
-                /* CRITICAL: Force the entire game content to shrink to fit the viewable height */
-                max-height: 100vh;
-                width: 100vw;
-                overflow: hidden; /* Ensure content inside the wrapper doesn't cause overflow */
-                /* Use flex to allow the internal components (header, board, hand) to share the space */
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start; /* Start content from the top */
-            }
-        }
 
     </style>
 </head>
@@ -2009,34 +1799,28 @@
         <!-- 🎨 v4.0.7: ROUND TABLE LAYOUT - Top Row (AI Opponents)     -->
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="round-table-top">
-
-
             <!-- Left: Habot (The Rabbit) -->
-
-            <div id="habot-area" class="opponent-area opponent-left" style="--player-color: #e74c3c;">
-                <div class="ai-header" onclick="toggleAIArea('habot-area')" data-expanded="false">
+            <div class="opponent-area opponent-left" style="--player-color: #e74c3c;">
+                <div class="opponent-header">
                     <div class="player-name">🐇 Habot</div>
-                    <div class="card-count-badge">Cards: <span id="player2Count">10</span></div>
-                    <div id="habot-indicator" class="ai-indicator">0 Points</div> <span class="collapse-icon">▼</span>
-                </div>
-
-                <div class="ai-content collapsed">
                     <div class="buy-info">Buys: <span id="player2Buys">3</span></div>
-
-                    <div class="opponent-published" id="player2Published">
-                        <div class="published-header">Published:</div>
-                        <div class="published-cards" id="player2CardsPublished"></div>
-                    </div>
-
-                    <div class="opponent-cards-visible" id="player2Cards"></div>
-
-                    <div class="ai-status-compact" id="habot-status">
-                        <div class="ai-status-action" id="habot-action">Waiting...</div>
-                    </div>
+                    <div class="card-count-badge">Cards: <span id="player2Count">10</span></div>
+                </div>
+                
+                <!-- Habot's Published Sequences (above their cards) -->
+                <div class="opponent-published" id="player2Published">
+                    <div class="published-header">Published:</div>
+                    <div class="published-cards" id="player2CardsPublished"></div>
+                </div>
+                
+                <!-- Habot's Visible Cards (last 3) -->
+                <div class="opponent-cards-visible" id="player2Cards"></div>
+                
+                <!-- Habot's Status -->
+                <div class="ai-status-compact" id="habot-status">
+                    <div class="ai-status-action" id="habot-action">Waiting...</div>
                 </div>
             </div>
-
-
             
             <!-- Center Top: Deck & Discard -->
             <div class="center-table-area">
@@ -2047,31 +1831,27 @@
             </div>
             
             <!-- Right: Jabot (The Tortoise) -->
-
-            <div id="jabot-area" class="opponent-area opponent-right" style="--player-color: #3498db;">
-                <div class="ai-header" onclick="toggleAIArea('jabot-area')" data-expanded="false">
+            <div class="opponent-area opponent-right" style="--player-color: #9b59b6;">
+                <div class="opponent-header">
                     <div class="player-name">🐢 Jabot</div>
-                    <div class="card-count-badge">Cards: <span id="player3Count">10</span></div>
-                    <div id="jabot-indicator" class="ai-indicator">0 Points</div> <span class="collapse-icon">▼</span>
-                </div>
-
-                <div class="ai-content collapsed">
                     <div class="buy-info">Buys: <span id="player3Buys">3</span></div>
-
-                    <div class="opponent-published" id="player3Published">
-                        <div class="published-header">Published:</div>
-                        <div class="published-cards" id="player3CardsPublished"></div>
-                    </div>
-
-                    <div class="opponent-cards-visible" id="player3Cards"></div>
-
-                    <div class="ai-status-compact" id="jabot-status">
-                        <div class="ai-status-action" id="jabot-action">Waiting...</div>
-                    </div>
+                    <div class="card-count-badge">Cards: <span id="player3Count">10</span></div>
+                </div>
+                
+                <!-- Jabot's Published Sequences (above their cards) -->
+                <div class="opponent-published" id="player3Published">
+                    <div class="published-header">Published:</div>
+                    <div class="published-cards" id="player3CardsPublished"></div>
+                </div>
+                
+                <!-- Jabot's Visible Cards (last 3) -->
+                <div class="opponent-cards-visible" id="player3Cards"></div>
+                
+                <!-- Jabot's Status -->
+                <div class="ai-status-compact" id="jabot-status">
+                    <div class="ai-status-action" id="jabot-action">Waiting...</div>
                 </div>
             </div>
-
-
         </div>
         
         <!-- ═══════════════════════════════════════════════════════════ -->
@@ -5608,24 +5388,6 @@
 
                         if (publishSuccess) {
                             this.aiJustPublished[ai] = true;
-
-                            // -----------------------------------------------------------------
-                            // --- NEW INSERTION: Auto-Expand AI Area after NEW sequence publish ---
-                            // -----------------------------------------------------------------
-                            if (ai === 1 || ai === 2) {
-                                const aiId = ai === 1 ? 'habot-area' : 'jabot-area';
-                                const area = document.getElementById(aiId);
-
-                                if (area) {
-                                    const content = area.querySelector('.ai-content');
-                                    // Only expand if it is currently collapsed
-                                    if (content.classList.contains('collapsed')) {
-                                        // NOTE: We assume toggleAIArea is globally available
-                                        toggleAIArea(aiId);
-                                    }
-                                }
-                            }
-
                             this.setAIStatus(statusId, `Published!`);
                             console.log(`%c  ✅ ${aiName} PUBLISHED successfully!`, 'color: #28a745; font-weight: bold;');
                             console.log(`     Published sequences:`, this.publishedSequences[ai]);
@@ -7033,22 +6795,7 @@
             // Only one option available - use executeAddToPublished
             const forceType = canExtendTriple ? 'triple' : 'ladder';
             game.executeAddToPublished(card, playerIdx, cardIdx, forceType);
-
-            // --- NEW: Auto-Expand AI Area if human extended their sequence ---
-            // playerIdx 1 = Habot, playerIdx 2 = Jabot
-            if (playerIdx === 1 || playerIdx === 2) {
-                const aiId = playerIdx === 1 ? 'habot-area' : 'jabot-area';
-                const content = document.getElementById(aiId).querySelector('.ai-content');
-
-                // Only toggle if it is currently collapsed to avoid unnecessary flicker
-                if (content.classList.contains('collapsed')) {
-                    // NOTE: The toggleAIArea function will handle the expansion animation
-                    toggleAIArea(aiId);
-                }
-            }
-            // -----------------------------------------------------------------
-        } // End of function
-
+        }
         //Nash: newGame
         // ============================================
         // EVENT LISTENERS (v4.1.1 - CSP Compliance)
@@ -7625,24 +7372,6 @@
             );
         }
 
-        // --- JAVASCRIPT: AI AREA TOGGLE FUNCTION ---
-        function toggleAIArea(areaId) {
-            const area = document.getElementById(areaId);
-            if (!area) return; // Safety check
-
-            const content = area.querySelector('.ai-content');
-            const header = area.querySelector('.ai-header');
-
-            const isCollapsed = content.classList.contains('collapsed');
-
-            if (isCollapsed) {
-                content.classList.remove('collapsed');
-                header.setAttribute('data-expanded', 'true');
-            } else {
-                content.classList.add('collapsed');
-                header.setAttribute('data-expanded', 'false');
-            }
-        }
 
     </script>
 </body>
