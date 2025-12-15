@@ -697,17 +697,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.5.12 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.5.12 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.5.14 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.5.14 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description"
         content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords"
         content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
-    <meta name="version" content="4.5.12">
+    <meta name="version" content="4.5.14">
     <meta name="copyright" content="Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.">
 
     <!-- Open Graph / Facebook -->
@@ -763,29 +763,56 @@
             margin: 0 auto
         }
 
-        .game-header {
-            text-align: center;
-            margin-bottom: 18px
+        /* 🎯 v4.5.14: Compact header - replaces old game-header and game-info */
+        .compact-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, rgba(255, 215, 0, .12), rgba(255, 255, 255, .04));
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 215, 0, .25);
+            box-shadow: var(--elev);
+            margin-bottom: 10px;
+            gap: 8px;
         }
 
-        .game-header h1 {
-            font-size: clamp(1.6rem, 3vw, 2.4rem);
+        .game-title {
+            font-size: 1rem;
+            font-weight: 900;
             color: var(--gold);
-            letter-spacing: .5px;
-            text-shadow: 0 1px 0 #000, 0 0 24px rgba(255, 213, 74, .25)
+            text-shadow: 0 1px 0 #000;
+            white-space: nowrap;
+        }
+
+        .hand-info {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--gold-2);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+
+        .turn-indicator {
+            padding: 6px 12px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: #052e1a;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, .35);
+            box-shadow: var(--ring);
+            white-space: nowrap;
+        }
+
+        /* Old styles kept for compatibility but hidden */
+        .game-header {
+            display: none;
         }
 
         .game-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-            justify-content: space-between;
-            background: linear-gradient(135deg, rgba(255, 215, 0, .10), rgba(255, 255, 255, .04));
-            padding: 16px 18px;
-            border-radius: var(--radius);
-            border: 1px solid rgba(255, 215, 0, .25);
-            box-shadow: var(--elev)
+            display: none;
         }
 
         .current-hand {
@@ -801,16 +828,6 @@
 
         .requirements.ready {
             color: var(--accent)
-        }
-
-        .turn-indicator {
-            padding: 8px 14px;
-            background: linear-gradient(180deg, var(--accent), var(--accent-2));
-            border-radius: 999px;
-            font-weight: 800;
-            color: #052e1a;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, .35);
-            box-shadow: var(--ring)
         }
 
         .leaderboard {
@@ -1127,20 +1144,25 @@
             border-color: var(--gold);
         }
 
+        /* 🎯 v4.5.14: Hide YOUR PUBLISHED section until player publishes */
         .your-published {
-            margin-bottom: 16px;
-            padding: 12px;
+            margin-bottom: 12px;
+            padding: 10px;
             background: rgba(0, 0, 0, .25);
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, .1);
-            min-height: 60px;
+            display: none; /* Hidden by default */
+        }
+
+        .your-published.has-cards {
+            display: block; /* Show when player has published */
         }
 
         .your-published .published-header {
-            font-size: .9rem;
+            font-size: .85rem;
             font-weight: 700;
             color: var(--gold);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: .5px;
         }
@@ -1789,20 +1811,7 @@
             pointer-events: none
         }
 
-        .fix-badge {
-            position: fixed;
-            top: 80px;
-            right: 16px;
-            background: linear-gradient(135deg, #ff6b35, #f7931e);
-            color: #fff;
-            font-weight: 900;
-            padding: 12px 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            z-index: 9998;
-            font-size: 0.9rem;
-            border: 2px solid rgba(255, 255, 255, 0.3)
-        }
+        /* fix-badge removed in v4.5.14 - game title now in compact header */
 
         /* Paste the entire contents of your local aob_shared.css here */
 
@@ -1907,35 +1916,38 @@
         /* --- CRITICAL FIX: Targeted Mobile/Portrait Overrides (Screen Fit & Collapse) --- */
         @media only screen and (max-width: 768px) and (orientation: portrait) {
 
-            /* 1. Body: The only rules needed to get full screen on mobile */
+            /* 1. Body: Allow scrolling on mobile - fix for Chrome iOS */
             body {
                 padding: 0 !important;
-                /* Force body to take full viewport height */
-                height: 100vh !important;
-                /* Allow scrolling ONLY if .game-container overflows, which it shouldn't */
-                overflow-y: hidden !important;
+                /* Use dvh (dynamic viewport height) for mobile browser chrome */
+                min-height: 100vh !important;
+                min-height: 100dvh !important; /* Modern browsers */
+                height: auto !important;
+                /* ALLOW scrolling on body for mobile */
+                overflow-y: auto !important;
                 overflow-x: hidden !important;
+                /* iOS safe area padding */
+                padding-bottom: env(safe-area-inset-bottom, 20px) !important;
             }
 
-            /* 2. Game Container: Force content to fit 100% of the space */
+            /* 2. Game Container: Allow natural height flow */
             .game-container {
-                max-height: 100vh !important;
+                min-height: 100vh !important;
+                min-height: 100dvh !important;
                 width: 100vw !important;
                 /* CRITICAL: Force Flexbox stacking and height control */
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: flex-start !important;
-                /* Allow the game container to scroll if internal elements overflow */
-                overflow-y: auto !important;
-                overflow-x: hidden !important;
+                /* Let body handle scrolling */
+                overflow: visible !important;
+                padding-bottom: 20px !important;
             }
 
-            /* 3. Central Board: CRITICAL: Tell the board to take all remaining space */
+            /* 3. Central Board: Natural height, no forced overflow */
             #game-board {
                 flex-grow: 1 !important;
-                /* Allow the board content itself to scroll */
-                overflow-y: auto !important;
-                overflow-x: hidden !important;
+                overflow: visible !important;
             }
 
             /* 4. Player's Hand Area: Prevent clipping of the cards */
@@ -1976,17 +1988,16 @@
 </head>
 
 <body>
-    <div class="fix-badge">✅ v4.5.13 Mobile</div>
     <div class="game-container">
-        <div class="game-header">
-            <h1>Habib Punja v4.5.12</h1>
-        </div>
-        <div class="game-info">
-            <div class="current-hand">Hand <span id="currentHand">1</span>: <span id="handRequirements">Two
-                    Triples</span></div>
-            <div class="requirements" id="detailedRequirements">Two Triples</div>
+        <!-- 🎯 v4.5.14: Compact header - single row with all essential info -->
+        <div class="compact-header">
+            <div class="game-title">🎴 Habib Punja</div>
+            <div class="hand-info">Hand <span id="currentHand">1</span>: <span id="handRequirements">2T</span></div>
             <div class="turn-indicator" id="turnIndicator">Your Turn</div>
         </div>
+        <!-- Hidden detailed requirements for JS compatibility -->
+        <div id="detailedRequirements" style="display:none;">Two Triples</div>
+        
         <!-- Old leaderboard hidden - scores now in center area -->
         <div class="leaderboard" style="display: none;">
             <div class="leaderboard-entries" id="leaderboardEntries"></div>
@@ -2258,16 +2269,7 @@
         console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #999;');
         console.log(' ');
 
-        // Update version badge if debug mode is active
-        if (DEBUG_MODE) {
-            setTimeout(() => {
-                const badge = document.querySelector('.fix-badge');
-                if (badge) {
-                    badge.innerHTML = '🐛 v4.5.12 DEBUG';
-                    badge.style.background = 'linear-gradient(135deg, #f44336, #e91e63)';
-                }
-            }, 100);
-        }
+        // 🎯 v4.5.14: Debug mode indicator removed (no longer using fix-badge)
 
         // Game state
         let deck = [];
@@ -2347,13 +2349,13 @@
                     cache: {}
                 };
                 this.handReqs = {
-                    1: { name: "Two Triples", seqs: ["triple", "triple"], cards: 10 },
-                    2: { name: "Triple + Ladder", seqs: ["triple", "ladder"], cards: 10 },
-                    3: { name: "Two Ladders", seqs: ["ladder", "ladder"], cards: 10 },
-                    4: { name: "Three Triples", seqs: ["triple", "triple", "triple"], cards: 10 },
-                    5: { name: "2 Triples + Ladder", seqs: ["triple", "triple", "ladder"], cards: 10 },
-                    6: { name: "Triple + 2 Ladders", seqs: ["triple", "ladder", "ladder"], cards: 10 },
-                    7: { name: "Three Ladders", seqs: ["ladder", "ladder", "ladder"], cards: 10 }
+                    1: { name: "Two Triples", short: "2T", seqs: ["triple", "triple"], cards: 10 },
+                    2: { name: "Triple + Ladder", short: "1T+1L", seqs: ["triple", "ladder"], cards: 10 },
+                    3: { name: "Two Ladders", short: "2L", seqs: ["ladder", "ladder"], cards: 10 },
+                    4: { name: "Three Triples", short: "3T", seqs: ["triple", "triple", "triple"], cards: 10 },
+                    5: { name: "2 Triples + Ladder", short: "2T+1L", seqs: ["triple", "triple", "ladder"], cards: 10 },
+                    6: { name: "Triple + 2 Ladders", short: "1T+2L", seqs: ["triple", "ladder", "ladder"], cards: 10 },
+                    7: { name: "Three Ladders", short: "3L", seqs: ["ladder", "ladder", "ladder"], cards: 10 }
                 };
                 this.initDeck(); this.deal(); this.updateUI();
 
@@ -6338,7 +6340,8 @@
             updateUI() {
                 const req = this.handReqs[this.currentHand];
                 document.getElementById('currentHand').textContent = this.currentHand;
-                document.getElementById('handRequirements').textContent = req.name;
+                // 🎯 v4.5.14: Use abbreviated name for compact header
+                document.getElementById('handRequirements').textContent = req.short || req.name;
                 const progress = this.getPublishProgress();
                 let progressParts = [];
                 if (progress.needTriples > 0) progressParts.push(`${progress.hasTriples}/${progress.needTriples} triples`);
@@ -6349,8 +6352,9 @@
                 reqEl.style.color = progress.canPublish ? '#28a745' : '#ffed4e';
                 if (progress.canPublish) reqEl.classList.add('ready');
                 else reqEl.classList.remove('ready');
-                const turnText = this.currentPlayer === 0 ? 'Your Turn' : this.currentPlayer === 1 ? "Habot's Turn" : "Jabot's Turn";
-                document.getElementById('turnIndicator').innerHTML = `${turnText} <span style="opacity:0.7;font-size:0.9em;">(Turn ${this.turnCounter})</span>`;
+                const turnText = this.currentPlayer === 0 ? 'Your Turn' : this.currentPlayer === 1 ? "Habot" : "Jabot";
+                // 🎯 v4.5.14: More compact turn indicator
+                document.getElementById('turnIndicator').textContent = turnText;
                 document.getElementById('playerBuys').textContent = this.playerBuys[0];
                 document.getElementById('player2Buys').textContent = this.playerBuys[1];
                 document.getElementById('player3Buys').textContent = this.playerBuys[2];
@@ -6576,6 +6580,16 @@
                     const containerId = p === 0 ? 'player1Cards' : `player${p + 1}CardsPublished`;
                     const container = document.getElementById(containerId);
                     container.innerHTML = '';
+
+                    // 🎯 v4.5.14: Toggle visibility of YOUR PUBLISHED section
+                    if (p === 0) {
+                        const publishedSection = document.getElementById('player1Published');
+                        if (this.publishedSequences[0] && this.publishedSequences[0].length > 0) {
+                            publishedSection.classList.add('has-cards');
+                        } else {
+                            publishedSection.classList.remove('has-cards');
+                        }
+                    }
 
                     // 🎯 v4.5.12: Render each sequence SEPARATELY with visual gaps
                     const sequences = this.publishedSequences[p];
