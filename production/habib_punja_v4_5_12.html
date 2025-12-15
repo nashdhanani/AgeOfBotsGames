@@ -737,8 +737,8 @@
             --muted: #cbd5e1;
             --ring: 0 0 0 2px rgba(255, 213, 74, .25), 0 10px 30px rgba(0, 0, 0, .35);
             --radius: 14px;
-            --card-w: 64px;
-            --card-h: 92px;
+            --card-w: 60px;
+            --card-h: 58px;
             --elev: 0 10px 25px rgba(0, 0, 0, .35)
         }
 
@@ -1577,20 +1577,18 @@
         .card {
             width: var(--card-w);
             height: var(--card-h);
-            border: 1px solid rgba(0, 0, 0, .2);
-            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, .25);
+            border-radius: 5px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
+            align-items: flex-start;
+            justify-content: flex-start;
             font-weight: 900;
-            cursor: move;
+            cursor: pointer;
             user-select: none;
             position: relative;
-            padding: 4px;
-            background: linear-gradient(180deg, #fbfbfb, #f0f0f0);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, .25);
+            padding: 6px 8px;
+            background: linear-gradient(180deg, #ffffff, #f8f8f8);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .18);
             transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease
         }
 
@@ -1598,58 +1596,59 @@
             content: '';
             position: absolute;
             inset: 0;
-            border-radius: 10px;
+            border-radius: 5px;
             pointer-events: none;
-            background: radial-gradient(800px 200px at 20% -10%, rgba(255, 255, 255, .8), transparent 60%);
-            opacity: .35
+            background: radial-gradient(600px 150px at 20% -10%, rgba(255, 255, 255, .7), transparent 60%);
+            opacity: .2
         }
 
         .card:hover {
-            transform: translateY(-8px) rotate(-.4deg);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, .35)
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .25)
         }
 
         .card.dragging {
             opacity: .7;
-            transform: rotate(3deg) scale(1.05)
+            transform: rotate(2deg) scale(1.05)
         }
 
         .card.drag-over {
-            border-left: 4px solid var(--accent)
+            border-left: 3px solid var(--accent)
         }
 
         .card.red {
-            color: #db1f2f
+            color: #dc2626
         }
 
         .card.black {
-            color: #0f172a
+            color: #1e293b
         }
 
         .card.red.heart {
-            color: #e31c23
+            color: #dc2626
         }
 
         .card.red.diamond {
-            color: #ff6b35
+            color: #ea580c
         }
 
         .card.selected {
             outline: 3px solid var(--gold);
             outline-offset: 0;
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 14px 34px rgba(255, 213, 74, .45)
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 10px 24px rgba(255, 213, 74, .4)
+        }
+
+        /* 🎯 v4.5.14: Compact card - suit and rank inline */
+        .card-suit {
+            font-size: 18px;
+            line-height: 1;
+            margin-right: 2px;
         }
 
         .card-rank {
-            font-size: 17px;
+            font-size: 22px;
             line-height: 1;
-            margin-bottom: 2px
-        }
-
-        .card-suit {
-            font-size: 30px;
-            line-height: 1
         }
 
         .btn {
@@ -6546,7 +6545,7 @@
                     if (card.suit === '♥') el.classList.add('heart');
                     if (card.suit === '♦') el.classList.add('diamond');
                     if (this.selectedCards.includes(i)) el.classList.add('selected');
-                    el.innerHTML = `<div class="card-rank">${card.rank}</div><div class="card-suit">${card.suit}</div>`;
+                    el.innerHTML = `<div class="card-suit">${card.suit}</div><div class="card-rank">${card.rank}</div>`;
                     el.draggable = true;
                     el.dataset.index = i;
                     el.onclick = () => {
@@ -6667,7 +6666,7 @@
                                 if (card.suit === '♥') el.classList.add('heart');
                                 if (card.suit === '♦') el.classList.add('diamond');
                                 el.style.transform = 'scale(0.7)';
-                                el.innerHTML = `<div class="card-rank">${card.rank}</div><div class="card-suit">${card.suit}</div>`;
+                                el.innerHTML = `<div class="card-suit">${card.suit}</div><div class="card-rank">${card.rank}</div>`;
                                 container.appendChild(el);
                                 seenIds.add(card.id);
                             }
@@ -6744,8 +6743,8 @@
                         }
 
                         cardEl.innerHTML = `
-                                        <div class="card-rank">${card.rank}</div>
                                         <div class="card-suit">${card.suit}</div>
+                                        <div class="card-rank">${card.rank}</div>
                                         ${duplicateLabel}
                                     `;
                         optDiv.appendChild(cardEl);
@@ -6784,8 +6783,8 @@
                         }
 
                         cardEl.innerHTML = `
-                                        <div class="card-rank">${card.rank}</div>
                                         <div class="card-suit">${card.suit}</div>
+                                        <div class="card-rank">${card.rank}</div>
                                         ${duplicateLabel}
                                     `;
                         optDiv.appendChild(cardEl);
