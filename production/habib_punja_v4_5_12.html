@@ -700,14 +700,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.5.14 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.5.14 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.5.14b - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.5.14b - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description"
         content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords"
         content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
-    <meta name="version" content="4.5.14">
+    <meta name="version" content="4.5.14b">
     <meta name="copyright" content="Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.">
 
     <!-- Open Graph / Facebook -->
@@ -763,7 +763,7 @@
             margin: 0 auto
         }
 
-        /* 🎯 v4.5.14: Compact header - replaces old game-header and game-info */
+        /* 🎯 v4.5.14b: Compact header - replaces old game-header and game-info */
         .compact-header {
             display: flex;
             align-items: center;
@@ -1144,7 +1144,7 @@
             border-color: var(--gold);
         }
 
-        /* 🎯 v4.5.14: Hide YOUR PUBLISHED section until player publishes */
+        /* 🎯 v4.5.14b: Hide YOUR PUBLISHED section until player publishes */
         .your-published {
             margin-bottom: 12px;
             padding: 10px;
@@ -1401,7 +1401,7 @@
         }
 
         /* Hand Selection Modal Styles */
-        /* 🎯 v4.5.14: Compact hand selection modal */
+        /* 🎯 v4.5.14b: Compact hand selection modal */
         .hand-selection-modal {
             max-width: 400px;
             max-height: 80vh;
@@ -1639,7 +1639,7 @@
             box-shadow: 0 10px 24px rgba(255, 213, 74, .4)
         }
 
-        /* 🎯 v4.5.14: Compact card - suit and rank inline */
+        /* 🎯 v4.5.14b: Compact card - suit and rank inline */
         .card-suit {
             font-size: 18px;
             line-height: 1;
@@ -1779,7 +1779,7 @@
             max-width: 120px;
         }
 
-        /* 🎯 v4.5.14: Sort picker popup */
+        /* 🎯 v4.5.14b: Sort picker popup */
         .sort-picker {
             position: absolute;
             bottom: calc(100% + 5px);
@@ -1858,7 +1858,7 @@
             pointer-events: none
         }
 
-        /* fix-badge removed in v4.5.14 - game title now in compact header */
+        /* fix-badge removed in v4.5.14b - game title now in compact header */
 
         /* Paste the entire contents of your local aob_shared.css here */
 
@@ -2018,17 +2018,30 @@
                 flex-grow: 0 !important;
             }
 
-            /* 5. AI Containers: Collapse them FULLY by default on mobile (The main objective!) */
-            #habot-area .ai-content,
-            #jabot-area .ai-content {
+            /* 5. AI Containers: Collapse them by default on mobile, but allow expansion */
+            #habot-area .ai-content.collapsed,
+            #jabot-area .ai-content.collapsed {
                 max-height: 0 !important;
                 opacity: 0 !important;
                 padding: 0 !important;
             }
 
+            /* When expanded (collapsed class removed), show content */
+            #habot-area .ai-content:not(.collapsed),
+            #jabot-area .ai-content:not(.collapsed) {
+                max-height: 400px !important;
+                opacity: 1 !important;
+                padding: 12px !important;
+            }
+
             #habot-area .ai-header[data-expanded="false"] .collapse-icon,
             #jabot-area .ai-header[data-expanded="false"] .collapse-icon {
                 transform: rotate(0deg) !important;
+            }
+
+            #habot-area .ai-header[data-expanded="true"] .collapse-icon,
+            #jabot-area .ai-header[data-expanded="true"] .collapse-icon {
+                transform: rotate(180deg) !important;
             }
         }
     </style>
@@ -2036,7 +2049,7 @@
 
 <body>
     <div class="game-container">
-        <!-- 🎯 v4.5.14: Compact header - single row with all essential info -->
+        <!-- 🎯 v4.5.14b: Compact header - single row with all essential info -->
         <div class="compact-header">
             <div class="game-title">🎴 Habib Punja</div>
             <div class="hand-info">Hand <span id="currentHand">1</span>: <span id="handRequirements">2T</span></div>
@@ -2163,7 +2176,7 @@
             </div>
         </div>
 
-        <!-- 🎯 v4.5.14: Compact 5-button layout with sort picker -->
+        <!-- 🎯 v4.5.14b: Compact 5-button layout with sort picker -->
         <div class="game-controls">
             <!-- Sort Picker Popup (positioned above buttons) -->
             <div id="sortPicker" class="sort-picker" style="display:none;">
@@ -2322,7 +2335,7 @@
         console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #999;');
         console.log(' ');
 
-        // 🎯 v4.5.14: Debug mode indicator removed (no longer using fix-badge)
+        // 🎯 v4.5.14b: Debug mode indicator removed (no longer using fix-badge)
 
         // Game state
         let deck = [];
@@ -6393,7 +6406,7 @@
             updateUI() {
                 const req = this.handReqs[this.currentHand];
                 document.getElementById('currentHand').textContent = this.currentHand;
-                // 🎯 v4.5.14: Use abbreviated name for compact header
+                // 🎯 v4.5.14b: Use abbreviated name for compact header
                 document.getElementById('handRequirements').textContent = req.short || req.name;
                 const progress = this.getPublishProgress();
                 let progressParts = [];
@@ -6406,7 +6419,7 @@
                 if (progress.canPublish) reqEl.classList.add('ready');
                 else reqEl.classList.remove('ready');
                 const turnText = this.currentPlayer === 0 ? 'Your Turn' : this.currentPlayer === 1 ? "Habot" : "Jabot";
-                // 🎯 v4.5.14: More compact turn indicator
+                // 🎯 v4.5.14b: More compact turn indicator
                 document.getElementById('turnIndicator').textContent = turnText;
                 document.getElementById('playerBuys').textContent = this.playerBuys[0];
                 document.getElementById('player2Buys').textContent = this.playerBuys[1];
@@ -6634,7 +6647,7 @@
                     const container = document.getElementById(containerId);
                     container.innerHTML = '';
 
-                    // 🎯 v4.5.14: Toggle visibility of YOUR PUBLISHED section
+                    // 🎯 v4.5.14b: Toggle visibility of YOUR PUBLISHED section
                     if (p === 0) {
                         const publishedSection = document.getElementById('player1Published');
                         if (this.publishedSequences[0] && this.publishedSequences[0].length > 0) {
@@ -7130,7 +7143,7 @@
             document.getElementById('buyBtn').addEventListener('click', buyCard);
             document.getElementById('newGameBtn').addEventListener('click', newGame);
 
-            // 🎯 v4.5.14: Sort picker toggle
+            // 🎯 v4.5.14b: Sort picker toggle
             const sortBtn = document.getElementById('sortBtn');
             const sortPicker = document.getElementById('sortPicker');
             
