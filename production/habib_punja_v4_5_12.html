@@ -1052,6 +1052,65 @@
         .deck-area-compact {
             display: flex;
             gap: 12px;
+            align-items: center;
+        }
+
+        /* 🎯 v4.5.13: Center Scoreboard - compact scores between Deck and Discard */
+        .center-scoreboard {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            min-width: 70px;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            gap: 8px;
+        }
+
+        .score-name {
+            font-size: 0.9rem;
+        }
+
+        .score-item span:last-child {
+            font-weight: 700;
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .habot-score { color: #e74c3c; }
+        .you-score { color: #ffd700; }
+        .jabot-score { color: #3498db; }
+
+        /* 🎯 v4.5.13: AI Action Header - shows last action in collapsed header */
+        .ai-action-header {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3px 8px;
+            border-radius: 10px;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-shrink: 1;
+        }
+
+        .ai-action-header.extended {
+            background: rgba(156, 39, 176, 0.4);
+            color: #ce93d8;
+        }
+
+        .ai-action-header.published {
+            background: rgba(76, 175, 80, 0.4);
+            color: #a5d6a7;
         }
 
         .player-area-center {
@@ -1917,7 +1976,7 @@
 </head>
 
 <body>
-    <div class="fix-badge">✅ v4.5.12</div>
+    <div class="fix-badge">✅ v4.5.13 Mobile</div>
     <div class="game-container">
         <div class="game-header">
             <h1>Habib Punja v4.5.12</h1>
@@ -1928,7 +1987,8 @@
             <div class="requirements" id="detailedRequirements">Two Triples</div>
             <div class="turn-indicator" id="turnIndicator">Your Turn</div>
         </div>
-        <div class="leaderboard">
+        <!-- Old leaderboard hidden - scores now in center area -->
+        <div class="leaderboard" style="display: none;">
             <div class="leaderboard-entries" id="leaderboardEntries"></div>
         </div>
 
@@ -1941,8 +2001,8 @@
             <div id="habot-area" class="opponent-area opponent-left" style="--player-color: #e74c3c;">
                 <div class="ai-header" onclick="toggleAIArea('habot-area')" data-expanded="false">
                     <div class="player-name">🐇 Habot</div>
-                    <div class="card-count-badge">Cards: <span id="player2Count">10</span></div>
-                    <div id="habot-indicator" class="ai-indicator">0 Points</div>
+                    <div class="card-count-badge"><span id="player2Count">10</span></div>
+                    <div id="habot-action-header" class="ai-action-header">Waiting...</div>
                     <span class="collapse-icon">▼</span>
                 </div>
 
@@ -1962,11 +2022,16 @@
                 </div>
             </div>
 
-            <!-- Center Top: Deck & Discard -->
+            <!-- Center Top: Deck & Scoreboard & Discard -->
             <div class="center-table-area">
                 <div class="deck-area-compact">
                     <div class="deck" id="drawDeck">
                         <div>Draw<br>Deck</div>
+                    </div>
+                    <div class="center-scoreboard" id="centerScoreboard">
+                        <div class="score-item habot-score"><span class="score-name">🐇</span><span id="habotScore">0</span></div>
+                        <div class="score-item you-score"><span class="score-name">👤</span><span id="youScore">0</span></div>
+                        <div class="score-item jabot-score"><span class="score-name">🐢</span><span id="jabotScore">0</span></div>
                     </div>
                     <div class="discard-pile" id="discardPile">
                         <div id="topDiscard">Discard<br>Pile</div>
@@ -1978,8 +2043,8 @@
             <div id="jabot-area" class="opponent-area opponent-right" style="--player-color: #3498db;">
                 <div class="ai-header" onclick="toggleAIArea('jabot-area')" data-expanded="false">
                     <div class="player-name">🐢 Jabot</div>
-                    <div class="card-count-badge">Cards: <span id="player3Count">10</span></div>
-                    <div id="jabot-indicator" class="ai-indicator">0 Points</div>
+                    <div class="card-count-badge"><span id="player3Count">10</span></div>
+                    <div id="jabot-action-header" class="ai-action-header">Waiting...</div>
                     <span class="collapse-icon">▼</span>
                 </div>
 
@@ -4602,7 +4667,28 @@
                 return false;
             }
 
-            setAIStatus(aiId, message) { const actionElement = document.getElementById(`${aiId}-action`); if (actionElement) actionElement.textContent = message }
+            setAIStatus(aiId, message) { 
+                // Update old action element (for backwards compatibility)
+                const actionElement = document.getElementById(`${aiId}-action`); 
+                if (actionElement) actionElement.textContent = message;
+                
+                // 🎯 v4.5.13: Update NEW header action element (always visible)
+                const headerElement = document.getElementById(`${aiId}-action-header`);
+                if (headerElement) {
+                    // Shorten message for header display
+                    let shortMsg = message;
+                    if (message.includes('Drawing')) shortMsg = 'Drew';
+                    else if (message.includes('Took')) shortMsg = message.replace('Took ', '📥 ');
+                    else if (message.includes('Discarded')) shortMsg = message.replace('Discarded: ', '📤 ');
+                    else if (message.includes('Published')) shortMsg = '📢 Published!';
+                    else if (message.includes('Added')) { shortMsg = '↗️ Extended'; headerElement.classList.add('extended'); }
+                    else if (message.includes('WINS')) shortMsg = '🏆 WINS!';
+                    else if (message.includes('Taking turn')) shortMsg = '🤔 Thinking...';
+                    else { headerElement.classList.remove('extended', 'published'); }
+                    
+                    headerElement.textContent = shortMsg;
+                }
+            }
 
             // ✅ FIX 3: Reduced buy window after publishing (5s instead of 10s)
             startBuyWindow(card, discardingPlayer) {
@@ -5714,6 +5800,12 @@
                                         this.playerHands[aiIdx].splice(i, 1);
                                         extendedSequence = true;
                                         console.log(`  ✅ v4.5.12: Extended ${['You', 'Habot', 'Jabot'][p]}'s sequence ${seqIdx + 1} with ${card.toString()}`);
+                                        
+                                        // 🎯 v4.5.13: Show toast for extension
+                                        const aiName = aiIdx === 1 ? 'Habot' : 'Jabot';
+                                        const targetName = p === 0 ? 'your' : p === aiIdx ? 'own' : (p === 1 ? "Habot's" : "Jabot's");
+                                        showExtensionToast(aiName, card.toString(), targetName);
+                                        
                                         break;
                                     }
                                 }
@@ -5787,6 +5879,12 @@
                                                 this.playerHands[aiIdx].splice(i, 1);
                                                 extendedSequence = true;
                                                 console.log(`  ✅ v4.5.12: Extended ${['You', 'Habot', 'Jabot'][p]}'s ladder sequence ${seqIdx + 1} with ${card.toString()}`);
+                                                
+                                                // 🎯 v4.5.13: Show toast for extension
+                                                const aiName = aiIdx === 1 ? 'Habot' : 'Jabot';
+                                                const targetName = p === 0 ? 'your' : p === aiIdx ? 'own' : (p === 1 ? "Habot's" : "Jabot's");
+                                                showExtensionToast(aiName, card.toString(), targetName);
+                                                
                                                 break;
                                             }
                                         }
@@ -6308,6 +6406,14 @@
             }
 
             updateLeaderboard() {
+                // 🎯 v4.5.13: Update center scoreboard (always visible)
+                const habotScoreEl = document.getElementById('habotScore');
+                const youScoreEl = document.getElementById('youScore');
+                const jabotScoreEl = document.getElementById('jabotScore');
+                if (habotScoreEl) habotScoreEl.textContent = this.playerScores[1];
+                if (youScoreEl) youScoreEl.textContent = this.playerScores[0];
+                if (jabotScoreEl) jabotScoreEl.textContent = this.playerScores[2];
+
                 // 👑 v4.0.7 Phase 3: Dynamic Crown & Pumpkin with Tie-Breaker Logic
                 const container = document.getElementById('leaderboardEntries');
                 if (!container) return;
@@ -7462,6 +7568,7 @@
                 case 'buy': bgColor = 'linear-gradient(135deg, #ffc107, #ff9800)'; textColor = '#000'; icon = '💰'; break;
                 case 'warning': bgColor = 'linear-gradient(135deg, #ff6b35, #f7931e)'; textColor = '#fff'; icon = '⚠️'; break;
                 case 'win': bgColor = 'linear-gradient(135deg, #ffd700, #ffed4e)'; textColor = '#000'; icon = '🏆'; duration = 3000; break;
+                case 'extend': bgColor = 'linear-gradient(135deg, #9c27b0, #7b1fa2)'; textColor = '#fff'; icon = '↗️'; break;
                 default: bgColor = 'linear-gradient(135deg, #4ade80, #22c55e)'; textColor = '#000'; icon = 'ℹ️';
             }
             toast.style.cssText = `background: ${bgColor}; color: ${textColor}; padding: 16px 24px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; box-shadow: 0 8px 24px rgba(0,0,0,0.4); animation: slideIn 0.3s ease; pointer-events: auto; ${type === 'win' ? 'animation: slideIn 0.3s ease, victoryPulse 0.5s ease 0.3s 3;' : ''}`;
@@ -7481,6 +7588,20 @@
         }
 
         function showBuyToast(aiName, card) { showToast(`${aiName} BOUGHT ${card.toString()}!`, 'buy') }
+
+        // 🎯 v4.5.13: Toast for sequence extensions
+        function showExtensionToast(aiName, cardStr, targetName) {
+            let message;
+            if (targetName === 'your') {
+                // Important! AI extended player's sequence
+                message = `⚠️ ${aiName} extended YOUR sequence with ${cardStr}!`;
+            } else if (targetName === 'own') {
+                message = `${aiName} extended own sequence with ${cardStr}`;
+            } else {
+                message = `${aiName} extended ${targetName} sequence with ${cardStr}`;
+            }
+            showToast(message, targetName === 'your' ? 'warning' : 'extend');
+        }
 
         // ============================================
         // 🎨 v2.5: Modal Notifications (Auto-Fade)
