@@ -804,6 +804,30 @@
             text-shadow: 0 1px 0 rgba(255, 255, 255, .35);
             box-shadow: var(--ring);
             white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        /* 🎯 v4.5.14b: Blinking animation for YOUR TURN - promised to Mubina! */
+        .turn-indicator.your-turn {
+            animation: pulse-glow 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(40, 167, 69, 0.5), 0 0 10px rgba(40, 167, 69, 0.3);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(40, 167, 69, 0.8), 0 0 30px rgba(40, 167, 69, 0.5), 0 0 45px rgba(40, 167, 69, 0.3);
+                transform: scale(1.05);
+            }
+        }
+
+        /* When it's AI's turn - no animation, muted style */
+        .turn-indicator.ai-turn {
+            background: linear-gradient(180deg, #6c757d, #495057);
+            color: #fff;
+            animation: none;
         }
 
         /* Old styles kept for compatibility but hidden */
@@ -6419,8 +6443,16 @@
                 if (progress.canPublish) reqEl.classList.add('ready');
                 else reqEl.classList.remove('ready');
                 const turnText = this.currentPlayer === 0 ? 'Your Turn' : this.currentPlayer === 1 ? "Habot" : "Jabot";
-                // 🎯 v4.5.14b: More compact turn indicator
-                document.getElementById('turnIndicator').textContent = turnText;
+                // 🎯 v4.5.14b: Blinking turn indicator for YOUR TURN - promised to Mubina!
+                const turnIndicator = document.getElementById('turnIndicator');
+                turnIndicator.textContent = turnText;
+                if (this.currentPlayer === 0) {
+                    turnIndicator.classList.add('your-turn');
+                    turnIndicator.classList.remove('ai-turn');
+                } else {
+                    turnIndicator.classList.remove('your-turn');
+                    turnIndicator.classList.add('ai-turn');
+                }
                 document.getElementById('playerBuys').textContent = this.playerBuys[0];
                 document.getElementById('player2Buys').textContent = this.playerBuys[1];
                 document.getElementById('player3Buys').textContent = this.playerBuys[2];
