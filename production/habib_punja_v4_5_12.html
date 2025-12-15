@@ -1401,26 +1401,24 @@
         }
 
         /* Hand Selection Modal Styles */
+        /* 🎯 v4.5.14: Compact hand selection modal */
         .hand-selection-modal {
-            max-width: 550px;
-            max-height: 85vh;
+            max-width: 400px;
+            max-height: 80vh;
             overflow-y: auto;
         }
 
         .hand-selection-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin: 20px 0;
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 5px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 15px 0;
         }
 
         .hand-option {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
+            padding: 10px 12px;
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid rgba(255, 215, 0, 0.3);
             border-radius: 8px;
@@ -1428,16 +1426,20 @@
             transition: all 0.2s ease;
         }
 
+        .hand-option.full-game {
+            grid-column: span 2;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
         .hand-option:hover {
             background: rgba(255, 215, 0, 0.1);
             border-color: rgba(255, 215, 0, 0.6);
-            transform: translateX(5px);
         }
 
         .hand-option input[type="radio"] {
-            margin-right: 12px;
-            width: 20px;
-            height: 20px;
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
         }
 
@@ -1447,18 +1449,19 @@
 
         .hand-label {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
             flex: 1;
         }
 
         .hand-label strong {
-            font-size: 16px;
+            font-size: 14px;
             color: #fff;
         }
 
         .hand-label small {
-            font-size: 13px;
+            font-size: 12px;
             color: rgba(255, 255, 255, 0.7);
         }
 
@@ -1761,7 +1764,52 @@
 
         .game-controls {
             text-align: center;
-            margin-top: 14px
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .button-row .btn {
+            flex: 1;
+            max-width: 120px;
+        }
+
+        /* 🎯 v4.5.14: Sort picker popup */
+        .sort-picker {
+            position: absolute;
+            bottom: calc(100% + 5px);
+            left: 10px;
+            background: linear-gradient(135deg, #1a3d2e, #0f2a1c);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 12px;
+            padding: 8px;
+            display: flex;
+            gap: 6px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+
+        .sort-option {
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sort-option:hover, .sort-option:active {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: var(--gold);
         }
 
         @keyframes slideIn {
@@ -2116,16 +2164,23 @@
             </div>
         </div>
 
-        <!-- Game Controls (unchanged) -->
+        <!-- 🎯 v4.5.14: Compact 5-button layout with sort picker -->
         <div class="game-controls">
-            <button class="btn" id="publishBtn" disabled>Publish Sequences</button>
-            <button class="btn" id="sortByRankBtn">Sort by Rank</button>
-            <button class="btn" id="sortBySuitBtn">Sort by Suit</button>
-            <button class="btn" id="discardBtn" disabled>Discard Selected</button>
-            <button class="btn" id="buyBtn" disabled>Buy from Discard <span id="buyTimer"
-                    style="display:none;"></span></button>
-            <button class="btn" id="sortByQuantityBtn">Sort by Quantity</button>
-            <button class="btn" id="newGameBtn">New Game</button>
+            <!-- Sort Picker Popup (positioned above buttons) -->
+            <div id="sortPicker" class="sort-picker" style="display:none;">
+                <button class="sort-option" id="sortByRankBtn">By Rank</button>
+                <button class="sort-option" id="sortBySuitBtn">By Suit</button>
+                <button class="sort-option" id="sortByQuantityBtn">By Qty</button>
+            </div>
+            <div class="button-row">
+                <button class="btn" id="sortBtn">Sort ▾</button>
+                <button class="btn" id="discardBtn" disabled>Discard</button>
+                <button class="btn" id="buyBtn" disabled>Buy <span id="buyTimer" style="display:none;"></span></button>
+            </div>
+            <div class="button-row">
+                <button class="btn" id="publishBtn" disabled>Publish</button>
+                <button class="btn" id="newGameBtn">New Game</button>
+            </div>
         </div>
     </div>
 
@@ -2148,69 +2203,68 @@
     <div id="handSelectionModal" class="modal-overlay">
         <div class="modal-content hand-selection-modal">
             <div class="modal-icon">🎮</div>
-            <div class="modal-title">Choose Game Mode</div>
-            <div class="modal-message">Select which game to play:</div>
+            <div class="modal-title">Game Mode</div>
             <div class="hand-selection-options">
-                <label class="hand-option">
+                <label class="hand-option full-game">
                     <input type="radio" name="handSelection" value="full" checked>
                     <span class="hand-label">
                         <strong>🎴 Full Game</strong>
-                        <small>All 7 Hands</small>
+                        <small>(All 7 Hands)</small>
                     </span>
                 </label>
                 <label class="hand-option">
                     <input type="radio" name="handSelection" value="1">
                     <span class="hand-label">
-                        <strong>Hand 1</strong>
-                        <small>Two Triples</small>
+                        <strong>H1:</strong>
+                        <small>2T</small>
                     </span>
                 </label>
                 <label class="hand-option">
                     <input type="radio" name="handSelection" value="2">
                     <span class="hand-label">
-                        <strong>Hand 2</strong>
-                        <small>Triple + Ladder</small>
+                        <strong>H2:</strong>
+                        <small>1T+1L</small>
                     </span>
                 </label>
                 <label class="hand-option">
                     <input type="radio" name="handSelection" value="3">
                     <span class="hand-label">
-                        <strong>Hand 3</strong>
-                        <small>Two Ladders</small>
+                        <strong>H3:</strong>
+                        <small>2L</small>
                     </span>
                 </label>
                 <label class="hand-option">
                     <input type="radio" name="handSelection" value="4">
                     <span class="hand-label">
-                        <strong>Hand 4</strong>
-                        <small>Three Triples</small>
+                        <strong>H4:</strong>
+                        <small>3T</small>
                     </span>
                 </label>
                 <label class="hand-option">
                     <input type="radio" name="handSelection" value="5">
                     <span class="hand-label">
-                        <strong>Hand 5</strong>
-                        <small>2 Triples + Ladder</small>
+                        <strong>H5:</strong>
+                        <small>2T+1L</small>
                     </span>
                 </label>
                 <label class="hand-option">
                     <input type="radio" name="handSelection" value="6">
                     <span class="hand-label">
-                        <strong>Hand 6</strong>
-                        <small>Triple + 2 Ladders</small>
+                        <strong>H6:</strong>
+                        <small>1T+2L</small>
                     </span>
                 </label>
                 <label class="hand-option">
                     <input type="radio" name="handSelection" value="7">
                     <span class="hand-label">
-                        <strong>Hand 7</strong>
-                        <small>Three Ladders</small>
+                        <strong>H7:</strong>
+                        <small>3L</small>
                     </span>
                 </label>
             </div>
             <div class="modal-buttons">
                 <button class="modal-btn cancel" id="handSelectionCancel">Cancel</button>
-                <button class="modal-btn confirm" id="handSelectionConfirm">Start Game</button>
+                <button class="modal-btn confirm" id="handSelectionConfirm">Start</button>
             </div>
         </div>
     </div>
@@ -7077,10 +7131,35 @@
             document.getElementById('buyBtn').addEventListener('click', buyCard);
             document.getElementById('newGameBtn').addEventListener('click', newGame);
 
-            // Sorting buttons
-            document.getElementById('sortByRankBtn').addEventListener('click', sortByRank);
-            document.getElementById('sortBySuitBtn').addEventListener('click', sortBySuit);
-            document.getElementById('sortByQuantityBtn').addEventListener('click', sortByQuantity);
+            // 🎯 v4.5.14: Sort picker toggle
+            const sortBtn = document.getElementById('sortBtn');
+            const sortPicker = document.getElementById('sortPicker');
+            
+            sortBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sortPicker.style.display = sortPicker.style.display === 'none' ? 'flex' : 'none';
+            });
+
+            // Close sort picker when clicking elsewhere
+            document.addEventListener('click', (e) => {
+                if (!sortPicker.contains(e.target) && e.target !== sortBtn) {
+                    sortPicker.style.display = 'none';
+                }
+            });
+
+            // Sorting buttons (close picker after selection)
+            document.getElementById('sortByRankBtn').addEventListener('click', () => {
+                sortByRank();
+                sortPicker.style.display = 'none';
+            });
+            document.getElementById('sortBySuitBtn').addEventListener('click', () => {
+                sortBySuit();
+                sortPicker.style.display = 'none';
+            });
+            document.getElementById('sortByQuantityBtn').addEventListener('click', () => {
+                sortByQuantity();
+                sortPicker.style.display = 'none';
+            });
 
             // Deck interaction
             document.getElementById('drawDeck').addEventListener('click', drawFromDeck);
