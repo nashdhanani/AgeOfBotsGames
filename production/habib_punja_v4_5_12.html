@@ -1171,15 +1171,57 @@
         /* 🎯 v4.5.14b: Hide YOUR PUBLISHED section until player publishes */
         .your-published {
             margin-bottom: 12px;
-            padding: 10px;
             background: rgba(0, 0, 0, .25);
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, .1);
             display: none; /* Hidden by default */
+            overflow: hidden;
         }
 
         .your-published.has-cards {
             display: block; /* Show when player has published */
+        }
+
+        /* Collapsible header for your published */
+        .your-published-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: .85rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            background: rgba(255, 215, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .your-published-header:hover {
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        .your-published-header .collapse-icon {
+            transition: transform 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .your-published-header[data-expanded="false"] .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        .your-published-content {
+            padding: 10px;
+            max-height: 300px;
+            opacity: 1;
+            transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+        }
+
+        .your-published-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 10px;
         }
 
         .your-published .published-header {
@@ -1532,7 +1574,7 @@
         }
 
         .discard-pile {
-            background: linear-gradient(160deg, #ff7b2b, #8f3c17)
+            background: linear-gradient(160deg, #ff8a9b, #d63c5c)
         }
 
         .deck:hover,
@@ -2029,6 +2071,10 @@
                 overflow-x: auto !important;
                 /* Ensure there's enough space for the hand to fully display */
                 padding-bottom: 5px !important;
+                /* 🎯 v4.5.14b: Fix right border cutoff on mobile */
+                margin-left: 8px !important;
+                margin-right: 8px !important;
+                box-sizing: border-box !important;
             }
 
             /* ADD/REPLACE WITH THIS CORRECT BLOCK INSIDE THE MEDIA QUERY: */
@@ -2076,7 +2122,7 @@
         <!-- 🎯 v4.5.14b: Compact header - single row with all essential info -->
         <div class="compact-header">
             <div class="game-title">🎴 Habib Punja</div>
-            <div class="hand-info">Hand <span id="currentHand">1</span>: <span id="handRequirements">2T</span></div>
+            <div class="hand-info">Hand <span id="currentHand">1</span>: <span id="handRequirements">2T</span> · T<span id="turnCounter">0</span></div>
             <div class="turn-indicator" id="turnIndicator">Your Turn</div>
         </div>
         <!-- Hidden detailed requirements for JS compatibility -->
@@ -2166,10 +2212,15 @@
         <!-- 🎨 v4.0.7: ROUND TABLE LAYOUT - Bottom (Your Area)         -->
         <!-- ═══════════════════════════════════════════════════════════ -->
         <div class="player-area-center" style="--player-color: #4a90e2;">
-            <!-- Your Published Sequences (above your hand) -->
+            <!-- Your Published Sequences (above your hand) - COLLAPSIBLE -->
             <div class="your-published" id="player1Published">
-                <div class="published-header">Your Published Sequences:</div>
-                <div class="published-cards" id="player1Cards"></div>
+                <div class="your-published-header" onclick="toggleYourPublished()" data-expanded="true">
+                    <span>Your Published Sequences</span>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="your-published-content" id="player1PublishedContent">
+                    <div class="published-cards" id="player1Cards"></div>
+                </div>
             </div>
 
             <!-- Your Hand -->
@@ -5129,8 +5180,11 @@
                 Object.entries(rankCounts).forEach(([rank, count]) => {
                     if (count >= 2) { tempHand.forEach(c => { if (c.rank === rank) protectedCards.add(c.id) }) }
                 });
-                if (this.publishedSequences[ai].length > 0) {
-                    if (this.couldExtendSequence(card, ai)) protectedCards.add(card.id);
+                // 🎯 v4.5.14b: Protect cards that can extend ANY published sequence (global resources!)
+                for (let p = 0; p < 3; p++) {
+                    if (this.publishedSequences[p].length > 0) {
+                        if (this.couldExtendSequence(card, p)) protectedCards.add(card.id);
+                    }
                 }
                 const safeCards = tempHand.filter(c => !protectedCards.has(c.id));
                 if (safeCards.length > 0) {
@@ -5364,8 +5418,20 @@
                     }
 
                     if (shouldTake && this.discardPile.length > 0) {
+                        const discardTop = this.discardPile[this.discardPile.length - 1];
 
-                        if (this.wouldDiscardImmediately(this.discardPile[this.discardPile.length - 1], ai)) {
+                        // 🎯 v4.5.14b FIX: Check if card can extend ANY published sequence (global resources!)
+                        // If so, ALWAYS take it - don't check wouldDiscardImmediately
+                        let canExtendAny = false;
+                        for (let p = 0; p < 3; p++) {
+                            if (this.publishedSequences[p].length > 0 && this.couldExtendSequence(discardTop, p)) {
+                                console.log(`%c  🎯 v4.5.14b: ${discardTop.toString()} can extend ${['Human', 'Habot', 'Jabot'][p]}'s sequence - TAKING IT!`, 'color: #27ae60; font-weight: bold;');
+                                canExtendAny = true;
+                                break;
+                            }
+                        }
+
+                        if (!canExtendAny && this.wouldDiscardImmediately(discardTop, ai)) {
                             this.setAIStatus(statusId, `Evaluating options...`);
                             this.handleDeckDraw(ai, statusId);
                             return;
@@ -5788,8 +5854,8 @@
                         this.lastAIDiscard[ai] = worst;
                         this.lastDiscard = worst;
                         this.lastDiscardByPlayer = ai;
-                        const current = document.getElementById(`${statusId}-action`).textContent;
-                        this.setAIStatus(statusId, current + ` → Discarded: ${worst.toString()}`);
+                        // 🎯 v4.5.14b: Simplified status - just show the discard, no prefix
+                        this.setAIStatus(statusId, `Discarded: ${worst.toString()}`);
                     }
                 }
                 if (this.playerHands[ai].length === 0) {
@@ -6432,6 +6498,8 @@
                 document.getElementById('currentHand').textContent = this.currentHand;
                 // 🎯 v4.5.14b: Use abbreviated name for compact header
                 document.getElementById('handRequirements').textContent = req.short || req.name;
+                // 🎯 v4.5.14b: Show turn counter in header
+                document.getElementById('turnCounter').textContent = this.turnCounter;
                 const progress = this.getPublishProgress();
                 let progressParts = [];
                 if (progress.needTriples > 0) progressParts.push(`${progress.hasTriples}/${progress.needTriples} triples`);
@@ -6767,10 +6835,33 @@
 
                 const tripleContainer = document.getElementById('tripleOptions');
 
-                seqs.triples.forEach((triple, idx) => {
+                // 🎯 v4.5.14b: Deduplicate triples for triple-only hands
+                // For triple-only hands, ♠3-♥3-♦3 is functionally same regardless of which physical cards
+                let displayTriples = seqs.triples;
+                if (laddersNeeded === 0) {
+                    const seenSuitCombos = new Set();
+                    displayTriples = seqs.triples.filter(triple => {
+                        // Create a key from rank + sorted suits (e.g., "3:♠♥♦")
+                        const rank = triple[0].rank;
+                        const suits = triple.map(c => c.suit).sort().join('');
+                        const key = `${rank}:${suits}`;
+                        if (seenSuitCombos.has(key)) {
+                            return false; // Skip duplicate suit combo
+                        }
+                        seenSuitCombos.add(key);
+                        return true;
+                    });
+                    console.log(`%c🎯 v4.5.14b: Deduplicated triples: ${seqs.triples.length} → ${displayTriples.length}`, 'color: #9b59b6; font-weight: bold;');
+                }
+
+                displayTriples.forEach((triple, idx) => {
                     const optDiv = document.createElement('div');
                     optDiv.style.cssText = 'display:flex;gap:5px;padding:8px;border:2px solid transparent;border-radius:8px;cursor:pointer;position:relative;';
-                    optDiv.onclick = () => toggleTripleSelection(idx, optDiv);
+                    // Store original index for selection (maps back to seqs.triples)
+                    const originalIdx = seqs.triples.findIndex(t => 
+                        t[0].id === triple[0].id && t[1].id === triple[1].id && t[2].id === triple[2].id
+                    );
+                    optDiv.onclick = () => toggleTripleSelection(originalIdx, optDiv);
 
                     triple.forEach(card => {
                         const cardEl = document.createElement('div');
@@ -6781,8 +6872,9 @@
                         cardEl.style.position = 'relative';
 
                         // ✅ FIX 5C: Use CONSISTENT number based on card ID
+                        // Only show badges when there are ladders (mixed hands need card tracking)
                         let duplicateLabel = '';
-                        if (cardIdToNumber.has(card.id)) {
+                        if (laddersNeeded > 0 && cardIdToNumber.has(card.id)) {
                             const cardNumber = cardIdToNumber.get(card.id);
                             duplicateLabel = `<div style="position:absolute;top:2px;right:2px;background:#ffd700;color:#000;width:16px;height:16px;border-radius:50%;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;border:1px solid #000;">${cardNumber}</div>`;
                         }
@@ -7787,6 +7879,24 @@
 
             const content = area.querySelector('.ai-content');
             const header = area.querySelector('.ai-header');
+
+            const isCollapsed = content.classList.contains('collapsed');
+
+            if (isCollapsed) {
+                content.classList.remove('collapsed');
+                header.setAttribute('data-expanded', 'true');
+            } else {
+                content.classList.add('collapsed');
+                header.setAttribute('data-expanded', 'false');
+            }
+        }
+
+        // 🎯 v4.5.14b: Toggle YOUR PUBLISHED section (collapsible like AI areas)
+        function toggleYourPublished() {
+            const content = document.getElementById('player1PublishedContent');
+            const header = document.querySelector('.your-published-header');
+            
+            if (!content || !header) return;
 
             const isCollapsed = content.classList.contains('collapsed');
 
