@@ -2,13 +2,13 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.5.12 - CRITICAL FIX: Duplicate Card Object Replacement
+  Version: 4.6 - CRITICAL FIX: Duplicate Card Object Replacement
   Release Date: December 10, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 4.5.12 - CRITICAL FIX: Object Reference & Duplicate Card Validation
+  🎮 VERSION 4.6 - CRITICAL FIX: Object Reference & Duplicate Card Validation
   ═══════════════════════════════════════════════════════════════════════════
   🐛 CRITICAL FIX #1: Duplicate card object reference bug (GAME-BREAKING)
   🐛 CRITICAL FIX #2: Published ladders not auto-sorting after extension
@@ -27,7 +27,7 @@
   2. De-duplication kept FIRST occurrence → same object in multiple patterns
   3. Smart assignment modified object.id → overwrote same object multiple times
   
-  **THE COMPLETE FIX (v4.5.12):**
+  **THE COMPLETE FIX (v4.6):**
   
   findSequences() created BOTH ladders using the SAME Ace instance!
   Validation correctly detected: "Same card used twice!"
@@ -36,7 +36,7 @@
   
   **Part 1: Generate ALL combinations (Line 2457-2564)**
   ```javascript
-  // v4.5.12: Generate ALL ladder combinations with duplicate ranks
+  // v4.6: Generate ALL ladder combinations with duplicate ranks
   
   // 1. J-Q-K-A: Create ladder for EACH Ace instance
   const allAces = g.filter(c => c.rank === 'A');
@@ -71,7 +71,7 @@
   
   **Part 2: De-duplicate for user display (Line 2567-2596)**
   ```javascript
-  // v4.5.12: Remove duplicate PATTERNS (not instances!)
+  // v4.6: Remove duplicate PATTERNS (not instances!)
   // User doesn't care which physical card ID goes where
   // They just want to see each unique pattern once
   
@@ -98,9 +98,9 @@
   seqs.ladders = this.deduplicateLadderPatterns(seqs.ladders);
   ```
   
-  **Part 3: Replace duplicate objects at publish time (Line 6461-6510) ⭐ v4.5.12 KEY FIX**
+  **Part 3: Replace duplicate objects at publish time (Line 6461-6510) ⭐ v4.6 KEY FIX**
   ```javascript
-  // v4.5.12 CRITICAL: Track processed OBJECTS (not just IDs!)
+  // v4.6 CRITICAL: Track processed OBJECTS (not just IDs!)
   // De-duplication leaves same card object in multiple patterns
   // We must REPLACE objects, not just modify IDs
   
@@ -142,7 +142,7 @@
     published[7].id = "xlos"  → Overwrites same object!
     Result: Both have id="xlos" ❌
   
-  NEW (v4.5.12 - replacing object):
+  NEW (v4.6 - replacing object):
     published[0] = A♦_obj1 (id:efep)  → Object A
     published[7] = A♦_obj2 (id:xlos)  → Object B (different!)
     Result: Two different objects! ✅
@@ -201,10 +201,10 @@
   ```javascript
   seq.push(card);
   
-  // v4.5.12: Auto-sort ladder after extension
+  // v4.6: Auto-sort ladder after extension
   if (forceType === 'ladder') {
       seq.sort((a, b) => a.getValue() - b.getValue());
-      console.log('🔄 v4.5.12: Re-sorted ladder:', seq.map(c => c.toString()).join('-'));
+      console.log('🔄 v4.6: Re-sorted ladder:', seq.map(c => c.toString()).join('-'));
   }
   ```
   
@@ -216,7 +216,7 @@
   
   ══════════════════════════════════════════════════════════════════════════
 
-  🎮 VERSION 4.5.12 - UX FIX: Game Completion Auto-Restart Removed
+  🎮 VERSION 4.6 - UX FIX: Game Completion Auto-Restart Removed
   ═══════════════════════════════════════════════════════════════
   🐛 Fixed: Game no longer auto-restarts after completion
   ✨ New: "Play Again" and "View Game" buttons on final results
@@ -700,14 +700,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.5.14b - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.5.14b - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.6 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.6 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description"
         content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords"
         content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
-    <meta name="version" content="4.5.14b">
+    <meta name="version" content="4.6">
     <meta name="copyright" content="Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.">
 
     <!-- Open Graph / Facebook -->
@@ -763,7 +763,7 @@
             margin: 0 auto
         }
 
-        /* 🎯 v4.5.14b: Compact header - replaces old game-header and game-info */
+        /* 🎯 v4.6: Compact header - replaces old game-header and game-info */
         .compact-header {
             display: flex;
             align-items: center;
@@ -807,7 +807,7 @@
             transition: all 0.3s ease;
         }
 
-        /* 🎯 v4.5.14b: Blinking animation for YOUR TURN - promised to Mubina! */
+        /* 🎯 v4.6: Blinking animation for YOUR TURN - promised to Mubina! */
         .turn-indicator.your-turn {
             animation: pulse-glow 1.2s ease-in-out infinite;
         }
@@ -1168,7 +1168,7 @@
             border-color: var(--gold);
         }
 
-        /* 🎯 v4.5.14b: Hide YOUR PUBLISHED section until player publishes */
+        /* 🎯 v4.6: Hide YOUR PUBLISHED section until player publishes */
         .your-published {
             margin-bottom: 12px;
             background: rgba(0, 0, 0, .25);
@@ -1467,7 +1467,7 @@
         }
 
         /* Hand Selection Modal Styles */
-        /* 🎯 v4.5.14b: Compact hand selection modal */
+        /* 🎯 v4.6: Compact hand selection modal */
         .hand-selection-modal {
             max-width: 400px;
             max-height: 80vh;
@@ -1705,7 +1705,7 @@
             box-shadow: 0 10px 24px rgba(255, 213, 74, .4)
         }
 
-        /* 🎯 v4.5.14b: Compact card - suit and rank inline */
+        /* 🎯 v4.6: Compact card - suit and rank inline */
         .card-suit {
             font-size: 18px;
             line-height: 1;
@@ -1845,36 +1845,114 @@
             max-width: 120px;
         }
 
-        /* 🎯 v4.5.14b: Sort picker popup */
-        .sort-picker {
-            position: absolute;
-            bottom: calc(100% + 5px);
-            left: 10px;
-            background: linear-gradient(135deg, #1a3d2e, #0f2a1c);
-            border: 2px solid rgba(255, 215, 0, 0.5);
-            border-radius: 12px;
-            padding: 8px;
-            display: flex;
-            gap: 6px;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-            z-index: 100;
+        /* 🎯 v4.6: Sort Bottom Sheet Modal (mobile-friendly) */
+        .sort-sheet-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9998;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
-        .sort-option {
-            padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 8px;
+        .sort-sheet-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sort-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, #1a4d3a, #0f2a1c);
+            border-top: 3px solid var(--gold);
+            border-radius: 20px 20px 0 0;
+            padding: 20px 16px calc(20px + env(safe-area-inset-bottom));
+            z-index: 9999;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .sort-sheet-overlay.active .sort-sheet {
+            transform: translateY(0);
+        }
+
+        .sort-sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+
+        .sort-sheet-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--gold);
+            text-align: center;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sort-sheet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sort-sheet-btn {
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
             color: #fff;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sort-sheet-btn:hover, .sort-sheet-btn:active {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: var(--gold);
+            transform: scale(1.02);
+        }
+
+        .sort-sheet-btn .sort-icon {
+            font-size: 1.3rem;
+        }
+
+        .sort-sheet-cancel {
+            margin-top: 10px;
+            padding: 14px 20px;
+            background: rgba(255, 100, 100, 0.1);
+            border: 2px solid rgba(255, 100, 100, 0.3);
+            border-radius: 12px;
+            color: #ff8a8a;
+            font-weight: 700;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .sort-option:hover, .sort-option:active {
-            background: rgba(255, 215, 0, 0.2);
-            border-color: var(--gold);
+        .sort-sheet-cancel:hover, .sort-sheet-cancel:active {
+            background: rgba(255, 100, 100, 0.2);
+            border-color: #ff8a8a;
+        }
+
+        /* Legacy sort-picker hidden */
+        .sort-picker {
+            display: none !important;
         }
 
         @keyframes slideIn {
@@ -1924,7 +2002,7 @@
             pointer-events: none
         }
 
-        /* fix-badge removed in v4.5.14b - game title now in compact header */
+        /* fix-badge removed in v4.6 - game title now in compact header */
 
         /* Paste the entire contents of your local aob_shared.css here */
 
@@ -2071,7 +2149,7 @@
                 overflow-x: auto !important;
                 /* Ensure there's enough space for the hand to fully display */
                 padding-bottom: 5px !important;
-                /* 🎯 v4.5.14b: Fix right border cutoff on mobile */
+                /* 🎯 v4.6: Fix right border cutoff on mobile */
                 margin-left: 8px !important;
                 margin-right: 8px !important;
                 box-sizing: border-box !important;
@@ -2119,7 +2197,7 @@
 
 <body>
     <div class="game-container">
-        <!-- 🎯 v4.5.14b: Compact header - single row with all essential info -->
+        <!-- 🎯 v4.6: Compact header - single row with all essential info -->
         <div class="compact-header">
             <div class="game-title">🎴 Habib Punja</div>
             <div class="hand-info">Hand <span id="currentHand">1</span>: <span id="handRequirements">2T</span> · T<span id="turnCounter">0</span></div>
@@ -2251,14 +2329,8 @@
             </div>
         </div>
 
-        <!-- 🎯 v4.5.14b: Compact 5-button layout with sort picker -->
+        <!-- 🎯 v4.6: Compact 5-button layout -->
         <div class="game-controls">
-            <!-- Sort Picker Popup (positioned above buttons) -->
-            <div id="sortPicker" class="sort-picker" style="display:none;">
-                <button class="sort-option" id="sortByRankBtn">By Rank</button>
-                <button class="sort-option" id="sortBySuitBtn">By Suit</button>
-                <button class="sort-option" id="sortByQuantityBtn">By Qty</button>
-            </div>
             <div class="button-row">
                 <button class="btn" id="sortBtn">Sort ▾</button>
                 <button class="btn" id="discardBtn" disabled>Discard</button>
@@ -2268,6 +2340,29 @@
                 <button class="btn" id="publishBtn" disabled>Publish</button>
                 <button class="btn" id="newGameBtn">New Game</button>
             </div>
+        </div>
+    </div>
+
+    <!-- 🎯 v4.6: Sort Bottom Sheet Modal -->
+    <div id="sortSheetOverlay" class="sort-sheet-overlay">
+        <div class="sort-sheet">
+            <div class="sort-sheet-handle"></div>
+            <div class="sort-sheet-title">Sort Cards By</div>
+            <div class="sort-sheet-options">
+                <button class="sort-sheet-btn" id="sortByRankBtn">
+                    <span class="sort-icon">🔢</span>
+                    <span>Rank (A, 2, 3...K)</span>
+                </button>
+                <button class="sort-sheet-btn" id="sortBySuitBtn">
+                    <span class="sort-icon">♠♥</span>
+                    <span>Suit (♠ ♥ ♦ ♣)</span>
+                </button>
+                <button class="sort-sheet-btn" id="sortByQuantityBtn">
+                    <span class="sort-icon">📊</span>
+                    <span>Quantity (Groups First)</span>
+                </button>
+            </div>
+            <button class="sort-sheet-cancel" id="sortCancelBtn">Cancel</button>
         </div>
     </div>
 
@@ -2400,7 +2495,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.5.12 - STAGED CONSTRUCTION', 'color: #9b59b6; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.6 - MOBILE OPTIMIZED', 'color: #9b59b6; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -2410,7 +2505,7 @@
         console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #999;');
         console.log(' ');
 
-        // 🎯 v4.5.14b: Debug mode indicator removed (no longer using fix-badge)
+        // 🎯 v4.6: Debug mode indicator removed (no longer using fix-badge)
 
         // Game state
         let deck = [];
@@ -2429,7 +2524,7 @@
 
         class GameState {
             constructor(carryOverScores = false, selectedHand = 'full') {
-                // 🎮 v4.5.12: Hand selection support
+                // 🎮 v4.6: Hand selection support
                 this.gameMode = selectedHand; // Track if 'full' or specific hand number
 
                 if (selectedHand === 'full') {
@@ -2449,7 +2544,7 @@
 
                 this.deck = []; this.discardPile = [];
                 this.playerHands = [[], [], []];
-                this.playerBuys = this.currentHand === 7 ? [2, 2, 2] : [3, 3, 3]; // 🎮 v4.5.12: Hand 7 gets 2 buys
+                this.playerBuys = this.currentHand === 7 ? [2, 2, 2] : [3, 3, 3]; // 🎮 v4.6: Hand 7 gets 2 buys
                 this.publishedSequences = [[], [], []]; this.gamePhase = 'draw';
                 this.selectedCards = [];
                 this.playerScores = carryOverScores ? [...persistentScores] : [0, 0, 0];
@@ -2462,7 +2557,7 @@
                 this.lastCardWarningShown = null;
                 this.discardPileAccessible = false; // 🔒 v4.1.3: Glass vault - only accessible after NEW discard
 
-                // 🏗️ v4.5.12: STAGED CONSTRUCTION SYSTEM for Games 6-7
+                // 🏗️ v4.6: STAGED CONSTRUCTION SYSTEM for Games 6-7
                 // AI builds sequences SEQUENTIALLY (L1 → L2 → T) instead of parallel accumulation
                 this.aiConstructionStage = [null, 'initial', 'initial']; // [human, habot, jabot]
                 // Stages: 'initial' → 'building_L1' → 'building_L2' → 'building_T' → 'ready_to_publish'
@@ -2470,7 +2565,7 @@
                 this.aiLockedSequences = [[], [], []]; // Completed sequences protected from discard
                 // Format: [{ type: 'ladder', cards: [...], suit: '♥' }, ...]
 
-                // 🔶 v4.5.12: HOLD SYSTEM - Parallel construction breakthrough!
+                // 🔶 v4.6: HOLD SYSTEM - Parallel construction breakthrough!
                 this.aiHeldSequences = [[], [], []]; // 3-card "almost ladders" on hold while building others
                 // Format: [{ cards: [Card, Card, Card], suit: '♠', targets: [5, 9], type: 'ladder', createdTurn: 15, priority: 10 }, ...]
 
@@ -2480,7 +2575,7 @@
                 this.aiSuitFocus = [null, [], []]; // Concentrated suits AI is working on
                 // Format: ['♥', '♠'] - 2-3 suits AI focuses on for ladder building
 
-                // 💚 v4.5.12: AGGRESSIVE BUY MODE - Track when stages started for scattered card detection
+                // 💚 v4.6: AGGRESSIVE BUY MODE - Track when stages started for scattered card detection
                 this.aiStageStartTurn = [null, 0, 0]; // Turn number when current stage started
                 // Used to detect when AI is stuck on same stage too long → activate aggressive mode
 
@@ -2500,12 +2595,12 @@
                 };
                 this.initDeck(); this.deal(); this.updateUI();
 
-                // 🏗️ v4.5.12: Initialize suit focus for ANY hand with ladders (not just 6-7)
+                // 🏗️ v4.6: Initialize suit focus for ANY hand with ladders (not just 6-7)
                 const handReq = this.handReqs[this.currentHand];
                 const needsLadders = handReq.seqs.filter(s => s === 'ladder').length > 0;
 
                 if (needsLadders) {
-                    console.log(`%c🏗️ v4.5.12: Initializing SUIT FOCUS for Hand ${this.currentHand} (${handReq.name})`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
+                    console.log(`%c🏗️ v4.6: Initializing SUIT FOCUS for Hand ${this.currentHand} (${handReq.name})`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
 
                     // For hands 6-7: Use full staged construction
                     if (this.currentHand >= 6) {
@@ -2962,7 +3057,7 @@
                 hand.forEach(c => { if (!bySuit[c.suit]) bySuit[c.suit] = []; bySuit[c.suit].push(c) });
                 Object.values(bySuit).forEach(g => {
                     if (g.length >= 4) {
-                        // v4.5.12 FIX: Generate J-Q-K-A ladders for ALL Aces (not just first)
+                        // v4.6 FIX: Generate J-Q-K-A ladders for ALL Aces (not just first)
                         const allAces = g.filter(c => c.rank === 'A');
                         const hasK = g.find(c => c.rank === 'K');
                         const hasQ = g.find(c => c.rank === 'Q');
@@ -2974,7 +3069,7 @@
                             });
                         }
 
-                        // v4.5.12 COMPLETE FIX: Handle duplicate ranks in consecutive ladders
+                        // v4.6 COMPLETE FIX: Handle duplicate ranks in consecutive ladders
                         // Group cards by rank (allows multiple instances of same rank)
                         const byRank = {};
                         g.forEach(card => {
@@ -3034,7 +3129,7 @@
                     }
                 });
 
-                // v4.5.12 FINAL: De-duplicate patterns for user display
+                // v4.6 FINAL: De-duplicate patterns for user display
                 // Keeps all combinations internally, but shows each pattern once
                 seqs.ladders = this.deduplicateLadderPatterns(seqs.ladders);
 
@@ -3042,7 +3137,7 @@
             }
 
             deduplicateLadderPatterns(ladders) {
-                // v4.5.12: Remove duplicate patterns from display
+                // v4.6: Remove duplicate patterns from display
                 // User doesn't care which physical card ID is used where
                 // They just want to see each unique pattern once
                 const uniquePatterns = new Map();
@@ -3061,7 +3156,7 @@
                     }
                 });
 
-                console.log(`%c🎯 v4.5.12: De-duplicated ${ladders.length} ladders → ${uniquePatterns.size} unique patterns`, 'color:#3b82f6;font-weight:bold');
+                console.log(`%c🎯 v4.6: De-duplicated ${ladders.length} ladders → ${uniquePatterns.size} unique patterns`, 'color:#3b82f6;font-weight:bold');
                 return Array.from(uniquePatterns.values());
             }
 
@@ -3228,9 +3323,9 @@
                     return false;
                 }
 
-                // 🏗️ v4.5.12: STAGED CONSTRUCTION - Use locked sequences for Hands 6-7
+                // 🏗️ v4.6: STAGED CONSTRUCTION - Use locked sequences for Hands 6-7
                 if (this.currentHand >= 6 && this.aiLockedSequences[pIdx].length > 0) {
-                    console.log(`  🏗️ v4.5.12: Using ${this.aiLockedSequences[pIdx].length} locked sequences for publishing`);
+                    console.log(`  🏗️ v4.6: Using ${this.aiLockedSequences[pIdx].length} locked sequences for publishing`);
 
                     const req = this.handReqs[this.currentHand].seqs;
                     const triplesNeeded = req.filter(s => s === 'triple').length;
@@ -3268,7 +3363,7 @@
                         this.publishedSequences[pIdx] = sequences;
                         this.aiJustPublished[pIdx] = true;
 
-                        console.log(`      ✅ v4.5.12: Published ${sequences.length} sequences from locked cards`);
+                        console.log(`      ✅ v4.6: Published ${sequences.length} sequences from locked cards`);
                         return true;
                     } else {
                         console.log(`      ❌ Not all requirements locked yet - continue building`);
@@ -3397,7 +3492,7 @@
                 return canExtendLow || canExtendHigh;
             }
 
-            // 🏗️ v4.5.12 STAGED CONSTRUCTION FUNCTIONS
+            // 🏗️ v4.6 STAGED CONSTRUCTION FUNCTIONS
             // ==========================================
 
             analyzeNearSequential(cards, suit) {
@@ -3426,7 +3521,7 @@
                 // Potential: high card count + low gaps = high potential
                 const potential = suitCards.length - gapCount;
 
-                console.log(`  🔍 v4.5.12: Analyzing ${suit} - ${values.join(',')} - gaps: [${gaps.join(',')}] - potential: ${potential}`);
+                console.log(`  🔍 v4.6: Analyzing ${suit} - ${values.join(',')} - gaps: [${gaps.join(',')}] - potential: ${potential}`);
                 return { values, gaps, potential, cardCount: suitCards.length };
             }
 
@@ -3446,12 +3541,12 @@
                 });
 
                 const selected = analysis.slice(0, numSuits).map(a => a.suit);
-                console.log(`  🎯 v4.5.12: Selected focus suits: ${selected.join(', ')}`);
+                console.log(`  🎯 v4.6: Selected focus suits: ${selected.join(', ')}`);
                 return selected;
             }
 
             selectSuitFocusFromSuits(hand, availableSuits, numSuits = 2) {
-                // 🔧 v4.5.12: Select suits from a limited set (excluding locked ladder suits)
+                // 🔧 v4.6: Select suits from a limited set (excluding locked ladder suits)
                 const analysis = availableSuits.map(suit => ({
                     suit,
                     ...this.analyzeNearSequential(hand, suit)
@@ -3465,12 +3560,12 @@
                 });
 
                 const selected = analysis.slice(0, Math.min(numSuits, availableSuits.length)).map(a => a.suit);
-                console.log(`  🎯 v4.5.12: Selected focus suits from ${availableSuits.join(',')}: ${selected.join(', ')}`);
+                console.log(`  🎯 v4.6: Selected focus suits from ${availableSuits.join(',')}: ${selected.join(', ')}`);
                 return selected;
             }
 
             getUnlockedCards(hand, playerIdx) {
-                // 🔧 v4.5.12: Get cards not in locked sequences
+                // 🔧 v4.6: Get cards not in locked sequences
                 const lockedCardIds = new Set();
                 this.aiLockedSequences[playerIdx].forEach(seq => {
                     seq.cards.forEach(card => lockedCardIds.add(card.id));
@@ -3478,7 +3573,7 @@
                 return hand.filter(card => !lockedCardIds.has(card.id));
             }
 
-            // 🔶 v4.5.12: HOLD SYSTEM - Parallel Construction Functions
+            // 🔶 v4.6: HOLD SYSTEM - Parallel Construction Functions
 
             findPotentialHolds(hand, playerIdx) {
                 // Find all 3-card combinations that are "one card away" from a 4-card ladder
@@ -3581,17 +3676,17 @@
                 const cardStr = hold.cards.map(c => c.toString()).join(',');
                 const targetStr = hold.targets.map(t => `${t}${hold.suit}`).join(' or ');
 
-                console.log(`🔶 v4.5.12: ${aiName} put on HOLD: ${cardStr} - targeting ${targetStr}`);
+                console.log(`🔶 v4.6: ${aiName} put on HOLD: ${cardStr} - targeting ${targetStr}`);
             }
 
             checkHeldSequences(playerIdx) {
-                // 🔧 v4.5.12: Check if any held sequences can now be completed
+                // 🔧 v4.6: Check if any held sequences can now be completed
                 // Returns: true if ANY hold was completed (prevents double-locking)
                 const hand = this.playerHands[playerIdx];
                 const aiName = playerIdx === 1 ? 'Habot' : 'Jabot';
                 let completedAnyHold = false;
 
-                // 🔧 v4.5.12: Check for overlapping cards BEFORE locking
+                // 🔧 v4.6: Check for overlapping cards BEFORE locking
                 const existingLocked = this.aiLockedSequences[playerIdx];
 
                 // Iterate backwards to safely remove completed holds
@@ -3609,7 +3704,7 @@
                         const completedLadder = [...hold.cards, targetCard]
                             .sort((a, b) => a.getValue() - b.getValue());
 
-                        // 🔧 v4.5.12: Check for overlap with existing locked sequences
+                        // 🔧 v4.6: Check for overlap with existing locked sequences
                         let hasOverlap = false;
                         for (const locked of existingLocked) {
                             const overlap = completedLadder.some(card =>
@@ -3619,7 +3714,7 @@
                             );
                             if (overlap) {
                                 hasOverlap = true;
-                                console.log(`⚠️ v4.5.12: SKIP HOLD lock - overlaps with existing locked sequence`);
+                                console.log(`⚠️ v4.6: SKIP HOLD lock - overlaps with existing locked sequence`);
                                 console.log(`   Attempted: ${completedLadder.map(c => c.toString()).join(',')}`);
                                 console.log(`   Conflicts with: ${locked.cards.map(c => c.toString()).join(',')}`);
                                 break;
@@ -3628,7 +3723,7 @@
 
                         if (!hasOverlap) {
                             this.lockSequence(playerIdx, completedLadder, 'ladder', hold.suit);
-                            console.log(`✅ v4.5.12: ${aiName} completed HOLD! Got ${targetCard.toString()} → Locked ${completedLadder.map(c => c.toString()).join(',')}`);
+                            console.log(`✅ v4.6: ${aiName} completed HOLD! Got ${targetCard.toString()} → Locked ${completedLadder.map(c => c.toString()).join(',')}`);
                             completedAnyHold = true;
 
                             // Check if ready to publish
@@ -3640,7 +3735,7 @@
                     }
                 }
 
-                return completedAnyHold; // 🔧 v4.5.12: Return flag for decision tree
+                return completedAnyHold; // 🔧 v4.6: Return flag for decision tree
             }
 
             generateTargetCardsWithHolds(hand, suitFocus, playerIdx, maxTargets = 5) {
@@ -3657,7 +3752,7 @@
                         const targetCard = `${rank}${hold.suit}`;
                         if (!targets.includes(targetCard)) {
                             targets.push(targetCard);
-                            console.log(`  🎯 v4.5.12: HOLD target: ${targetCard} (completes ${hold.cards.map(c => c.toString()).join(',')})`);
+                            console.log(`  🎯 v4.6: HOLD target: ${targetCard} (completes ${hold.cards.map(c => c.toString()).join(',')})`);
                         }
                     });
                 });
@@ -3665,7 +3760,7 @@
                 return targets.slice(0, maxTargets + 3); // Allow a few extra for holds
             }
 
-            // 💚 v4.5.12: AGGRESSIVE BUY MODE - Detect when AI needs to be more lenient
+            // 💚 v4.6: AGGRESSIVE BUY MODE - Detect when AI needs to be more lenient
             isAggressiveBuyMode(playerIdx) {
                 // Detects "scattered card emergency" - when AI is stuck and needs to lower standards
                 const stage = this.aiConstructionStage[playerIdx];
@@ -3693,7 +3788,7 @@
 
                 if (aggressive) {
                     const aiName = playerIdx === 1 ? 'Habot' : 'Jabot';
-                    console.log(`%c💚 v4.5.12: ${aiName} AGGRESSIVE BUY MODE activated!`, 'color: #27ae60; font-weight: bold;');
+                    console.log(`%c💚 v4.6: ${aiName} AGGRESSIVE BUY MODE activated!`, 'color: #27ae60; font-weight: bold;');
                     console.log(`   Reason: Stuck on ${stage} for ${turnsOnStage} turns, ${buysRemaining} buys left, only ${targets.length} targets`);
                 }
 
@@ -3727,7 +3822,7 @@
 
                         if (maxRun >= 4 && !targets.includes(targetCard)) {
                             targets.push(targetCard);
-                            console.log(`  🎯 v4.5.12: Target card: ${targetCard} (would create ${maxRun}-card run)`);
+                            console.log(`  🎯 v4.6: Target card: ${targetCard} (would create ${maxRun}-card run)`);
                             if (targets.length >= maxTargets) break;
                         }
                     }
@@ -3747,7 +3842,7 @@
                 // Marks a completed sequence as protected from discard
                 const locked = { type, cards: [...cards], suit };
                 this.aiLockedSequences[playerIdx].push(locked);
-                console.log(`  🔒 v4.5.12: LOCKED ${type} sequence (${cards.length} cards) for Player ${playerIdx}`);
+                console.log(`  🔒 v4.6: LOCKED ${type} sequence (${cards.length} cards) for Player ${playerIdx}`);
                 return locked;
             }
 
@@ -3770,7 +3865,7 @@
                 const needTriples = req.filter(s => s === 'triple').length;
                 const needLadders = req.filter(s => s === 'ladder').length;
 
-                console.log(`  🏗️ v4.5.12: Stage check for Player ${playerIdx} - Current: ${currentStage}`);
+                console.log(`  🏗️ v4.6: Stage check for Player ${playerIdx} - Current: ${currentStage}`);
                 console.log(`      Has: ${seqs.triples.length} triples, ${seqs.ladders.length} ladders`);
                 console.log(`      Need: ${needTriples} triples, ${needLadders} ladders`);
                 console.log(`      Locked: ${this.aiLockedSequences[playerIdx].length} sequences`);
@@ -3782,13 +3877,13 @@
                     // First ladder complete → move to building second ladder
                     if (needLadders >= 2) {
                         this.aiConstructionStage[playerIdx] = 'building_L2';
-                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.12: Track stage change
-                        console.log(`  🎯 v4.5.12: ADVANCED to building_L2 (first ladder locked)`);
-                        // 🔧 v4.5.12: Exclude suits already used in locked ladders
+                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.6: Track stage change
+                        console.log(`  🎯 v4.6: ADVANCED to building_L2 (first ladder locked)`);
+                        // 🔧 v4.6: Exclude suits already used in locked ladders
                         const lockedSuits = this.aiLockedSequences[playerIdx]
                             .filter(s => s.type === 'ladder')
                             .map(s => s.suit);
-                        console.log(`      🚫 v4.5.12: Excluding locked ladder suits: ${lockedSuits.join(', ')}`);
+                        console.log(`      🚫 v4.6: Excluding locked ladder suits: ${lockedSuits.join(', ')}`);
                         const availableSuits = ['♠', '♥', '♦', '♣'].filter(s => !lockedSuits.includes(s));
                         // Select from UNLOCKED hand only, in different suits
                         const unlockedHand = this.getUnlockedCards(hand, playerIdx);
@@ -3798,21 +3893,21 @@
                     } else {
                         // Only need 1 ladder total → move to triple
                         this.aiConstructionStage[playerIdx] = 'building_T';
-                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.12: Track stage change
-                        console.log(`  🎯 v4.5.12: ADVANCED to building_T (only 1 ladder needed)`);
+                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.6: Track stage change
+                        console.log(`  🎯 v4.6: ADVANCED to building_T (only 1 ladder needed)`);
                     }
                 } else if (currentStage === 'building_L2' && lockedLadders >= 2) {
-                    // 🔧 v4.5.12: Check if we need a third ladder or a triple
+                    // 🔧 v4.6: Check if we need a third ladder or a triple
                     if (needLadders >= 3) {
                         // Hand 7: Need 3 ladders → build third ladder
                         this.aiConstructionStage[playerIdx] = 'building_L3';
-                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.12: Track stage change
-                        console.log(`  🎯 v4.5.12: ADVANCED to building_L3 (need third ladder)`);
-                        // 🔧 v4.5.12: Exclude suits from L1 and L2
+                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.6: Track stage change
+                        console.log(`  🎯 v4.6: ADVANCED to building_L3 (need third ladder)`);
+                        // 🔧 v4.6: Exclude suits from L1 and L2
                         const lockedSuits = this.aiLockedSequences[playerIdx]
                             .filter(s => s.type === 'ladder')
                             .map(s => s.suit);
-                        console.log(`      🚫 v4.5.12: Excluding locked ladder suits: ${lockedSuits.join(', ')}`);
+                        console.log(`      🚫 v4.6: Excluding locked ladder suits: ${lockedSuits.join(', ')}`);
                         const availableSuits = ['♠', '♥', '♦', '♣'].filter(s => !lockedSuits.includes(s));
                         const unlockedHand = this.getUnlockedCards(hand, playerIdx);
                         const focusSuits = this.selectSuitFocusFromSuits(unlockedHand, availableSuits, 2);
@@ -3821,26 +3916,26 @@
                     } else if (needTriples >= 1) {
                         // Hand 6: Need triple → build triple
                         this.aiConstructionStage[playerIdx] = 'building_T';
-                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.5.12: Track stage change
-                        console.log(`  🎯 v4.5.12: ADVANCED to building_T (need triple)`);
+                        this.aiStageStartTurn[playerIdx] = this.turnCounter; // 💚 v4.6: Track stage change
+                        console.log(`  🎯 v4.6: ADVANCED to building_T (need triple)`);
                     } else {
                         // Edge case: already have everything
                         this.aiConstructionStage[playerIdx] = 'ready_to_publish';
-                        console.log(`  ✅ v4.5.12: READY TO PUBLISH! All requirements met!`);
+                        console.log(`  ✅ v4.6: READY TO PUBLISH! All requirements met!`);
                     }
                 } else if (currentStage === 'building_L3' && lockedLadders >= 3) {
-                    // 🔧 v4.5.12: Third ladder complete (Hand 7)
+                    // 🔧 v4.6: Third ladder complete (Hand 7)
                     const lockedTriples = this.aiLockedSequences[playerIdx].filter(s => s.type === 'triple').length;
                     if (lockedTriples >= needTriples && lockedLadders >= needLadders) {
                         this.aiConstructionStage[playerIdx] = 'ready_to_publish';
-                        console.log(`  ✅ v4.5.12: READY TO PUBLISH! All 3 ladders locked!`);
+                        console.log(`  ✅ v4.6: READY TO PUBLISH! All 3 ladders locked!`);
                     }
                 } else if (currentStage === 'building_T') {
                     // Check if we have all requirements
                     const lockedTriples = this.aiLockedSequences[playerIdx].filter(s => s.type === 'triple').length;
                     if (lockedTriples >= needTriples && lockedLadders >= needLadders) {
                         this.aiConstructionStage[playerIdx] = 'ready_to_publish';
-                        console.log(`  ✅ v4.5.12: READY TO PUBLISH! All sequences complete!`);
+                        console.log(`  ✅ v4.6: READY TO PUBLISH! All sequences complete!`);
                     }
                 }
             }
@@ -3958,11 +4053,11 @@
                     const seqSuit = seq[0].suit;
                     if (card.suit !== seqSuit) return false;
 
-                    // 🐛 v4.5.12 FIX: Check for duplicate rank+suit in ladder
+                    // 🐛 v4.6 FIX: Check for duplicate rank+suit in ladder
                     // Ladders need CONSECUTIVE ranks - can't have same rank twice!
                     const hasDuplicateRank = seq.some(c => c.rank === card.rank && c.suit === card.suit);
                     if (hasDuplicateRank) {
-                        console.log(`%c  🚫 v4.5.12: Cannot add ${card.toString()} - rank already exists in ladder`, 'color:#ef4444;font-weight:bold');
+                        console.log(`%c  🚫 v4.6: Cannot add ${card.toString()} - rank already exists in ladder`, 'color:#ef4444;font-weight:bold');
                         return false;
                     }
 
@@ -4172,9 +4267,9 @@
             findWorstCard(pIdx) {
                 let hand = this.playerHands[pIdx];  // 🐛 v4.0.7: Changed to 'let' to allow reassignment
 
-                // 🔒 v4.5.12: PROTECT LOCKED SEQUENCES from discard!
+                // 🔒 v4.6: PROTECT LOCKED SEQUENCES from discard!
                 if (this.currentHand >= 6 && this.aiLockedSequences[pIdx].length > 0) {
-                    console.log(`  🔒 v4.5.12: Protecting ${this.aiLockedSequences[pIdx].length} locked sequences from discard`);
+                    console.log(`  🔒 v4.6: Protecting ${this.aiLockedSequences[pIdx].length} locked sequences from discard`);
 
                     // Filter out ALL cards that are in locked sequences
                     const unlockedCards = hand.filter(card => !this.isSequenceLocked(pIdx, card));
@@ -4704,13 +4799,13 @@
                     case 5: if (buysUsed >= 2) return false; const hasAnySequence = hasTriple || hasLadder; return hasAnySequence && cardValue >= 30;
                     case 6:
                     case 7:
-                        // 🏗️ v4.5.12: STAGED CONSTRUCTION STRATEGY
+                        // 🏗️ v4.6: STAGED CONSTRUCTION STRATEGY
                         // Build sequences SEQUENTIALLY: L1 → L2 → T (not parallel!)
 
                         const stage = this.aiConstructionStage[ai];
                         const aiName = ai === 1 ? 'Habot' : 'Jabot';
 
-                        console.log(`  🏗️ v4.5.12 ${aiName} BUY CHECK - Stage: ${stage}, Buys used: ${buysUsed}/2-3`);
+                        console.log(`  🏗️ v4.6 ${aiName} BUY CHECK - Stage: ${stage}, Buys used: ${buysUsed}/2-3`);
 
                         // Stage 1 & 2: Building Ladders - TARGET-BASED BUYING
                         if (stage === 'building_L1' || stage === 'building_L2') {
@@ -4733,7 +4828,7 @@
                                 return true; // BUY immediately if it's a target!
                             }
 
-                            // 💚 v4.5.12: AGGRESSIVE BUY MODE - Lower standards when stuck with scattered cards
+                            // 💚 v4.6: AGGRESSIVE BUY MODE - Lower standards when stuck with scattered cards
                             const aggressiveMode = this.isAggressiveBuyMode(ai);
 
                             if (aggressiveMode) {
@@ -4977,6 +5072,8 @@
                         const published = this.autoPublish(ai);
                         if (published) {
                             console.log(`✅ PATCH 1: ${aiName} auto-published sequences after buy window!`);
+                            // 🎯 v4.6 FIX: Block extensions on same turn as initial publish
+                            this.aiJustPublished[ai] = true;
                         }
                         this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
@@ -4993,6 +5090,8 @@
                         const published = this.autoPublish(ai);
                         if (published) {
                             console.log(`✅ PATCH 1: ${aiName} auto-published sequences after buy window!`);
+                            // 🎯 v4.6 FIX: Block extensions on same turn as initial publish
+                            this.aiJustPublished[ai] = true;
                         }
                         this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
@@ -5008,6 +5107,8 @@
                         const published = this.autoPublish(ai);
                         if (published) {
                             console.log(`✅ PATCH 1: ${aiName} auto-published after AI bought!`);
+                            // 🎯 v4.6 FIX: Block extensions on same turn as initial publish
+                            this.aiJustPublished[ai] = true;
                         }
                         this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
@@ -5059,9 +5160,9 @@
                     return;
                 }
 
-                // 🐛 v4.5.12 FIX: If AI has no buys left, pass window to next player instead of closing
+                // 🐛 v4.6 FIX: If AI has no buys left, pass window to next player instead of closing
                 if (this.playerBuys[aiPlayer] <= 0) {
-                    console.log(`%c⏭️ v4.5.12: ${aiName} has no buys left - rotating to next player`, 'color: #9e9e9e; font-weight: bold;');
+                    console.log(`%c⏭️ v4.6: ${aiName} has no buys left - rotating to next player`, 'color: #9e9e9e; font-weight: bold;');
 
                     // Find next player who hasn't had a chance yet
                     const nextBuyPlayer = (aiPlayer + 2) % 3; // Skip to next in rotation
@@ -5082,7 +5183,7 @@
                     }
 
                     // Rotate to next player
-                    console.log(`%c🔄 v4.5.12: Rotating buy window to ${playerNames[nextBuyPlayer]}`, 'color: #ffc107; font-weight: bold;');
+                    console.log(`%c🔄 v4.6: Rotating buy window to ${playerNames[nextBuyPlayer]}`, 'color: #ffc107; font-weight: bold;');
                     this.buyWindow.buyWindowPlayer = nextBuyPlayer;
 
                     // If next player is human, enable buy button
@@ -5097,7 +5198,7 @@
                 }
 
                 // 🎯 PATCH I v4.1.4: Block buying after publishing in triple-only games (buy window version)
-                // 🐛 v4.5.12 FIX: Rotate to next player instead of closing window
+                // 🐛 v4.6 FIX: Rotate to next player instead of closing window
                 if (this.publishedSequences[aiPlayer].length > 0) {
                     const req = this.handReqs[this.currentHand].seqs;
                     const needLadders = req.filter(s => s === 'ladder').length;
@@ -5118,7 +5219,7 @@
                         }
 
                         // Rotate to next player
-                        console.log(`%c🔄 v4.5.12: Rotating buy window to ${playerNames[nextBuyPlayer]}`, 'color: #ffc107; font-weight: bold;');
+                        console.log(`%c🔄 v4.6: Rotating buy window to ${playerNames[nextBuyPlayer]}`, 'color: #ffc107; font-weight: bold;');
                         this.buyWindow.buyWindowPlayer = nextBuyPlayer;
 
                         if (nextBuyPlayer === 0) {
@@ -5180,7 +5281,7 @@
                 Object.entries(rankCounts).forEach(([rank, count]) => {
                     if (count >= 2) { tempHand.forEach(c => { if (c.rank === rank) protectedCards.add(c.id) }) }
                 });
-                // 🎯 v4.5.14b: Protect cards that can extend ANY published sequence (global resources!)
+                // 🎯 v4.6: Protect cards that can extend ANY published sequence (global resources!)
                 for (let p = 0; p < 3; p++) {
                     if (this.publishedSequences[p].length > 0) {
                         if (this.couldExtendSequence(card, p)) protectedCards.add(card.id);
@@ -5405,7 +5506,7 @@
                     console.log(`     shouldTake: ${shouldTake} ${!shouldTake && (aiHandSize <= 3 || anyPlayerNearWin) ? '(BLOCKED - endgame)' : ''}`);
 
                     // 🎯 PATCH I v4.1.1: Block buying after publishing in triple-only games
-                    // 🐛 v4.5.12 FIX: EXCEPT when card extends a sequence!
+                    // 🐛 v4.6 FIX: EXCEPT when card extends a sequence!
                     if (shouldTake && this.publishedSequences[ai].length > 0 && !extendsAnySequence) {
                         const req = this.handReqs[this.currentHand].seqs;
                         const needLadders = req.filter(s => s === 'ladder').length;
@@ -5420,12 +5521,12 @@
                     if (shouldTake && this.discardPile.length > 0) {
                         const discardTop = this.discardPile[this.discardPile.length - 1];
 
-                        // 🎯 v4.5.14b FIX: Check if card can extend ANY published sequence (global resources!)
+                        // 🎯 v4.6 FIX: Check if card can extend ANY published sequence (global resources!)
                         // If so, ALWAYS take it - don't check wouldDiscardImmediately
                         let canExtendAny = false;
                         for (let p = 0; p < 3; p++) {
                             if (this.publishedSequences[p].length > 0 && this.couldExtendSequence(discardTop, p)) {
-                                console.log(`%c  🎯 v4.5.14b: ${discardTop.toString()} can extend ${['Human', 'Habot', 'Jabot'][p]}'s sequence - TAKING IT!`, 'color: #27ae60; font-weight: bold;');
+                                console.log(`%c  🎯 v4.6: ${discardTop.toString()} can extend ${['Human', 'Habot', 'Jabot'][p]}'s sequence - TAKING IT!`, 'color: #27ae60; font-weight: bold;');
                                 canExtendAny = true;
                                 break;
                             }
@@ -5520,18 +5621,18 @@
             continueAITurnAfterDraw(ai, statusId) {
                 const aiName = ai === 1 ? 'Habot' : 'Jabot';
 
-                // 🏗️ v4.5.12: STAGED CONSTRUCTION WITH HOLD SYSTEM + DECISION TREE DEBUG
+                // 🏗️ v4.6: STAGED CONSTRUCTION WITH HOLD SYSTEM + DECISION TREE DEBUG
                 if (this.currentHand >= 6 && this.aiConstructionStage[ai] !== 'ready_to_publish') {
                     const hand = this.playerHands[ai];
-                    const unlockedHand = this.getUnlockedCards(hand, ai); // 🔧 v4.5.12: Only check unlocked cards!
+                    const unlockedHand = this.getUnlockedCards(hand, ai); // 🔧 v4.6: Only check unlocked cards!
                     const seqs = this.findSequences(unlockedHand);
                     const stage = this.aiConstructionStage[ai];
 
                     console.log(`%c🌳 DECISION TREE START - ${aiName} - Stage: ${stage}`, 'color: #9c27b0; font-weight: bold; font-size: 14px;');
-                    console.log(`  🏗️ v4.5.12: ${aiName} turn - Stage: ${stage}`);
+                    console.log(`  🏗️ v4.6: ${aiName} turn - Stage: ${stage}`);
                     console.log(`      Hand: ${hand.length} total (${unlockedHand.length} unlocked) - ${seqs.triples.length}T, ${seqs.ladders.length}L`);
 
-                    // 🔧 v4.5.12: NODE 1 - Check held sequences FIRST (returns completion flag!)
+                    // 🔧 v4.6: NODE 1 - Check held sequences FIRST (returns completion flag!)
                     console.log(`%c├─ NODE 1: checkHeldSequences() - Checking for HOLD completions`, 'color: #2196f3; font-weight: bold;');
                     const completedHoldThisTurn = this.checkHeldSequences(ai);
 
@@ -5543,7 +5644,7 @@
                     } else {
                         console.log(`%c│  └─ ℹ️  No holds completed - Proceeding to direct ladder checks`, 'color: #ff9800;');
 
-                        // 🔧 v4.5.12: NODE 2 - Check for direct ladders (ONLY if no hold completed!)
+                        // 🔧 v4.6: NODE 2 - Check for direct ladders (ONLY if no hold completed!)
                         console.log(`%c├─ NODE 2: Direct ladder detection`, 'color: #2196f3; font-weight: bold;');
 
                         // Check if we completed a sequence in current stage
@@ -5565,7 +5666,7 @@
                             }
                         } else if (stage === 'building_L1' && seqs.ladders.length === 0) {
                             console.log(`%c│  ├─ No complete ladders found - Checking for HOLD opportunities`, 'color: #607d8b;');
-                            // 🔶 v4.5.12: No complete ladder → Check for HOLDS
+                            // 🔶 v4.6: No complete ladder → Check for HOLDS
                             const potentialHolds = this.findPotentialHolds(unlockedHand, ai);
 
                             if (potentialHolds.length > 0 && this.aiHeldSequences[ai].length === 0) {
@@ -5574,7 +5675,7 @@
                                 this.putOnHold(ai, bestHold);
 
                                 // IMMEDIATELY advance to L2 (don't wait!)
-                                console.log(`%c│  └─ ⏭️ v4.5.12: Advancing to L2 while L1 on hold`, 'color: #ff9800; font-weight: bold;');
+                                console.log(`%c│  └─ ⏭️ v4.6: Advancing to L2 while L1 on hold`, 'color: #ff9800; font-weight: bold;');
                                 this.advanceConstructionStage(ai);
                             } else {
                                 console.log(`%c│  └─ ⏸️  No HOLD opportunities - Continuing to accumulate cards`, 'color: #9e9e9e;');
@@ -5606,7 +5707,7 @@
                             }
                         } else if (stage === 'building_L2' && seqs.ladders.length < 2) {
                             console.log(`%c│  ├─ Less than 2 ladders - Checking for L2 HOLD opportunities`, 'color: #607d8b;');
-                            // 🔶 v4.5.12: No second ladder yet → Check for HOLDS
+                            // 🔶 v4.6: No second ladder yet → Check for HOLDS
                             const unlockedHand = this.getUnlockedCards(hand, ai);
                             const potentialHolds = this.findPotentialHolds(unlockedHand, ai);
 
@@ -5617,14 +5718,14 @@
                                 this.putOnHold(ai, bestHold);
 
                                 // Advance to next stage while L2 on hold
-                                console.log(`%c│  └─ ⏭️ v4.5.12: Advancing while L2 on hold`, 'color: #ff9800; font-weight: bold;');
+                                console.log(`%c│  └─ ⏭️ v4.6: Advancing while L2 on hold`, 'color: #ff9800; font-weight: bold;');
                                 this.advanceConstructionStage(ai);
                             } else {
                                 console.log(`%c│  └─ ⏸️  No L2 HOLD opportunities or already have hold`, 'color: #9e9e9e;');
                             }
                         } else if (stage === 'building_L3' && seqs.ladders.length >= 3) {
                             console.log(`%c│  ├─ Found ${seqs.ladders.length} ladders - Checking for third ladder to lock`, 'color: #607d8b;');
-                            // 🔧 v4.5.12: Lock third ladder (Hand 7)
+                            // 🔧 v4.6: Lock third ladder (Hand 7)
                             const locked = this.aiLockedSequences[ai].filter(s => s.type === 'ladder');
 
                             if (locked.length === 2) {
@@ -5636,7 +5737,7 @@
 
                                 if (unlockedLadder) {
                                     this.lockSequence(ai, unlockedLadder, 'ladder', unlockedLadder[0].suit);
-                                    console.log(`%c│  └─ 🔒 v4.5.12: Locked THIRD ladder: ${unlockedLadder.map(c => c.toString()).join(', ')}`, 'color: #4caf50; font-weight: bold;');
+                                    console.log(`%c│  └─ 🔒 v4.6: Locked THIRD ladder: ${unlockedLadder.map(c => c.toString()).join(', ')}`, 'color: #4caf50; font-weight: bold;');
 
                                     // Check if ready to publish
                                     this.advanceConstructionStage(ai);
@@ -5648,7 +5749,7 @@
                             }
                         } else if (stage === 'building_L3' && seqs.ladders.length < 3) {
                             console.log(`%c│  ├─ Less than 3 ladders - Checking for L3 HOLD opportunities`, 'color: #607d8b;');
-                            // 🔶 v4.5.12: No third ladder yet → Can put on hold if needed
+                            // 🔶 v4.6: No third ladder yet → Can put on hold if needed
                             const unlockedHand = this.getUnlockedCards(hand, ai);
                             const potentialHolds = this.findPotentialHolds(unlockedHand, ai);
 
@@ -5854,7 +5955,7 @@
                         this.lastAIDiscard[ai] = worst;
                         this.lastDiscard = worst;
                         this.lastDiscardByPlayer = ai;
-                        // 🎯 v4.5.14b: Simplified status - just show the discard, no prefix
+                        // 🎯 v4.6: Simplified status - just show the discard, no prefix
                         this.setAIStatus(statusId, `Discarded: ${worst.toString()}`);
                     }
                 }
@@ -5944,7 +6045,7 @@
                             const rankCounts = {};
                             published.forEach(c => { rankCounts[c.rank] = (rankCounts[c.rank] || 0) + 1 });
                             if (rankCounts[card.rank] >= 3) {
-                                // 🐛 v4.5.12 FIX: Find the specific sequence to extend and add directly
+                                // 🐛 v4.6 FIX: Find the specific sequence to extend and add directly
                                 let extendedSequence = false;
 
                                 for (let seqIdx = 0; seqIdx < this.publishedSequences[p].length; seqIdx++) {
@@ -5957,7 +6058,7 @@
                                         this.publishedSequences[p][seqIdx].push(card);
                                         this.playerHands[aiIdx].splice(i, 1);
                                         extendedSequence = true;
-                                        console.log(`  ✅ v4.5.12: Extended ${['You', 'Habot', 'Jabot'][p]}'s sequence ${seqIdx + 1} with ${card.toString()}`);
+                                        console.log(`  ✅ v4.6: Extended ${['You', 'Habot', 'Jabot'][p]}'s sequence ${seqIdx + 1} with ${card.toString()}`);
                                         
                                         // 🎯 v4.5.13: Show toast for extension
                                         const aiName = aiIdx === 1 ? 'Habot' : 'Jabot';
@@ -6016,7 +6117,7 @@
                                     return this.canCardExtendLadder(cardVal, ladder);
                                 });
                                 if (canExtendLadder) {
-                                    // 🐛 v4.5.12 FIX: Find the specific sequence to extend and add directly
+                                    // 🐛 v4.6 FIX: Find the specific sequence to extend and add directly
                                     let extendedSequence = false;
 
                                     for (let seqIdx = 0; seqIdx < this.publishedSequences[p].length; seqIdx++) {
@@ -6036,7 +6137,7 @@
                                                 this.publishedSequences[p][seqIdx].push(card);
                                                 this.playerHands[aiIdx].splice(i, 1);
                                                 extendedSequence = true;
-                                                console.log(`  ✅ v4.5.12: Extended ${['You', 'Habot', 'Jabot'][p]}'s ladder sequence ${seqIdx + 1} with ${card.toString()}`);
+                                                console.log(`  ✅ v4.6: Extended ${['You', 'Habot', 'Jabot'][p]}'s ladder sequence ${seqIdx + 1} with ${card.toString()}`);
                                                 
                                                 // 🎯 v4.5.13: Show toast for extension
                                                 const aiName = aiIdx === 1 ? 'Habot' : 'Jabot';
@@ -6071,7 +6172,7 @@
                 }
                 setTimeout(() => { this.showModal('Hand Complete', `${winnerName} won Hand ${this.currentHand}!`) }, 2000);
                 setTimeout(async () => {
-                    // 🎮 v4.5.12: Check if single hand mode or full game
+                    // 🎮 v4.6: Check if single hand mode or full game
                     if (this.gameMode !== 'full') {
                         // Single hand mode - show hand selection menu again
                         console.log('%c🎯 Single hand complete! Showing hand selection menu...', 'color: #ffd700; font-weight: bold;');
@@ -6099,11 +6200,11 @@
                         this.lastDiscard = null; this.lastDiscardByPlayer = -1; this.discardPile = [];
                         this.turnCounter = 0; this.lastAIDiscard = [null, null, null]; this.lastCardWarningShown = null;
 
-                        // 🏗️ v4.5.12: Initialize staged construction for Hands 6-7
+                        // 🏗️ v4.6: Initialize staged construction for Hands 6-7
                         if (this.currentHand >= 6) {
-                            console.log(`%c🏗️ v4.5.12: Initializing STAGED CONSTRUCTION for Hand ${this.currentHand}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
+                            console.log(`%c🏗️ v4.6: Initializing STAGED CONSTRUCTION for Hand ${this.currentHand}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
                             this.aiConstructionStage = [null, 'building_L1', 'building_L1'];
-                            this.aiStageStartTurn = [null, this.turnCounter, this.turnCounter]; // 💚 v4.5.12: Track stage start
+                            this.aiStageStartTurn = [null, this.turnCounter, this.turnCounter]; // 💚 v4.6: Track stage start
                             this.aiLockedSequences = [[], [], []];
                             this.aiTargetCards = [null, [], []];
                             this.aiSuitFocus = [null, [], []];
@@ -6121,11 +6222,11 @@
                 persistentScores = [...this.playerScores];
                 const msg = `Game Complete!\n\n🏆 ${winner.name} wins with ${winner.score} points!\n🎃 ${loser.name} is the Habib Punja with ${loser.score} points!`;
 
-                // 🎮 v4.5.12: Show final results with Play Again option instead of auto-restarting
+                // 🎮 v4.6: Show final results with Play Again option instead of auto-restarting
                 this.showFinalResultsModal(msg, winner, loser);
             }
 
-            // 🎮 v4.5.12: NEW - Final results modal with Play Again option
+            // 🎮 v4.6: NEW - Final results modal with Play Again option
             showFinalResultsModal(msg, winner, loser) {
                 const modal = document.createElement('div');
                 modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;';
@@ -6287,7 +6388,7 @@
                 // Remove card from hand
                 this.playerHands[0].splice(cardIdx, 1);
 
-                // 🎯 v4.5.12 CRITICAL FIX: When forceType specified, ONLY check matching sequence type!
+                // 🎯 v4.6 CRITICAL FIX: When forceType specified, ONLY check matching sequence type!
                 let addedToSequence = false;
                 for (let seq of published) {
                     // Determine if this sequence is triple or ladder
@@ -6300,20 +6401,20 @@
                     if (typeMatches && this.canAddToPublishedSequence(card, seq)) {
                         seq.push(card);
 
-                        // v4.5.12 FIX: Auto-sort ladder after extension for visual clarity
+                        // v4.6 FIX: Auto-sort ladder after extension for visual clarity
                         if (forceType === 'ladder') {
                             seq.sort((a, b) => a.getValue() - b.getValue());
-                            console.log(`%c  🔄 v4.5.12: Re-sorted ladder after extension: ${seq.map(c => c.toString()).join('-')}`, 'color:#3b82f6;font-weight:bold');
+                            console.log(`%c  🔄 v4.6: Re-sorted ladder after extension: ${seq.map(c => c.toString()).join('-')}`, 'color:#3b82f6;font-weight:bold');
                         }
 
-                        console.log(`%c  ✅ v4.5.12: Added ${card.toString()} to ${forceType} sequence: ${seq.map(c => c.toString()).join(' ')}`, 'color:#28a745;font-weight:bold');
+                        console.log(`%c  ✅ v4.6: Added ${card.toString()} to ${forceType} sequence: ${seq.map(c => c.toString()).join(' ')}`, 'color:#28a745;font-weight:bold');
                         addedToSequence = true;
                         break;
                     }
                 }
 
                 if (!addedToSequence) {
-                    console.log(`%c  ⚠️ v4.5.12: Could not add to existing ${forceType} sequence, creating new`, 'color:#f59e0b;');
+                    console.log(`%c  ⚠️ v4.6: Could not add to existing ${forceType} sequence, creating new`, 'color:#f59e0b;');
                     published.push([card]);
                 }
 
@@ -6440,11 +6541,11 @@
                 this.lastCardWarningShown = null;
                 this.buyWindow = { active: false, card: null, discardingPlayer: -1, buyWindowPlayer: -1, expiresAt: 0, timerInterval: null, pendingDeckDraw: null };
 
-                // 🏗️ v4.5.12 FIX: Initialize staged construction when jumping to Hands 6-7
+                // 🏗️ v4.6 FIX: Initialize staged construction when jumping to Hands 6-7
                 if (handNum >= 6) {
-                    console.log(`%c🏗️ v4.5.12: Initializing STAGED CONSTRUCTION for Hand ${handNum}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
+                    console.log(`%c🏗️ v4.6: Initializing STAGED CONSTRUCTION for Hand ${handNum}`, 'color: #9b59b6; font-weight: bold; font-size: 14px;');
                     this.aiConstructionStage = [null, 'building_L1', 'building_L1'];
-                    this.aiStageStartTurn = [null, this.turnCounter, this.turnCounter]; // 💚 v4.5.12: Track stage start
+                    this.aiStageStartTurn = [null, this.turnCounter, this.turnCounter]; // 💚 v4.6: Track stage start
                     this.aiLockedSequences = [[], [], []];
                     this.aiTargetCards = [null, [], []];
                     this.aiSuitFocus = [null, [], []];
@@ -6496,9 +6597,9 @@
             updateUI() {
                 const req = this.handReqs[this.currentHand];
                 document.getElementById('currentHand').textContent = this.currentHand;
-                // 🎯 v4.5.14b: Use abbreviated name for compact header
+                // 🎯 v4.6: Use abbreviated name for compact header
                 document.getElementById('handRequirements').textContent = req.short || req.name;
-                // 🎯 v4.5.14b: Show turn counter in header
+                // 🎯 v4.6: Show turn counter in header
                 document.getElementById('turnCounter').textContent = this.turnCounter;
                 const progress = this.getPublishProgress();
                 let progressParts = [];
@@ -6511,7 +6612,7 @@
                 if (progress.canPublish) reqEl.classList.add('ready');
                 else reqEl.classList.remove('ready');
                 const turnText = this.currentPlayer === 0 ? 'Your Turn' : this.currentPlayer === 1 ? "Habot" : "Jabot";
-                // 🎯 v4.5.14b: Blinking turn indicator for YOUR TURN - promised to Mubina!
+                // 🎯 v4.6: Blinking turn indicator for YOUR TURN - promised to Mubina!
                 const turnIndicator = document.getElementById('turnIndicator');
                 turnIndicator.textContent = turnText;
                 if (this.currentPlayer === 0) {
@@ -6747,7 +6848,7 @@
                     const container = document.getElementById(containerId);
                     container.innerHTML = '';
 
-                    // 🎯 v4.5.14b: Toggle visibility of YOUR PUBLISHED section
+                    // 🎯 v4.6: Toggle visibility of YOUR PUBLISHED section
                     if (p === 0) {
                         const publishedSection = document.getElementById('player1Published');
                         if (this.publishedSequences[0] && this.publishedSequences[0].length > 0) {
@@ -6757,7 +6858,7 @@
                         }
                     }
 
-                    // 🎯 v4.5.12: Render each sequence SEPARATELY with visual gaps
+                    // 🎯 v4.6: Render each sequence SEPARATELY with visual gaps
                     const sequences = this.publishedSequences[p];
                     if (!sequences || sequences.length === 0) return;
 
@@ -6835,7 +6936,7 @@
 
                 const tripleContainer = document.getElementById('tripleOptions');
 
-                // 🎯 v4.5.14b: Deduplicate triples for triple-only hands
+                // 🎯 v4.6: Deduplicate triples for triple-only hands
                 // For triple-only hands, ♠3-♥3-♦3 is functionally same regardless of which physical cards
                 let displayTriples = seqs.triples;
                 if (laddersNeeded === 0) {
@@ -6851,7 +6952,7 @@
                         seenSuitCombos.add(key);
                         return true;
                     });
-                    console.log(`%c🎯 v4.5.14b: Deduplicated triples: ${seqs.triples.length} → ${displayTriples.length}`, 'color: #9b59b6; font-weight: bold;');
+                    console.log(`%c🎯 v4.6: Deduplicated triples: ${seqs.triples.length} → ${displayTriples.length}`, 'color: #9b59b6; font-weight: bold;');
                 }
 
                 displayTriples.forEach((triple, idx) => {
@@ -6964,7 +7065,7 @@
             game.publishSelection.triples.forEach(idx => { published = published.concat(seqs.triples[idx]) });
             game.publishSelection.ladders.forEach(idx => { published = published.concat(seqs.ladders[idx]) });
 
-            // v4.5.12 CRITICAL FIX: Smart-assign card IDs before validation
+            // v4.6 CRITICAL FIX: Smart-assign card IDs before validation
             // IMPORTANT: De-duplication may leave SAME card object in multiple patterns
             // We need to track which card OBJECTS we've seen, not just IDs
             const usedIdsForAssignment = new Set();
@@ -6973,7 +7074,7 @@
             published.forEach((card, index) => {
                 // Check if we've already processed this exact card OBJECT
                 if (processedObjects.has(card)) {
-                    console.log(`%c  ⚠️  v4.5.12: Card object ${card.rank}${card.suit} appears multiple times! Finding replacement...`, 'color:#f59e0b;font-weight:bold');
+                    console.log(`%c  ⚠️  v4.6: Card object ${card.rank}${card.suit} appears multiple times! Finding replacement...`, 'color:#f59e0b;font-weight:bold');
 
                     // This card object is reused! Find a different card instance
                     const availableCard = game.playerHands[0].find(c =>
@@ -6987,9 +7088,9 @@
                         published[index] = availableCard;
                         usedIdsForAssignment.add(availableCard.id);
                         processedObjects.add(availableCard);
-                        console.log(`%c  ✅ v4.5.12: Replaced with ${availableCard.rank}${availableCard.suit} (ID: ${availableCard.id})`, 'color:#28a745;');
+                        console.log(`%c  ✅ v4.6: Replaced with ${availableCard.rank}${availableCard.suit} (ID: ${availableCard.id})`, 'color:#28a745;');
                     } else {
-                        console.log(`%c  ❌ v4.5.12: No available card found for ${card.rank}${card.suit}!`, 'color:#ef4444;font-weight:bold');
+                        console.log(`%c  ❌ v4.6: No available card found for ${card.rank}${card.suit}!`, 'color:#ef4444;font-weight:bold');
                     }
                 } else {
                     // First time seeing this card object - check if we need to reassign
@@ -7003,12 +7104,12 @@
                         published[index] = availableCard;
                         usedIdsForAssignment.add(availableCard.id);
                         processedObjects.add(availableCard);
-                        console.log(`%c  🔄 v4.5.12: Assigned ${card.rank}${card.suit} → ID ${availableCard.id}`, 'color:#3b82f6;');
+                        console.log(`%c  🔄 v4.6: Assigned ${card.rank}${card.suit} → ID ${availableCard.id}`, 'color:#3b82f6;');
                     }
                 }
             });
 
-            console.log(`%c✅ v4.5.12: Smart-assigned ${published.length} cards with unique IDs`, 'color:#28a745;font-weight:bold');
+            console.log(`%c✅ v4.6: Smart-assigned ${published.length} cards with unique IDs`, 'color:#28a745;font-weight:bold');
 
             // ========== START FIX 5: REPLACE FROM HERE ==========
 
@@ -7075,7 +7176,7 @@
             // ✅ KEEP EVERYTHING BELOW (Execution section - unchanged)
             published.forEach(c => { const idx = game.playerHands[0].findIndex(card => card.id === c.id); if (idx > -1) game.playerHands[0].splice(idx, 1) });
 
-            // v4.5.12 CRITICAL FIX: Rebuild sequences from modified published array
+            // v4.6 CRITICAL FIX: Rebuild sequences from modified published array
             // The published array has the correct card instances (with smart assignment)
             // We need to split it back into sequences based on user's original selections
             const sequences = [];
@@ -7103,7 +7204,7 @@
 
             game.publishedSequences[0] = sequences;
 
-            console.log(`%c🎯 v4.5.12: Published ${sequences.length} sequences with smart-assigned cards`, 'color: #27ae60; font-weight: bold;');
+            console.log(`%c🎯 v4.6: Published ${sequences.length} sequences with smart-assigned cards`, 'color: #27ae60; font-weight: bold;');
             sequences.forEach((seq, i) => {
                 console.log(`  Sequence ${i + 1}: ${seq.map(c => c.toString() + '(' + c.id.substring(0, 4) + ')').join(' ')}`);
             });
@@ -7267,34 +7368,40 @@
             document.getElementById('buyBtn').addEventListener('click', buyCard);
             document.getElementById('newGameBtn').addEventListener('click', newGame);
 
-            // 🎯 v4.5.14b: Sort picker toggle
+            // 🎯 v4.6: Sort Bottom Sheet Modal
             const sortBtn = document.getElementById('sortBtn');
-            const sortPicker = document.getElementById('sortPicker');
+            const sortSheetOverlay = document.getElementById('sortSheetOverlay');
             
+            // Open sort sheet
             sortBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                sortPicker.style.display = sortPicker.style.display === 'none' ? 'flex' : 'none';
+                sortSheetOverlay.classList.add('active');
             });
 
-            // Close sort picker when clicking elsewhere
-            document.addEventListener('click', (e) => {
-                if (!sortPicker.contains(e.target) && e.target !== sortBtn) {
-                    sortPicker.style.display = 'none';
+            // Close sort sheet when clicking overlay
+            sortSheetOverlay.addEventListener('click', (e) => {
+                if (e.target === sortSheetOverlay) {
+                    sortSheetOverlay.classList.remove('active');
                 }
             });
 
-            // Sorting buttons (close picker after selection)
+            // Cancel button
+            document.getElementById('sortCancelBtn').addEventListener('click', () => {
+                sortSheetOverlay.classList.remove('active');
+            });
+
+            // Sorting buttons (close sheet after selection)
             document.getElementById('sortByRankBtn').addEventListener('click', () => {
                 sortByRank();
-                sortPicker.style.display = 'none';
+                sortSheetOverlay.classList.remove('active');
             });
             document.getElementById('sortBySuitBtn').addEventListener('click', () => {
                 sortBySuit();
-                sortPicker.style.display = 'none';
+                sortSheetOverlay.classList.remove('active');
             });
             document.getElementById('sortByQuantityBtn').addEventListener('click', () => {
                 sortByQuantity();
-                sortPicker.style.display = 'none';
+                sortSheetOverlay.classList.remove('active');
             });
 
             // Deck interaction
@@ -7891,7 +7998,7 @@
             }
         }
 
-        // 🎯 v4.5.14b: Toggle YOUR PUBLISHED section (collapsible like AI areas)
+        // 🎯 v4.6: Toggle YOUR PUBLISHED section (collapsible like AI areas)
         function toggleYourPublished() {
             const content = document.getElementById('player1PublishedContent');
             const header = document.querySelector('.your-published-header');
