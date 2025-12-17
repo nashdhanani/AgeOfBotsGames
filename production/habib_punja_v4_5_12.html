@@ -2,12 +2,42 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.6 - CRITICAL FIX: Duplicate Card Object Replacement
-  Release Date: December 10, 2025
+  Version: 4.7 - Hand-Aware AI: Depleted Ranks & Ladder Protection
+  Release Date: December 17, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
+  🎮 VERSION 4.7 - Hand-Aware AI: Depleted Ranks & Ladder Protection
+  ═══════════════════════════════════════════════════════════════════════════
+  
+  🧠 FIX #1: DEPLETED RANK TRACKING
+  Problem: AI chased mathematically impossible triples after 5+ cards of rank published
+  - 2 decks = 8 cards per rank
+  - If 5+ cards of rank are published globally, only 3 remain
+  - Impossible to build a NEW triple from remaining cards
+  
+  Solution: getDepletedRanks() tracks published cards by rank across ALL players
+  - Ranks with 5+ published are marked "depleted"
+  - AI treats depleted rank cards as "stealth cards" (safe to discard or extend only)
+  - Dramatically improves AI decision-making in mid/late game
+  
+  🎯 FIX #2: HAND-AWARE LADDER PROTECTION
+  Problem: AI broke perfect ladders to make triples (e.g., had 4-5-6-7-8♠, made triple of 4s!)
+  - Test showed AI destroying consecutive runs to fulfill "any two sequences"
+  - Hand 2 requires "1 Triple + 1 Ladder" but AI tried to make 2 triples
+  
+  Solution: getProtectedLadderCards() identifies consecutive runs
+  - When hand requires ladders, 4+ consecutive same-suit cards are PROTECTED
+  - Protected cards excluded from triple consideration
+  - Emergency publish respects hand type requirements
+  
+  📝 FIX #3: GRAMMAR - "You Wins" → "You Win"
+  Problem: Victory message said "You wins with X points" 
+  Solution: Conditional verb based on player name
+  
+  ═══════════════════════════════════════════════════════════════════════════
+  
   🎮 VERSION 4.6 - CRITICAL FIX: Object Reference & Duplicate Card Validation
   ═══════════════════════════════════════════════════════════════════════════
   🐛 CRITICAL FIX #1: Duplicate card object reference bug (GAME-BREAKING)
@@ -700,14 +730,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.6 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.6 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.7 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.7 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description"
         content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords"
         content="Habib Punja, card game, rummy, Liverpool Rummy, AI card game, strategy game, online card game, AgeOfBotsGames">
     <meta name="author" content="AgeOfBotsGames LLC">
-    <meta name="version" content="4.6">
+    <meta name="version" content="4.7">
     <meta name="copyright" content="Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.">
 
     <!-- Open Graph / Facebook -->
@@ -2495,7 +2525,8 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.6 - MOBILE OPTIMIZED', 'color: #9b59b6; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.7 - HAND-AWARE AI', 'color: #9b59b6; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
         console.log('%cWebsite: https://ageofbotsgames.com', 'color: #2196F3; font-size: 12px;');
@@ -2643,6 +2674,140 @@
                 if (aiScore >= maxOtherScore && aiScore > minOtherScore + 20) return 'rabbit';
                 if (aiScore <= minOtherScore) return 'tortoise';
                 return this.aiPersonality[aiIdx] || 'neutral';
+            }
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // 🚫 v4.7: DEPLETED RANK TRACKING
+            // When 5+ cards of a rank are published globally, only 3 remain in 2-deck game
+            // → Impossible to build a NEW triple of that rank
+            // ═══════════════════════════════════════════════════════════════════════════
+            
+            getDepletedRanks() {
+                const rankCounts = {};
+                
+                // Count ALL published cards by rank across ALL players
+                for (let p = 0; p < 3; p++) {
+                    if (!this.publishedSequences[p]) continue;
+                    for (const seq of this.publishedSequences[p]) {
+                        if (!seq.cards) continue;
+                        for (const card of seq.cards) {
+                            rankCounts[card.rank] = (rankCounts[card.rank] || 0) + 1;
+                        }
+                    }
+                }
+                
+                // 2 decks = 8 cards per rank
+                // If 5+ are published, only 3 remain → can't make a NEW triple
+                const depleted = Object.keys(rankCounts).filter(rank => rankCounts[rank] >= 5);
+                
+                if (depleted.length > 0) {
+                    console.log(`%c🚫 v4.7: Depleted ranks (≥5 published): ${depleted.join(', ')}`, 'color: #e74c3c; font-weight: bold;');
+                }
+                
+                return depleted;
+            }
+            
+            isRankDepleted(rank) {
+                const depletedRanks = this.getDepletedRanks();
+                return depletedRanks.includes(rank);
+            }
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // 🛡️ v4.7: HAND-AWARE LADDER PROTECTION
+            // Protect consecutive cards when hand requires ladders
+            // ═══════════════════════════════════════════════════════════════════════════
+            
+            getHandRequirements() {
+                const handReq = this.handReqs[this.currentHand];
+                const seqs = handReq.seqs || [];
+                
+                return {
+                    needsLadder: seqs.includes('ladder'),
+                    needsTriple: seqs.includes('triple'),
+                    ladderCount: seqs.filter(s => s === 'ladder').length,
+                    tripleCount: seqs.filter(s => s === 'triple').length,
+                    totalSequences: seqs.length
+                };
+            }
+            
+            findConsecutiveRuns(hand) {
+                const runs = [];
+                const bySuit = {};
+                
+                // Group cards by suit
+                for (const card of hand) {
+                    if (!bySuit[card.suit]) bySuit[card.suit] = [];
+                    bySuit[card.suit].push(card);
+                }
+                
+                // For each suit, find consecutive sequences
+                for (const suit in bySuit) {
+                    const cards = bySuit[suit];
+                    if (cards.length < 3) continue;
+                    
+                    // Sort by value
+                    cards.sort((a, b) => a.getValue() - b.getValue());
+                    
+                    let runStart = 0;
+                    for (let i = 1; i <= cards.length; i++) {
+                        const isConsecutive = i < cards.length && 
+                            cards[i].getValue() === cards[i-1].getValue() + 1;
+                        
+                        if (!isConsecutive) {
+                            const runLength = i - runStart;
+                            if (runLength >= 3) {
+                                runs.push({
+                                    suit: suit,
+                                    cards: cards.slice(runStart, i),
+                                    length: runLength,
+                                    ranks: cards.slice(runStart, i).map(c => c.rank).join('-')
+                                });
+                            }
+                            runStart = i;
+                        }
+                    }
+                }
+                
+                if (runs.length > 0) {
+                    console.log(`%c🎯 v4.7: Found ${runs.length} consecutive run(s): ${runs.map(r => r.ranks + r.suit).join(', ')}`, 'color: #27ae60; font-weight: bold;');
+                }
+                
+                return runs;
+            }
+            
+            getProtectedLadderCards(hand, pIdx) {
+                const requirements = this.getHandRequirements();
+                const protectedIds = new Set();
+                
+                // Only protect if this hand requires ladders
+                if (!requirements.needsLadder) return protectedIds;
+                
+                const runs = this.findConsecutiveRuns(hand);
+                
+                // Protect cards in runs of 4+ (strong ladder potential)
+                for (const run of runs) {
+                    if (run.length >= 4) {
+                        for (const card of run.cards) {
+                            protectedIds.add(card.id);
+                            console.log(`%c🛡️ v4.7: Protecting ${card.toString()} - part of ${run.length}-card ladder`, 'color: #3498db; font-weight: bold;');
+                        }
+                    }
+                }
+                
+                return protectedIds;
+            }
+            
+            // Check if a card can extend any published sequence (for stealth card evaluation)
+            canCardExtendAnyPublished(card) {
+                for (let p = 0; p < this.players; p++) {
+                    if (!this.publishedSequences[p] || this.publishedSequences[p].length === 0) continue;
+                    for (const seq of this.publishedSequences[p]) {
+                        if (this.canExtendSequence(seq, card)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
             }
 
             // ============================================
@@ -3382,14 +3547,31 @@
                         this.getPublishedSuits(i).forEach(s => opponentSuits.add(s));
                     }
                 }
+                
+                // 🛡️ v4.7: Get protected ladder cards BEFORE selecting triples
+                const laddersNeeded = req.filter(s => s === 'ladder').length;
+                let protectedIds = new Set();
+                if (laddersNeeded > 0) {
+                    protectedIds = this.getProtectedLadderCards(hand, pIdx);
+                    console.log(`%c🛡️ v4.7: autoPublish protecting ${protectedIds.size} ladder cards`, 'color: #3498db; font-weight: bold;');
+                }
+                
+                // 🚫 v4.7: Get depleted ranks
+                const depletedRanks = this.getDepletedRanks();
+                
                 let published = [];
                 const usedCardIds = new Set();
                 let triplesPublished = 0;
                 let laddersPublished = 0;
                 const triplesNeeded = req.filter(s => s === 'triple').length;
-                const laddersNeeded = req.filter(s => s === 'ladder').length;
+                
                 while (triplesPublished < triplesNeeded) {
-                    const availableHand = hand.filter(c => !usedCardIds.has(c.id));
+                    // 🛡️ v4.7: Exclude protected ladder cards AND depleted ranks from triple candidates
+                    const availableHand = hand.filter(c => 
+                        !usedCardIds.has(c.id) && 
+                        !protectedIds.has(c.id) &&
+                        !depletedRanks.includes(c.rank)
+                    );
                     const byRank = {};
                     availableHand.forEach(c => { if (!byRank[c.rank]) byRank[c.rank] = []; byRank[c.rank].push(c) });
                     const ranks = Object.keys(byRank).filter(rank => byRank[rank].length >= 3).sort((a, b) => {
@@ -3399,6 +3581,24 @@
                         return parseInt(a === 'A' ? 1 : a === 'J' ? 11 : a === 'Q' ? 12 : a === 'K' ? 13 : a) -
                             parseInt(b === 'A' ? 1 : b === 'J' ? 11 : b === 'Q' ? 12 : b === 'K' ? 13 : b);
                     });
+                    
+                    // 🛡️ v4.7: If no valid triples found with protection, try without protection (fallback)
+                    if (ranks.length === 0 && protectedIds.size > 0) {
+                        console.log(`%c⚠️ v4.7: No triples without protected cards - trying with all cards`, 'color: #f39c12; font-weight: bold;');
+                        const fallbackHand = hand.filter(c => !usedCardIds.has(c.id) && !depletedRanks.includes(c.rank));
+                        const fallbackByRank = {};
+                        fallbackHand.forEach(c => { if (!fallbackByRank[c.rank]) fallbackByRank[c.rank] = []; fallbackByRank[c.rank].push(c) });
+                        const fallbackRanks = Object.keys(fallbackByRank).filter(rank => fallbackByRank[rank].length >= 3);
+                        if (fallbackRanks.length > 0) {
+                            const rank = fallbackRanks[0];
+                            const cards = fallbackByRank[rank];
+                            published = published.concat(cards.slice(0, 3));
+                            cards.slice(0, 3).forEach(c => usedCardIds.add(c.id));
+                            triplesPublished++;
+                            continue;
+                        }
+                    }
+                    
                     if (ranks.length === 0) break;
                     const rank = ranks[0];
                     const cards = byRank[rank];
@@ -4194,6 +4394,22 @@
             evaluateCard(card, pIdx) {
                 const hand = this.playerHands[pIdx];
                 let val = 0;
+
+                // 🚫 v4.7: Check if this card's rank is depleted (can't make new triple)
+                if (this.isRankDepleted(card.rank)) {
+                    // Check if it can extend any published sequence
+                    const canExtend = this.canCardExtendAnyPublished(card);
+                    
+                    if (canExtend) {
+                        // Keep some value - can use for extension
+                        console.log(`%c📉 v4.7: ${card.toString()} rank depleted but can extend - moderate value`, 'color: #f39c12;');
+                        val = 15;  // Extension value only
+                    } else {
+                        // Stealth card - safe to discard, no triple potential
+                        console.log(`%c📉 v4.7: ${card.toString()} rank depleted, no extension - STEALTH CARD`, 'color: #e74c3c;');
+                        return -5;  // Negative = prioritize discarding
+                    }
+                }
 
                 const sameRank = hand.filter(c => c.rank === card.rank).length;
                 const sameSuit = hand.filter(c => c.suit === card.suit);
@@ -5395,32 +5611,40 @@
                     // 🎯 PATCH M: In triple games, only buy if completes/extends a triple
                     // 🎯 v4.0.7 FIX: Check BOTH hand AND published sequences!
                     // 🎯 v4.0.7 FIX: Check ALL published sequences (global resources), not just AI's own!
+                    // 🚫 v4.7: Also check if rank is DEPLETED (mathematically impossible to triple)
                     if (shouldTake && this.discardPile.length > 0) {
                         const req = this.handReqs[this.currentHand].seqs;
                         const hasOnlyTriples = req.every(s => s === 'triple');
 
                         if (hasOnlyTriples && !forceBuy) {
                             const topCard = this.discardPile[this.discardPile.length - 1];
-                            const matchingInHand = this.playerHands[ai].filter(c => c.rank === topCard.rank).length;
-
-                            // 🎯 v4.0.7: Check ALL published sequences (anyone's!)
-                            let matchingInAnyPublished = 0;
-                            for (let p = 0; p < this.players; p++) {
-                                const matching = this.getFlatPublished(p).filter(c => c.rank === topCard.rank).length;
-                                if (matching > 0) {
-                                    matchingInAnyPublished = matching;
-                                    break; // Found one - that's enough! No need to check more
-                                }
-                            }
-
-                            const totalMatching = matchingInHand + matchingInAnyPublished;
-
-                            if (totalMatching < 2) {
-                                // Need at least 2 existing (hand OR any published) + 1 buy = 3 minimum
-                                console.log(`  → PATCH M: Blocking buy - ${topCard.toString()} won't complete triple (${matchingInHand} in hand, ${matchingInAnyPublished} in any published = ${totalMatching} total)`);
+                            
+                            // 🚫 v4.7: First check if rank is depleted
+                            if (this.isRankDepleted(topCard.rank)) {
+                                console.log(`%c  🚫 v4.7: Blocking buy - ${topCard.toString()} rank is DEPLETED (≥5 published globally)`, 'color: #e74c3c; font-weight: bold;');
                                 shouldTake = false;
                             } else {
-                                console.log(`  → PATCH M: Allowing buy - ${topCard.toString()} extends/completes triple! (${matchingInHand} in hand + ${matchingInAnyPublished} in published + 1 buy = extends global sequence)`);
+                                const matchingInHand = this.playerHands[ai].filter(c => c.rank === topCard.rank).length;
+
+                                // 🎯 v4.0.7: Check ALL published sequences (anyone's!)
+                                let matchingInAnyPublished = 0;
+                                for (let p = 0; p < this.players; p++) {
+                                    const matching = this.getFlatPublished(p).filter(c => c.rank === topCard.rank).length;
+                                    if (matching > 0) {
+                                        matchingInAnyPublished = matching;
+                                        break; // Found one - that's enough! No need to check more
+                                    }
+                                }
+
+                                const totalMatching = matchingInHand + matchingInAnyPublished;
+
+                                if (totalMatching < 2) {
+                                    // Need at least 2 existing (hand OR any published) + 1 buy = 3 minimum
+                                    console.log(`  → PATCH M: Blocking buy - ${topCard.toString()} won't complete triple (${matchingInHand} in hand, ${matchingInAnyPublished} in any published = ${totalMatching} total)`);
+                                    shouldTake = false;
+                                } else {
+                                    console.log(`  → PATCH M: Allowing buy - ${topCard.toString()} extends/completes triple! (${matchingInHand} in hand + ${matchingInAnyPublished} in published + 1 buy = extends global sequence)`);
+                                }
                             }
                         }
                     }
@@ -6220,7 +6444,9 @@
                 const winner = results[0];
                 const loser = results[results.length - 1];
                 persistentScores = [...this.playerScores];
-                const msg = `Game Complete!\n\n🏆 ${winner.name} wins with ${winner.score} points!\n🎃 ${loser.name} is the Habib Punja with ${loser.score} points!`;
+                // 📝 v4.7: Grammar fix - "You win" not "You wins"
+                const winVerb = winner.name === 'You' ? 'win' : 'wins';
+                const msg = `Game Complete!\n\n🏆 ${winner.name} ${winVerb} with ${winner.score} points!\n🎃 ${loser.name} is the Habib Punja with ${loser.score} points!`;
 
                 // 🎮 v4.6: Show final results with Play Again option instead of auto-restarting
                 this.showFinalResultsModal(msg, winner, loser);
