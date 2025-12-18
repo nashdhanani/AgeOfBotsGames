@@ -35,6 +35,39 @@
   📝 FIX #3: GRAMMAR - "You Wins" → "You Win"
   Problem: Victory message said "You wins with X points" 
   Solution: Conditional verb based on player name
+
+  🐛 FIX #4: BUG - "Add to Sequence" Shown for Unpublished Players (Mubina's Bug #5)
+  Problem: Extend buttons appeared for Habot/Jabot even when they hadn't published
+  Solution: Only show extend buttons for players with actual published sequences
+  
+  📜 FIX #5: MESSAGE LOG SYSTEM (Mubina's Feedback #2)
+  Problem: Flash messages fly by too fast, no way to review them
+  Solution: Added "📜 Log" button that shows message history
+  - All toasts are logged with timestamps
+  - Log clears on new game
+  - Shows message count badge
+  - AI publish events now generate toast notifications
+  
+  🐛 FIX #6: separateSequences Combining Ladder Cards into Triples
+  Problem: When published array contains 7♣,7♦,7♠ (triple) + 5♥,6♥,7♥,8♥ (ladder),
+           separateSequences saw 4 sevens and grouped them as quad, breaking ladder!
+  Solution: separateSequences now creates exactly triplesNeeded triples (3 cards each),
+           leaving remaining cards available for ladders
+           
+  🐛 FIX #7: AI Buying When Already Publishable (Test #7)
+  Problem: Jabot bought K♥ even though it already had publishable sequences
+  Solution: shouldAllowBuy() now returns false if canPublish() is true
+  
+  🐛 FIX #8: AI Not Publishing With Perfect Hand (Test #7)
+  Problem: canPublishNow=true but shouldPublish=false because turn<15 and hand>7
+           AI sat on perfect publishable hand instead of publishing immediately
+  Solution: If publishing would leave ≤5 cards remaining, publish immediately
+  
+  🐛 FIX #9: PATCH LADDER-DISCARD Discarding Triple Cards (Test #7)
+  Problem: 7♣ discarded as "isolated" (only club) but was part of 7♣,7♦,7♠ triple!
+  Solution: PATCH LADDER-DISCARD now checks both ladder AND triple groupings
+  Priority order: LADDER (score 60-80) > TRIPLE (score 30-40) > building pairs
+  This ensures cards in ladders are protected first (ladders harder to build)
   
   ═══════════════════════════════════════════════════════════════════════════
   
@@ -2032,6 +2065,105 @@
             pointer-events: none
         }
 
+        /* 📜 v4.7: Message Log Modal Styles */
+        .log-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        .log-modal-overlay.active {
+            display: flex;
+        }
+        
+        .log-modal {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .log-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(255, 215, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 16px 16px 0 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .log-close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+        }
+        
+        .log-close-btn:hover {
+            background: rgba(255, 100, 100, 0.3);
+        }
+        
+        .log-modal-content {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .log-entry {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .log-entry-time {
+            color: #888;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+        
+        .log-entry-icon {
+            font-size: 1.1rem;
+        }
+        
+        .log-entry-text {
+            flex: 1;
+        }
+        
+        .log-entry.info { background: rgba(74, 222, 128, 0.15); color: #4ade80; }
+        .log-entry.buy { background: rgba(255, 193, 7, 0.15); color: #ffc107; }
+        .log-entry.warning { background: rgba(255, 107, 53, 0.15); color: #ff6b35; }
+        .log-entry.win { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
+        .log-entry.extend { background: rgba(156, 39, 176, 0.15); color: #ce93d8; }
+        .log-entry.publish { background: rgba(33, 150, 243, 0.15); color: #64b5f6; }
+        .log-entry.turn { background: rgba(255, 255, 255, 0.05); color: #aaa; }
+
         /* fix-badge removed in v4.6 - game title now in compact header */
 
         /* Paste the entire contents of your local aob_shared.css here */
@@ -2368,7 +2500,21 @@
             </div>
             <div class="button-row">
                 <button class="btn" id="publishBtn" disabled>Publish</button>
+                <button class="btn" id="logBtn">📜 Log</button>
                 <button class="btn" id="newGameBtn">New Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📜 v4.7: Message Log Modal -->
+    <div id="logModalOverlay" class="log-modal-overlay">
+        <div class="log-modal">
+            <div class="log-modal-header">
+                <span>📜 Game Log</span>
+                <button class="log-close-btn" id="logCloseBtn">✕</button>
+            </div>
+            <div class="log-modal-content" id="logContent">
+                <p style="color: #888; text-align: center;">No messages yet...</p>
             </div>
         </div>
     </div>
@@ -2552,6 +2698,65 @@
 
         let game = null;
         let persistentScores = [0, 0, 0];
+        
+        // 📜 v4.7: Message Log System
+        let messageLog = [];
+        
+        function addToLog(message, type = 'info', icon = 'ℹ️') {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            messageLog.push({ message, type, icon, time: timeStr });
+            
+            // Keep log to reasonable size (last 100 messages)
+            if (messageLog.length > 100) {
+                messageLog.shift();
+            }
+            
+            // Update badge if log has new messages
+            updateLogBadge();
+        }
+        
+        function updateLogBadge() {
+            const logBtn = document.getElementById('logBtn');
+            if (logBtn && messageLog.length > 0) {
+                logBtn.textContent = `📜 Log (${messageLog.length})`;
+            }
+        }
+        
+        function clearMessageLog() {
+            messageLog = [];
+            const logBtn = document.getElementById('logBtn');
+            if (logBtn) logBtn.textContent = '📜 Log';
+            renderLogContent();
+        }
+        
+        function renderLogContent() {
+            const content = document.getElementById('logContent');
+            if (!content) return;
+            
+            if (messageLog.length === 0) {
+                content.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">No messages yet...</p>';
+                return;
+            }
+            
+            // Render messages in reverse order (newest first)
+            content.innerHTML = messageLog.slice().reverse().map(entry => `
+                <div class="log-entry ${entry.type}">
+                    <span class="log-entry-icon">${entry.icon}</span>
+                    <span class="log-entry-text">${entry.message}</span>
+                    <span class="log-entry-time">${entry.time}</span>
+                </div>
+            `).join('');
+        }
+        
+        function showLogModal() {
+            renderLogContent();
+            document.getElementById('logModalOverlay').classList.add('active');
+        }
+        
+        function hideLogModal() {
+            document.getElementById('logModalOverlay').classList.remove('active');
+        }
 
         class GameState {
             constructor(carryOverScores = false, selectedHand = 'full') {
@@ -3383,24 +3588,36 @@
                     byRank[c.rank].push(c);
                 });
 
-                Object.values(byRank).forEach(rankCards => {
-                    if (rankCards.length >= 3) {
-                        // 🎯 v4.0.7 FIX: Handle 4-of-a-kind properly
-                        // If exactly 4 cards, keep them together
-                        // If more than 4, group by 3s
-                        if (rankCards.length === 4) {
-                            sequences.push(rankCards);
-                            rankCards.forEach(c => usedInSequence.add(c.id));
-                        } else {
-                            // Group by 3s for 3, 5, 6, 7+ cards
-                            for (let i = 0; i + 2 < rankCards.length; i += 3) {
-                                const triple = rankCards.slice(i, i + 3);
-                                sequences.push(triple);
-                                triple.forEach(c => usedInSequence.add(c.id));
-                            }
-                        }
+                // 🐛 v4.7 FIX: Create exactly the right number of triples
+                const triplesNeeded = req.filter(s => s === 'triple').length;
+                let triplesCreated = 0;
+                
+                // Sort ranks by count (descending) to prioritize ranks with more cards
+                const sortedRanks = Object.entries(byRank)
+                    .filter(([rank, cards]) => cards.length >= 3)
+                    .sort((a, b) => b[1].length - a[1].length);
+                
+                for (const [rank, rankCards] of sortedRanks) {
+                    // How many triples can we make from this rank?
+                    const possibleTriples = Math.floor(rankCards.length / 3);
+                    const triplesToMake = Math.min(possibleTriples, triplesNeeded - triplesCreated);
+                    
+                    for (let i = 0; i < triplesToMake; i++) {
+                        const triple = rankCards.slice(i * 3, i * 3 + 3);
+                        sequences.push(triple);
+                        triple.forEach(c => usedInSequence.add(c.id));
+                        triplesCreated++;
+                        console.log(`%c✅ v4.7: Created triple #${triplesCreated} from rank ${rank}: ${triple.map(c => c.toString()).join(', ')}`, 'color: #27ae60;');
                     }
-                });
+                    
+                    // Leave any remaining cards for potential ladder
+                    const remainingOfRank = rankCards.length - (triplesToMake * 3);
+                    if (remainingOfRank > 0) {
+                        console.log(`%c   → ${remainingOfRank} card(s) of rank ${rank} left for ladder`, 'color: #3498db;');
+                    }
+                    
+                    if (triplesCreated >= triplesNeeded) break;
+                }
 
                 // Extract ladders from remaining cards
                 const remainingCards = cards.filter(c => !usedInSequence.has(c.id));
@@ -3572,8 +3789,27 @@
                         !protectedIds.has(c.id) &&
                         !depletedRanks.includes(c.rank)
                     );
+                    
+                    // 🐛 v4.7 DEBUG: Log filtering results
+                    console.log(`%c🔍 v4.7 DEBUG: Building triple - hand has ${hand.length} cards`, 'color: #9b59b6;');
+                    console.log(`   Protected IDs: [${Array.from(protectedIds).join(', ')}]`);
+                    console.log(`   Available after filtering: ${availableHand.length} cards`);
+                    hand.forEach(c => {
+                        const isProtected = protectedIds.has(c.id);
+                        const isUsed = usedCardIds.has(c.id);
+                        if (isProtected) {
+                            console.log(`   🛡️ ${c.toString()} (id:${c.id}) - PROTECTED, excluded from triple`);
+                        }
+                    });
+                    
                     const byRank = {};
                     availableHand.forEach(c => { if (!byRank[c.rank]) byRank[c.rank] = []; byRank[c.rank].push(c) });
+                    
+                    // 🐛 v4.7 DEBUG: Show what ranks are available for triples
+                    Object.keys(byRank).forEach(rank => {
+                        console.log(`   Rank ${rank}: ${byRank[rank].length} cards - ${byRank[rank].map(c => c.toString()).join(', ')}`);
+                    });
+                    
                     const ranks = Object.keys(byRank).filter(rank => byRank[rank].length >= 3).sort((a, b) => {
                         const aOverlap = opponentRanks.has(a) ? 1 : 0;
                         const bOverlap = opponentRanks.has(b) ? 1 : 0;
@@ -3581,6 +3817,8 @@
                         return parseInt(a === 'A' ? 1 : a === 'J' ? 11 : a === 'Q' ? 12 : a === 'K' ? 13 : a) -
                             parseInt(b === 'A' ? 1 : b === 'J' ? 11 : b === 'Q' ? 12 : b === 'K' ? 13 : b);
                     });
+                    
+                    console.log(`   Ranks with 3+ cards: [${ranks.join(', ')}]`);
                     
                     // 🛡️ v4.7: If no valid triples found with protection, try without protection (fallback)
                     if (ranks.length === 0 && protectedIds.size > 0) {
@@ -3592,6 +3830,7 @@
                         if (fallbackRanks.length > 0) {
                             const rank = fallbackRanks[0];
                             const cards = fallbackByRank[rank];
+                            console.log(`%c   ⚠️ FALLBACK: Using ${cards.slice(0, 3).map(c => c.toString()).join(', ')} for triple`, 'color: #f39c12;');
                             published = published.concat(cards.slice(0, 3));
                             cards.slice(0, 3).forEach(c => usedCardIds.add(c.id));
                             triplesPublished++;
@@ -3602,6 +3841,7 @@
                     if (ranks.length === 0) break;
                     const rank = ranks[0];
                     const cards = byRank[rank];
+                    console.log(`%c   ✅ Using ${cards.slice(0, 3).map(c => c.toString()).join(', ')} for triple (from ${cards.length} available)`, 'color: #27ae60;');
                     if (cards.length >= 4) {
                         published = published.concat(cards.slice(0, 3));
                         cards.slice(0, 3).forEach(c => usedCardIds.add(c.id));
@@ -3627,6 +3867,23 @@
                     laddersPublished++;
                 }
                 if (triplesPublished < triplesNeeded || laddersPublished < laddersNeeded) return false;
+
+                // 🐛 v4.7 DEBUG: Log what's in published before separateSequences
+                console.log(`%c🔍 v4.7 DEBUG: Published array before separateSequences:`, 'color: #9b59b6; font-weight: bold;');
+                console.log(`   Total cards: ${published.length}`);
+                console.log(`   Cards: ${published.map(c => `${c.toString()}(${c.id})`).join(', ')}`);
+                
+                // Group by rank to see if there's overlap
+                const debugByRank = {};
+                published.forEach(c => {
+                    if (!debugByRank[c.rank]) debugByRank[c.rank] = [];
+                    debugByRank[c.rank].push(c.toString());
+                });
+                Object.entries(debugByRank).forEach(([rank, cards]) => {
+                    if (cards.length >= 3) {
+                        console.log(`   ⚠️ Rank ${rank} has ${cards.length} cards: ${cards.join(', ')}`);
+                    }
+                });
 
                 // 🎯 v4.0.7: Use separateSequences to build 2D structure
                 const sequences = this.separateSequences(published, req);
@@ -4535,44 +4792,82 @@
                             if (!cardsBySuit[card.suit]) cardsBySuit[card.suit] = [];
                             cardsBySuit[card.suit].push(card);
                         });
+                        
+                        // 🐛 v4.7 FIX: Also group cards by RANK to protect triples!
+                        const cardsByRank = {};
+                        hand.forEach(card => {
+                            if (!cardsByRank[card.rank]) cardsByRank[card.rank] = [];
+                            cardsByRank[card.rank].push(card);
+                        });
 
                         // Score each card based on ladder potential
+                        // 🎯 v4.7: Priority order: LADDER > TRIPLE (ladders are harder to build!)
                         const cardScores = hand.map(card => {
                             const sameSuitCards = cardsBySuit[card.suit];
-                            if (sameSuitCards.length < 2) {
-                                // Isolated card - low score (good to discard)
-                                return { card, score: 0, reason: 'isolated' };
-                            }
+                            const sameRankCards = cardsByRank[card.rank];
+                            
+                            // 🎯 STEP 1: Check if part of sequential run (LADDER) - HIGHEST PRIORITY
+                            if (sameSuitCards.length >= 2) {
+                                const values = sameSuitCards.map(c => c.value).sort((a, b) => a - b);
+                                let inRun = false;
+                                let runLength = 0;
 
-                            // Check if part of sequential run
-                            const values = sameSuitCards.map(c => c.value).sort((a, b) => a - b);
-                            let inRun = false;
-                            let runLength = 0;
+                                for (let i = 0; i < values.length; i++) {
+                                    if (values[i] === card.value) {
+                                        // Check neighbors
+                                        let run = 1;
+                                        // Check left
+                                        for (let j = i - 1; j >= 0 && values[j] === values[j + 1] - 1; j--) run++;
+                                        // Check right
+                                        for (let j = i + 1; j < values.length && values[j] === values[j - 1] + 1; j++) run++;
 
-                            for (let i = 0; i < values.length; i++) {
-                                if (values[i] === card.value) {
-                                    // Check neighbors
-                                    let run = 1;
-                                    // Check left
-                                    for (let j = i - 1; j >= 0 && values[j] === values[j + 1] - 1; j--) run++;
-                                    // Check right
-                                    for (let j = i + 1; j < values.length && values[j] === values[j - 1] + 1; j++) run++;
-
-                                    if (run >= 3) {
-                                        inRun = true;
-                                        runLength = run;
-                                        break;
+                                        if (run >= 3) {
+                                            inRun = true;
+                                            runLength = run;
+                                            break;
+                                        }
                                     }
                                 }
-                            }
 
-                            if (inRun) {
-                                return { card, score: runLength * 10, reason: `in ${runLength}-run` };
-                            } else if (sameSuitCards.length >= 3) {
-                                return { card, score: sameSuitCards.length * 2, reason: `${sameSuitCards.length} same suit` };
-                            } else {
-                                return { card, score: 1, reason: 'pair only' };
+                                if (inRun) {
+                                    // Card is in a ladder - PROTECT IT (highest score)
+                                    return { card, score: runLength * 20, reason: `in ${runLength}-card ladder` };
+                                }
                             }
+                            
+                            // 🎯 STEP 2: Check if card is part of a triple (3+ same rank) - SECOND PRIORITY
+                            // Only check this if card is NOT already protected by a ladder
+                            if (sameRankCards.length >= 3) {
+                                return { card, score: sameRankCards.length * 10, reason: `part of ${sameRankCards.length}-of-a-kind` };
+                            }
+                            
+                            // 🎯 STEP 3: Check if card is building toward ladder (2+ consecutive same suit)
+                            if (sameSuitCards.length >= 2) {
+                                const values = sameSuitCards.map(c => c.value).sort((a, b) => a - b);
+                                // Check if this card has an adjacent neighbor
+                                const hasAdjacent = values.some((v, i) => 
+                                    (i > 0 && v - values[i-1] === 1) || 
+                                    (i < values.length - 1 && values[i+1] - v === 1)
+                                );
+                                if (hasAdjacent) {
+                                    return { card, score: 6, reason: 'building ladder (consecutive)' };
+                                }
+                            }
+                            
+                            // 🎯 STEP 4: Check if card is building toward triple (2 same rank)
+                            if (sameRankCards.length === 2) {
+                                return { card, score: 5, reason: 'building triple (pair)' };
+                            }
+                            
+                            // 🎯 STEP 5: Same suit but not consecutive (potential ladder material)
+                            if (sameSuitCards.length >= 3) {
+                                return { card, score: sameSuitCards.length, reason: `${sameSuitCards.length} same suit (scattered)` };
+                            } else if (sameSuitCards.length === 2) {
+                                return { card, score: 1, reason: 'pair same suit' };
+                            }
+                            
+                            // Isolated card - low score (good to discard)
+                            return { card, score: 0, reason: 'isolated' };
                         });
 
                         // Sort by score (lowest = worst = discard first)
@@ -4996,6 +5291,15 @@
             shouldAllowBuy(ai, discardCard) {
                 const buysRemaining = this.playerBuys[ai];
                 if (buysRemaining === 0) return false;
+                
+                // 🐛 v4.7 FIX: Don't buy if AI can already publish!
+                // Buying increases hand size and delays publishing
+                if (this.canPublish(ai) && this.publishedSequences[ai].length === 0) {
+                    const aiName = ai === 1 ? 'Habot' : 'Jabot';
+                    console.log(`%c🚫 v4.7: ${aiName} can already publish - skipping buy!`, 'color: #e74c3c; font-weight: bold;');
+                    return false;
+                }
+                
                 const hand = this.playerHands[ai];
                 const buysUsed = (this.currentHand === 7 ? 2 : 3) - buysRemaining;
                 const seqs = this.findSequences(hand);
@@ -6016,6 +6320,8 @@
                     if (publishSuccess) {
                         this.aiJustPublished[ai] = true;
                         this.setAIStatus(statusId, `Emergency Published!`);
+                        // 📜 v4.7: Log AI emergency publish event
+                        showToast(`${aiName} EMERGENCY PUBLISHED!`, 'publish');
                         console.log(`%c✅ PATCH 4: ${aiName} emergency publish SUCCESS!`, 'color: #27ae60; font-weight: bold;');
                         const newHandSize = this.playerHands[ai].length;
                         console.log(`%c   Hand reduced from ${currentHandSize} to ${newHandSize}`, 'color: #27ae60;');
@@ -6092,12 +6398,23 @@
                         else if (personality === 'tortoise') optimalSize -= 1;
                         if (this.playerHands[ai].length <= optimalSize) shouldPublish = true;
                     }
+                    
+                    // 🐛 v4.7 FIX: If publishing would leave AI with very few cards (2-5), PUBLISH IMMEDIATELY!
+                    // This prevents AI from sitting on perfect hands and buying unnecessarily
+                    const cardsRequired = this.handReqs[this.currentHand].cards;
+                    const remainingAfterPublish = this.playerHands[ai].length - cardsRequired;
+                    if (remainingAfterPublish <= 5) {
+                        console.log(`%c🎯 v4.7: Publishing would leave only ${remainingAfterPublish} cards - PUBLISH NOW!`, 'color: #27ae60; font-weight: bold;');
+                        shouldPublish = true;
+                    }
 
                     console.log(`%c  📋 ${aiName} publish check:`, 'color: #9b59b6; font-weight: bold;');
                     console.log(`     canPublishNow: ${canPublishNow}`);
                     console.log(`     opponentDanger: ${opponentDanger}`);
                     console.log(`     turnCounter: ${this.turnCounter}`);
                     console.log(`     handSize: ${this.playerHands[ai].length}`);
+                    console.log(`     cardsRequired: ${cardsRequired}`);
+                    console.log(`     remainingAfterPublish: ${remainingAfterPublish}`);
                     console.log(`     shouldPublish: ${shouldPublish}`);
 
                     if (shouldPublish) {
@@ -6108,6 +6425,8 @@
                         if (publishSuccess) {
                             this.aiJustPublished[ai] = true;
                             this.setAIStatus(statusId, `Published!`);
+                            // 📜 v4.7: Log AI publish event
+                            showToast(`${aiName} PUBLISHED sequences!`, 'publish');
                             console.log(`%c  ✅ ${aiName} PUBLISHED successfully!`, 'color: #28a745; font-weight: bold;');
                             console.log(`     Published sequences:`, this.publishedSequences[ai]);
                         } else {
@@ -6856,10 +7175,23 @@
                 const selCount = document.getElementById('selectedCount');
                 if (this.selectedCards.length > 0) { selInfo.style.display = 'inline-block'; selCount.textContent = this.selectedCards.length }
                 else selInfo.style.display = 'none';
-                const playerHasPublished = this.publishedSequences[0].length > 0;
+                
+                // 🐛 v4.7 FIX: Only show "Add to" buttons for players who ACTUALLY have published
                 const addSection = document.getElementById('addToPublishedSection');
-                if (playerHasPublished && this.currentPlayer === 0 && this.gamePhase === 'discard' && this.selectedCards.length === 1 && !this.justPublished && this.playerHands[0].length > 1) addSection.style.display = 'block';
-                else addSection.style.display = 'none';
+                const anyPlayerHasPublished = this.publishedSequences.some(seqs => seqs.length > 0);
+                
+                if (anyPlayerHasPublished && this.currentPlayer === 0 && this.gamePhase === 'discard' && this.selectedCards.length === 1 && !this.justPublished && this.playerHands[0].length > 1) {
+                    addSection.style.display = 'block';
+                    
+                    // 🐛 v4.7 FIX: Show/hide individual buttons based on who has published
+                    document.querySelectorAll('.add-to-published').forEach(btn => {
+                        const playerIdx = parseInt(btn.dataset.player);
+                        const hasPublished = this.publishedSequences[playerIdx] && this.publishedSequences[playerIdx].length > 0;
+                        btn.style.display = hasPublished ? 'inline-block' : 'none';
+                    });
+                } else {
+                    addSection.style.display = 'none';
+                }
 
                 // 🎨 v4.0.7: Update active-turn highlighting for round table layout
                 document.querySelectorAll('.opponent-area, .player-area-center').forEach(el => el.classList.remove('active-turn'));
@@ -7594,6 +7926,13 @@
             document.getElementById('buyBtn').addEventListener('click', buyCard);
             document.getElementById('newGameBtn').addEventListener('click', newGame);
 
+            // 📜 v4.7: Log Modal
+            document.getElementById('logBtn').addEventListener('click', showLogModal);
+            document.getElementById('logCloseBtn').addEventListener('click', hideLogModal);
+            document.getElementById('logModalOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'logModalOverlay') hideLogModal();
+            });
+
             // 🎯 v4.6: Sort Bottom Sheet Modal
             const sortBtn = document.getElementById('sortBtn');
             const sortSheetOverlay = document.getElementById('sortSheetOverlay');
@@ -7963,6 +8302,7 @@
 
             // Step 3: Start new game with selected hand
             persistentScores = [0, 0, 0];
+            clearMessageLog();  // 📜 v4.7: Clear message log on new game
             game = new GameState(false, selectedHand);
         }
 
@@ -8131,8 +8471,13 @@
                 case 'warning': bgColor = 'linear-gradient(135deg, #ff6b35, #f7931e)'; textColor = '#fff'; icon = '⚠️'; break;
                 case 'win': bgColor = 'linear-gradient(135deg, #ffd700, #ffed4e)'; textColor = '#000'; icon = '🏆'; duration = 3000; break;
                 case 'extend': bgColor = 'linear-gradient(135deg, #9c27b0, #7b1fa2)'; textColor = '#fff'; icon = '↗️'; break;
+                case 'publish': bgColor = 'linear-gradient(135deg, #2196f3, #1976d2)'; textColor = '#fff'; icon = '📢'; break;
                 default: bgColor = 'linear-gradient(135deg, #4ade80, #22c55e)'; textColor = '#000'; icon = 'ℹ️';
             }
+            
+            // 📜 v4.7: Also add to message log
+            addToLog(message, type, icon);
+            
             toast.style.cssText = `background: ${bgColor}; color: ${textColor}; padding: 16px 24px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; box-shadow: 0 8px 24px rgba(0,0,0,0.4); animation: slideIn 0.3s ease; pointer-events: auto; ${type === 'win' ? 'animation: slideIn 0.3s ease, victoryPulse 0.5s ease 0.3s 3;' : ''}`;
             toast.innerHTML = `${icon} ${message}`;
             container.appendChild(toast);
