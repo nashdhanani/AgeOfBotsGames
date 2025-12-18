@@ -35,6 +35,34 @@
   Solution: Added touch-action:manipulation to all interactive elements
   - Cards, buttons, and clickable areas now respond instantly
   
+  📂 FIX #5: AI Published Area Auto-Expand
+  Problem: When Habot/Jabot publish, their area stayed collapsed
+  Solution: Auto-expand AI area when they publish sequences
+  - Added auto-expand to ALL publish paths (5 locations)
+  - Players can immediately see what AI published
+  - Consistent with human player's published area behavior
+  
+  📝 FIX #6: "Emergency Published" Terminology
+  Problem: "EMERGENCY PUBLISHED!" message confused beta testers
+  Solution: All publish events now show "PUBLISHED sequences!"
+  - Cleaner, consistent messaging in toast notifications
+  - Internal console logs still show PATCH info for debugging
+  
+  🎯 FIX #7: End-Game Dialog Flow (Modal Stacking)
+  Problem: "View Game" button revealed hidden "Game Over!" modal underneath
+  Root cause: showWinToast() created persistent modal that stacked under others
+  Solution: Three fixes applied:
+  - Changed showWinToast() to use auto-fading toast instead of modal
+  - Set gamePhase='end' when final results shown (skips New Game confirmation)
+  - Hand Complete modal now auto-dismisses (prevents modal stacking)
+  
+  📱 FIX #8: Remove Redundant Placeholder Cards
+  Problem: AI areas showed 3 "?" cards + "+X hidden" text (wasted ~110px height)
+  Solution: Removed placeholder cards entirely
+  - Count badge in header already shows card count
+  - Only shows "🏆 Empty!" when AI wins
+  - Saves precious mobile vertical space
+  
   ✅ Already Optimized: Asset Loading
   - Unicode card symbols (♠♥♦♣) instead of PNG images
   - CSS gradients for visual effects
@@ -1109,8 +1137,13 @@
             display: flex;
             gap: 6px;
             justify-content: center;
-            padding: 12px 0;
-            min-height: 110px;
+            padding: 6px 0;
+            /* 🎯 v5.0: Removed min-height - container only shows "Empty!" on win */
+        }
+
+        .opponent-cards-visible:empty {
+            display: none;
+            padding: 0;
         }
 
         .ai-status-compact {
@@ -3001,7 +3034,7 @@
         // GAME METADATA & BRANDING
         // ============================================================================
         console.log('%c🎮 HABIB PUNJA v5.0 - YOUTUBE PLAYABLES READY', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
-        console.log('%c🎬 No alerts | 📱 Portrait fix | 📐 Safe areas | 👆 Touch optimized', 'color: #ffd700; font-weight: bold;');
+        console.log('%c🎬 8 Mobile Fixes: No alerts | Portrait | Safe areas | Touch | AI expand | Clean msgs | Dialog flow | No placeholders', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
@@ -5941,6 +5974,18 @@
                             console.log(`✅ PATCH 1: ${aiName} auto-published sequences after buy window!`);
                             // 🎯 v4.6 FIX: Block extensions on same turn as initial publish
                             this.aiJustPublished[ai] = true;
+                            showToast(`${aiName} PUBLISHED sequences!`, 'publish');
+                            // 🎯 v5.0: Auto-expand AI area
+                            const areaId = ai === 1 ? 'habot-area' : 'jabot-area';
+                            const aiArea = document.getElementById(areaId);
+                            if (aiArea) {
+                                const content = aiArea.querySelector('.ai-content');
+                                const header = aiArea.querySelector('.ai-header');
+                                if (content && content.classList.contains('collapsed')) {
+                                    content.classList.remove('collapsed');
+                                    header.setAttribute('data-expanded', 'true');
+                                }
+                            }
                         }
                         this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
@@ -5959,6 +6004,18 @@
                             console.log(`✅ PATCH 1: ${aiName} auto-published sequences after buy window!`);
                             // 🎯 v4.6 FIX: Block extensions on same turn as initial publish
                             this.aiJustPublished[ai] = true;
+                            showToast(`${aiName} PUBLISHED sequences!`, 'publish');
+                            // 🎯 v5.0: Auto-expand AI area
+                            const areaId = ai === 1 ? 'habot-area' : 'jabot-area';
+                            const aiArea = document.getElementById(areaId);
+                            if (aiArea) {
+                                const content = aiArea.querySelector('.ai-content');
+                                const header = aiArea.querySelector('.ai-header');
+                                if (content && content.classList.contains('collapsed')) {
+                                    content.classList.remove('collapsed');
+                                    header.setAttribute('data-expanded', 'true');
+                                }
+                            }
                         }
                         this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
@@ -5976,6 +6033,18 @@
                             console.log(`✅ PATCH 1: ${aiName} auto-published after AI bought!`);
                             // 🎯 v4.6 FIX: Block extensions on same turn as initial publish
                             this.aiJustPublished[ai] = true;
+                            showToast(`${aiName} PUBLISHED sequences!`, 'publish');
+                            // 🎯 v5.0: Auto-expand AI area
+                            const areaId = ai === 1 ? 'habot-area' : 'jabot-area';
+                            const aiArea = document.getElementById(areaId);
+                            if (aiArea) {
+                                const content = aiArea.querySelector('.ai-content');
+                                const header = aiArea.querySelector('.ai-header');
+                                if (content && content.classList.contains('collapsed')) {
+                                    content.classList.remove('collapsed');
+                                    header.setAttribute('data-expanded', 'true');
+                                }
+                            }
                         }
                         this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
@@ -6224,8 +6293,20 @@
                         console.log(`%c🚨 PATCH 3: ${aiName} has ${currentHandSize} cards and hasn't published - forcing publish check`, 'color: #e74c3c; font-weight: bold;');
                         const published = this.autoPublish(ai);
                         if (published) {
-                            console.log(`%c✅ PATCH 3: ${aiName} emergency published!`, 'color: #27ae60; font-weight: bold;');
+                            console.log(`%c✅ PATCH 3: ${aiName} published!`, 'color: #27ae60; font-weight: bold;');
                             this.aiJustPublished[ai] = true; // 🐛 v4.1.5: Set flag to block extensions this turn
+                            showToast(`${aiName} PUBLISHED sequences!`, 'publish');
+                            // 🎯 v5.0: Auto-expand AI area
+                            const areaId = ai === 1 ? 'habot-area' : 'jabot-area';
+                            const aiArea = document.getElementById(areaId);
+                            if (aiArea) {
+                                const content = aiArea.querySelector('.ai-content');
+                                const header = aiArea.querySelector('.ai-header');
+                                if (content && content.classList.contains('collapsed')) {
+                                    content.classList.remove('collapsed');
+                                    header.setAttribute('data-expanded', 'true');
+                                }
+                            }
                             // Update hand size after publishing
                             const newHandSize = this.playerHands[ai].length;
                             console.log(`%c   Hand size reduced from ${currentHandSize} to ${newHandSize}`, 'color: #27ae60;');
@@ -6659,21 +6740,34 @@
                     }
                 }
 
-                // PATCH 4: Emergency publish if hand is too large
+                // PATCH 4: Force publish if hand is too large
                 const currentHandSize = this.playerHands[ai].length;
                 if (currentHandSize >= 13 && this.publishedSequences[ai].length === 0 && this.canPublish(ai)) {
                     console.log(`%c🚨 PATCH 4: ${aiName} has ${currentHandSize} cards - FORCING publish!`, 'color: #e74c3c; font-weight: bold;');
                     const publishSuccess = this.autoPublish(ai);
                     if (publishSuccess) {
                         this.aiJustPublished[ai] = true;
-                        this.setAIStatus(statusId, `Emergency Published!`);
-                        // 📜 v4.7: Log AI emergency publish event
-                        showToast(`${aiName} EMERGENCY PUBLISHED!`, 'publish');
-                        console.log(`%c✅ PATCH 4: ${aiName} emergency publish SUCCESS!`, 'color: #27ae60; font-weight: bold;');
+                        this.setAIStatus(statusId, `Published!`);
+                        // 📜 v5.0: Use normal "Published" message (not "Emergency" - confuses testers)
+                        showToast(`${aiName} PUBLISHED sequences!`, 'publish');
+                        console.log(`%c✅ PATCH 4: ${aiName} publish SUCCESS!`, 'color: #27ae60; font-weight: bold;');
                         const newHandSize = this.playerHands[ai].length;
                         console.log(`%c   Hand reduced from ${currentHandSize} to ${newHandSize}`, 'color: #27ae60;');
+                        
+                        // 🎯 v5.0: Auto-expand AI area when they publish
+                        const areaId = ai === 1 ? 'habot-area' : 'jabot-area';
+                        const aiArea = document.getElementById(areaId);
+                        if (aiArea) {
+                            const content = aiArea.querySelector('.ai-content');
+                            const header = aiArea.querySelector('.ai-header');
+                            if (content && content.classList.contains('collapsed')) {
+                                content.classList.remove('collapsed');
+                                header.setAttribute('data-expanded', 'true');
+                                console.log(`%c  📂 v5.0: Auto-expanded ${aiName}'s area to show published sequences`, 'color: #17a2b8;');
+                            }
+                        }
                     } else {
-                        console.log(`%c⚠️ PATCH 4: ${aiName} emergency publish FAILED - no valid sequences`, 'color: #f39c12; font-weight: bold;');
+                        console.log(`%c⚠️ PATCH 4: ${aiName} publish FAILED - no valid sequences`, 'color: #f39c12; font-weight: bold;');
                     }
                 }
 
@@ -6776,6 +6870,19 @@
                             showToast(`${aiName} PUBLISHED sequences!`, 'publish');
                             console.log(`%c  ✅ ${aiName} PUBLISHED successfully!`, 'color: #28a745; font-weight: bold;');
                             console.log(`     Published sequences:`, this.publishedSequences[ai]);
+                            
+                            // 🎯 v5.0: Auto-expand AI area when they publish so player can see sequences
+                            const areaId = ai === 1 ? 'habot-area' : 'jabot-area';
+                            const aiArea = document.getElementById(areaId);
+                            if (aiArea) {
+                                const content = aiArea.querySelector('.ai-content');
+                                const header = aiArea.querySelector('.ai-header');
+                                if (content && content.classList.contains('collapsed')) {
+                                    content.classList.remove('collapsed');
+                                    header.setAttribute('data-expanded', 'true');
+                                    console.log(`%c  📂 v5.0: Auto-expanded ${aiName}'s area to show published sequences`, 'color: #17a2b8;');
+                                }
+                            }
                         } else {
                             console.log(`%c  ❌ ${aiName} publish FAILED`, 'color: #dc3545; font-weight: bold;');
                         }
@@ -7060,7 +7167,22 @@
                     this.playerHands[i].forEach(c => score += c.getPenaltyValue());
                     this.playerScores[i] += score;
                 }
-                setTimeout(() => { this.showModal('Hand Complete', `${winnerName} won Hand ${this.currentHand}!`) }, 2000);
+                // 🎯 v5.0: Auto-dismiss "Hand Complete" after 2 seconds (don't require OK click)
+                // This prevents modal overlap with hand selection/final results
+                setTimeout(() => { 
+                    const tempModal = document.createElement('div');
+                    tempModal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:10000;';
+                    
+                    const tempContent = document.createElement('div');
+                    tempContent.style.cssText = 'background:#1a4d2e;padding:30px;border-radius:15px;text-align:center;border:2px solid #ffd700;';
+                    
+                    tempContent.innerHTML = `<h2 style="color:#ffd700;margin-bottom:15px;">Hand Complete</h2><p style="color:white;">${winnerName} won Hand ${this.currentHand}!</p>`;
+                    tempModal.appendChild(tempContent);
+                    document.body.appendChild(tempModal);
+                    
+                    // Auto-remove after 1.5 seconds (before next modal appears)
+                    setTimeout(() => tempModal.remove(), 1500);
+                }, 2000);
                 setTimeout(async () => {
                     // 🎮 v4.6: Check if single hand mode or full game
                     if (this.gameMode !== 'full') {
@@ -7106,6 +7228,9 @@
             }
 
             showFinalResults() {
+                // 🎯 v5.0: Set gamePhase to 'end' so New Game button doesn't show confirmation
+                this.gamePhase = 'end';
+                
                 const results = this.playerScores.map((s, i) => ({ name: i === 0 ? 'You' : i === 1 ? 'Habot' : 'Jabot', score: s })).sort((a, b) => a.score - b.score);
                 const winner = results[0];
                 const loser = results[results.length - 1];
@@ -7701,7 +7826,8 @@
             }
 
             renderAIHands() {
-                // 🎴 v4.0.7 Phase 2: Show last 3 cards for AI players
+                // 🎯 v5.0: Removed placeholder "?" cards - count badge in header is sufficient
+                // This saves ~60px vertical space per AI area on mobile
                 [1, 2].forEach(p => {
                     const container = document.getElementById(`player${p + 1}Cards`);
                     const countBadge = document.getElementById(`player${p + 1}Count`);
@@ -7710,39 +7836,16 @@
                     const hand = this.playerHands[p];
                     const handSize = hand.length;
 
-                    // Update card count badge
+                    // Update card count badge in header
                     if (countBadge) {
                         countBadge.textContent = handSize;
                     }
 
+                    // 🎯 v5.0: Only show message if hand is empty (game over state)
                     if (handSize === 0) {
-                        container.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No cards</div>';
-                        return;
+                        container.innerHTML = '<div style="text-align: center; color: var(--gold); padding: 10px; font-weight: bold;">🏆 Empty!</div>';
                     }
-
-                    // Show last 3 cards (or fewer if hand is smaller)
-                    const cardsToShow = Math.min(3, handSize);
-                    const startIndex = Math.max(0, handSize - cardsToShow);
-
-                    for (let i = startIndex; i < handSize; i++) {
-                        const el = document.createElement('div');
-                        el.className = 'card';
-                        el.style.background = '#2c3e50';
-                        el.style.cursor = 'default';
-                        el.innerHTML = `<div style="font-size: 28px; color: rgba(255,255,255,0.4);">?</div>`;
-                        container.appendChild(el);
-                    }
-
-                    // Add hidden cards indicator if more than 3 cards
-                    if (handSize > 3) {
-                        const hiddenEl = document.createElement('div');
-                        hiddenEl.style.fontSize = '.75rem';
-                        hiddenEl.style.color = 'var(--muted)';
-                        hiddenEl.style.textAlign = 'center';
-                        hiddenEl.style.marginTop = '6px';
-                        hiddenEl.textContent = `+${handSize - 3} hidden`;
-                        container.appendChild(hiddenEl);
-                    }
+                    // Otherwise container stays empty - count badge shows card count
                 });
             }
 
@@ -8895,15 +8998,10 @@
         }
 
         function showWinToast(playerName) {
+            // 🎯 v5.0: Use auto-fading toast instead of persistent modal
+            // This prevents modal stacking with Final Results
             const verb = (playerName === 'You') ? 'Win' : 'Wins';
-            // NO auto-fade - game over message!
-            showInfoModal(
-                '🏆 Game Over!',
-                `${playerName} ${verb}!`,
-                'New Game',
-                '🎉',
-                false    // NO auto-fade - player must acknowledge
-            );
+            showToast(`🏆 ${playerName} ${verb}!`, 'win');
         }
 
         // --- JAVASCRIPT: AI AREA TOGGLE FUNCTION ---
