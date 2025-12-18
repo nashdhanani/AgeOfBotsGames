@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Age of Bots – Accessibility Features</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="Accessibility features in Habib Punja: colorblind-friendly suits, visual alerts, and inclusive design for all players." />
+    <style>
+        :root {
+            color-scheme: dark;
+            --aob-bg: #020617;
+            --aob-bg-soft: #020b24;
+            --aob-border-soft: rgba(148, 163, 184, 0.4);
+            --aob-accent: #22d3ee;
+            --aob-gold: #facc15;
+            --aob-text: #e2e8f0;
+            --aob-muted: #94a3b8;
+            --aob-radius-lg: 20px;
+            --aob-radius-xl: 26px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #0b1120 0, #020617 45%, #000 100%);
+            color: var(--aob-text);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        a {
+            color: var(--aob-accent);
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+
+        .aob-shell {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 12px 16px 32px;
+        }
+        /* NAV */
+        .aob-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+            box-shadow: 0 14px 40px rgba(15, 23, 42, 0.9);
+            margin-bottom: 18px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .aob-nav-title {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .aob-nav-logo {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-accent);
+        }
+
+        .aob-nav-sub {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
+        }
+
+        .aob-nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .aob-nav-link {
+            font-size: 12px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            color: var(--aob-muted);
+            text-decoration: none;
+            background: transparent;
+        }
+
+            .aob-nav-link:hover {
+                border-color: rgba(148, 163, 184, 0.6);
+                color: var(--aob-text);
+            }
+
+        .aob-nav-link--primary {
+            border-color: rgba(56, 189, 248, 0.7);
+            background: radial-gradient(circle at top, #0ea5e9 0, #0369a1 40%, #020617 100%);
+            color: #e0f2fe;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.6);
+        }
+
+        .aob-nav-link--active {
+            border-color: rgba(250, 204, 21, 0.8);
+            color: var(--aob-gold);
+        }
+
+        .aob-panel {
+            border-radius: var(--aob-radius-xl);
+            border: 1px solid var(--aob-border-soft);
+            background: radial-gradient(circle at top left, #020b24 0, #020617 55%, #000 100%);
+            padding: 16px 18px 18px;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.95);
+            margin-bottom: 18px;
+        }
+
+        .aob-panel-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--aob-gold);
+            margin-bottom: 4px;
+        }
+
+        .aob-panel-sub {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--aob-muted);
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 16px;
+            margin: 18px 0 8px;
+            color: var(--aob-accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h2 .icon {
+            font-size: 20px;
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 6px 0;
+            color: var(--aob-text);
+        }
+
+        ul {
+            padding-left: 18px;
+            margin: 6px 0 8px;
+        }
+
+        li {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 6px;
+            color: var(--aob-text);
+        }
+
+        /* Suit Demo Cards */
+        .suit-demo {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 16px 0;
+        }
+
+        .suit-card {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .suit-card.spades {
+            color: #1e293b;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            font-weight: 900;
+        }
+
+        .suit-card.hearts {
+            color: #dc2626;
+            background: rgba(220, 38, 38, 0.15);
+            border-color: rgba(220, 38, 38, 0.3);
+        }
+
+        .suit-card.diamonds {
+            color: #d97706;
+            background: rgba(217, 119, 6, 0.15);
+            border-color: rgba(217, 119, 6, 0.3);
+            font-style: italic;
+        }
+
+        .suit-card.clubs {
+            color: #2563eb;
+            background: rgba(37, 99, 235, 0.15);
+            border-color: rgba(37, 99, 235, 0.3);
+            font-weight: 800;
+        }
+
+        .suit-symbol {
+            font-size: 24px;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 4px solid #4ade80;
+            padding: 14px 18px;
+            border-radius: 0 12px 12px 0;
+            margin: 16px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .tip-box strong {
+            color: #4ade80;
+        }
+
+        /* Alert Colors Demo */
+        .alert-list {
+            list-style: none;
+            padding: 0;
+            margin: 12px 0;
+        }
+
+        .alert-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .alert-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .alert-dot.green { background: #4ade80; box-shadow: 0 0 8px rgba(74, 222, 128, 0.5); }
+        .alert-dot.yellow { background: #ffc107; box-shadow: 0 0 8px rgba(255, 193, 7, 0.5); }
+        .alert-dot.orange { background: #ff6b35; box-shadow: 0 0 8px rgba(255, 107, 53, 0.5); }
+        .alert-dot.blue { background: #2196f3; box-shadow: 0 0 8px rgba(33, 150, 243, 0.5); }
+        .alert-dot.gold { background: #ffd700; box-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+
+        /* WCAG Badge */
+        .wcag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(37, 99, 235, 0.2);
+            border: 1px solid rgba(37, 99, 235, 0.4);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #93c5fd;
+            margin: 10px 0;
+        }
+
+        .wcag-badge .check {
+            color: #4ade80;
+            font-weight: bold;
+        }
+
+        .aob-footer {
+            margin-top: 20px;
+            padding: 10px 4px 0;
+            border-top: 1px solid rgba(15, 23, 42, 0.9);
+            font-size: 11px;
+            color: var(--aob-muted);
+            text-align: center;
+        }
+
+            .aob-footer strong {
+                color: var(--aob-accent);
+                font-weight: 600;
+            }
+
+        /* Philosophy Section */
+        .philosophy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .philosophy-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .philosophy-item .icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .philosophy-item .title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--aob-accent);
+            margin-bottom: 4px;
+        }
+
+        .philosophy-item .desc {
+            font-size: 12px;
+            color: var(--aob-muted);
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="aob-shell">
+        <header class="aob-nav">
+            <div class="aob-nav-title">
+                <div class="aob-nav-logo">AGE OF BOTS GAMES</div>
+                <div class="aob-nav-sub">Habib Punja · Strategic Card Game</div>
+            </div>
+            <nav class="aob-nav-links">
+                <a class="aob-nav-link" href="index.html">Home</a>
+                <a class="aob-nav-link aob-nav-link--primary" href="habib_punja_v4_8.html">Play Game</a>
+                <a class="aob-nav-link" href="characters.html">Characters</a>
+                <a class="aob-nav-link" href="strategic-guide.html">Strategy Guide</a>
+                <a class="aob-nav-link" href="resources.html">Resources</a>
+                <a class="aob-nav-link aob-nav-link--active" href="accessibility.html">Accessibility</a>
+                <a class="aob-nav-link" href="contact.html">Contact</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Hero Panel -->
+            <section class="aob-panel">
+                <div class="aob-panel-title">♿ Accessibility Features</div>
+                <div class="aob-panel-sub">Designed for Everyone</div>
+                <p>
+                    Habib Punja was built with accessibility in mind from the ground up. Whether you have 
+                    color vision differences, are playing in varied lighting conditions, or simply prefer 
+                    clearer visual cues, we've designed the game to be <strong>enjoyable for all players</strong>.
+                </p>
+                <div class="wcag-badge">
+                    <span class="check">✓</span> WCAG 2.1 Guideline 1.4.1 Compliant – Never relies on color alone
+                </div>
+            </section>
+
+            <!-- Colorblind-Friendly Suits -->
+            <section class="aob-panel">
+                <h2><span class="icon">🎨</span> Colorblind-Friendly Card Suits</h2>
+                <p>
+                    Each suit has a <strong>unique color AND font style</strong> so you never have to rely 
+                    on color alone to identify cards. This is especially important for:
+                </p>
+                <ul>
+                    <li>Players with red-green colorblindness (affects ~8% of men)</li>
+                    <li>Older players with age-related vision changes</li>
+                    <li>Anyone playing in low-light environments</li>
+                </ul>
+
+                <div class="suit-demo">
+                    <div class="suit-card spades">
+                        <span class="suit-symbol">♠</span>
+                        <span>Spades – Dark & Bold</span>
+                    </div>
+                    <div class="suit-card hearts">
+                        <span class="suit-symbol">♥</span>
+                        <span>Hearts – Red & Serif</span>
+                    </div>
+                    <div class="suit-card diamonds">
+                        <span class="suit-symbol">♦</span>
+                        <span>Diamonds – Orange & Italic</span>
+                    </div>
+                    <div class="suit-card clubs">
+                        <span class="suit-symbol">♣</span>
+                        <span>Clubs – Blue & Rounded</span>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <strong>💡 Tip:</strong> Even in low light or with color vision differences, you can 
+                    identify suits by their font style: italic diamonds, bold blue clubs, sharp narrow 
+                    spades, and serif hearts.
+                </div>
+            </section>
+
+            <!-- Visual Alerts -->
+            <section class="aob-panel">
+                <h2><span class="icon">🔔</span> Visual Alert System</h2>
+                <p>
+                    Important game events appear as <strong>colored toast notifications</strong> in the 
+                    corner of the screen. Each color represents a different type of event:
+                </p>
+
+                <ul class="alert-list">
+                    <li>
+                        <span class="alert-dot green"></span>
+                        <span><strong>Green</strong> – General information and confirmations</span>
+                    </li>
+                    <li>
+                        <span class="alert-dot yellow"></span>
+                        <span><strong>Yellow</strong> – Someone bought a card from the discard pile</span>
+                    </li>
+                    <li>
+                        <span class="alert-dot orange"></span>
+                        <span><strong>Orange</strong> – Warning! An opponent extended your sequence</span>
+                    </li>
+                    <li>
+                        <span class="alert-dot blue"></span>
+                        <span><strong>Blue</strong> – AI player published their sequences</span>
+                    </li>
+                    <li>
+                        <span class="alert-dot gold"></span>
+                        <span><strong>Gold</strong> – Victory announcement!</span>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Message Log -->
+            <section class="aob-panel">
+                <h2><span class="icon">📜</span> Message Log</h2>
+                <p>
+                    Flash messages can move fast during gameplay! Click the <strong>📜 Log</strong> button 
+                    at any time to review all game events at your own pace.
+                </p>
+                <ul>
+                    <li>All toast notifications are recorded with timestamps</li>
+                    <li>Review what happened while you were thinking about your move</li>
+                    <li>Log clears automatically when you start a new game</li>
+                    <li>Badge shows unread message count</li>
+                </ul>
+            </section>
+
+            <!-- Timing & Controls -->
+            <section class="aob-panel">
+                <h2><span class="icon">⏱️</span> Buy Window Timer</h2>
+                <p>
+                    When a card is discarded, you have the opportunity to "buy" it before play continues. 
+                    The game gives <strong>human players extra time</strong> to make this decision:
+                </p>
+                <ul>
+                    <li><strong>Human players:</strong> 8 seconds to decide</li>
+                    <li><strong>AI players:</strong> 3 seconds (faster to keep game moving)</li>
+                </ul>
+                <p>
+                    Watch for the countdown timer on the Buy button. If you don't act in time, the 
+                    opportunity passes to the next player.
+                </p>
+            </section>
+
+            <!-- Card Selection -->
+            <section class="aob-panel">
+                <h2><span class="icon">🎯</span> Card Selection & Touch Support</h2>
+                <p>
+                    Selected cards are clearly highlighted with multiple visual cues:
+                </p>
+                <ul>
+                    <li><strong>Golden outline</strong> around selected cards</li>
+                    <li><strong>Lift effect</strong> – selected cards rise up slightly</li>
+                    <li><strong>Selection counter</strong> shows how many cards you've picked</li>
+                </ul>
+                <p>
+                    On <strong>mobile devices</strong>, tap to select cards. On <strong>desktop</strong>, 
+                    you can also drag cards to manually reorder your hand.
+                </p>
+            </section>
+
+            <!-- In-Game Access -->
+            <section class="aob-panel">
+                <h2><span class="icon">♿</span> Accessing Accessibility Info In-Game</h2>
+                <p>
+                    While playing Habib Punja, you can always access accessibility information by clicking 
+                    the <strong>♿ button</strong> in the game header (next to the game title). This opens 
+                    a quick reference modal with all the information on this page.
+                </p>
+                <div class="tip-box">
+                    <strong>💡 Tip:</strong> Share this page with friends or family who might benefit from 
+                    knowing the game was designed with accessibility in mind!
+                </div>
+            </section>
+
+            <!-- Design Philosophy -->
+            <section class="aob-panel">
+                <h2><span class="icon">🧠</span> Our Design Philosophy</h2>
+                <p>
+                    We believe strategic games should be accessible to everyone. Our accessibility 
+                    approach is guided by three principles:
+                </p>
+
+                <div class="philosophy-grid">
+                    <div class="philosophy-item">
+                        <div class="icon">🔀</div>
+                        <div class="title">Redundant Cues</div>
+                        <div class="desc">Never rely on a single sense – combine color, shape, and text</div>
+                    </div>
+                    <div class="philosophy-item">
+                        <div class="icon">🎚️</div>
+                        <div class="title">High Contrast</div>
+                        <div class="desc">Clear visual distinction between all interactive elements</div>
+                    </div>
+                    <div class="philosophy-item">
+                        <div class="icon">⏰</div>
+                        <div class="title">Flexible Timing</div>
+                        <div class="desc">Extra time for human players; message log for review</div>
+                    </div>
+                </div>
+
+                <p style="margin-top:14px;font-size:13px;color:var(--aob-muted);">
+                    Have suggestions for improving accessibility? We'd love to hear from you via the 
+                    <a href="contact.html">Contact</a> page. MuBot reviews all feedback for potential 
+                    improvements.
+                </p>
+            </section>
+        </main>
+
+        <footer class="aob-footer">
+            <div><strong>AgeOfBotsGames.com</strong> · Face off against evolving AI minds in a strategic 7-hand war.</div>
+            <div>Habib Punja Public Beta · Habot · Jabot · MuBot · Joko</div>
+        </footer>
+    </div>
+</body>
+</html>

@@ -2,12 +2,44 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 4.7 - Hand-Aware AI: Depleted Ranks & Ladder Protection
-  Release Date: December 17, 2025
+  Version: 4.8 - Accessibility Update: Colorblind-Friendly Suit Differentiation
+  Release Date: December 18, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
+  🎮 VERSION 4.8 - Accessibility Update: Colorblind-Friendly Suits
+  ═══════════════════════════════════════════════════════════════════════════
+  
+  🎨 ACCESSIBILITY IMPROVEMENTS FOR COLORBLIND USERS
+  Problem: Spades (♠) and Clubs (♣) both black - hard to distinguish for:
+  - Older players
+  - Red-green colorblind users (most common: 8% of men)
+  - Low-light environments (Tesla Supercharger demographic)
+  
+  Solution: Each suit now has UNIQUE color + font style (WCAG compliant):
+  
+  ♠ SPADES:   Dark slate (#1e293b) | Extra bold | Narrow/sharp font
+  ♥ HEARTS:   Classic red (#dc2626) | Standard weight | Serif font
+  ♦ DIAMONDS: Orange/amber (#d97706) | Italic | Times font
+  ♣ CLUBS:    Bright blue (#2563eb) | Bold rounded | Wide font
+  
+  Design Principles Applied:
+  - Never rely on color alone (WCAG 2.1 guideline 1.4.1)
+  - Combine shape/glyph + color + font weight for redundancy
+  - High contrast for readability
+  - Tested for deuteranopia (red-green) and protanopia colorblindness
+  
+  ♿ ACCESSIBILITY INFO MODAL
+  - Click the ♿ button in the header to view all accessibility features
+  - Documents suit color scheme, message log, buy timer, visual alerts
+  - Helps players understand the game was designed with them in mind
+  
+  This update targets YouTube Playables accessibility requirements
+  and improves UX for retired/senior players.
+  
+  ═══════════════════════════════════════════════════════════════════════════
+  
   🎮 VERSION 4.7 - Hand-Aware AI: Depleted Ranks & Ladder Protection
   ═══════════════════════════════════════════════════════════════════════════
   
@@ -763,8 +795,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <!-- Primary Meta Tags -->
-    <title>Habib Punja v4.7 - Strategic AI Card Game | AgeOfBotsGames</title>
-    <meta name="title" content="Habib Punja v4.7 - Strategic AI Card Game | AgeOfBotsGames">
+    <title>Habib Punja v4.8 - Strategic AI Card Game | AgeOfBotsGames</title>
+    <meta name="title" content="Habib Punja v4.8 - Strategic AI Card Game | AgeOfBotsGames">
     <meta name="description"
         content="Play Habib Punja, a strategic Liverpool Rummy variant against AI opponents Habot and Jabot. Master triples and ladders across 7 challenging hands!">
     <meta name="keywords"
@@ -1753,6 +1785,55 @@
             color: #1e293b
         }
 
+        /* 🎨 v4.8 ACCESSIBILITY: Suit-specific colors + font styles
+           Each suit has unique color AND font weight/style for colorblind users
+           Priority: Shape recognition > Color differentiation */
+        
+        /* ♠ SPADES: Dark slate, extra bold, sharp */
+        .card.suit-spades {
+            color: #1e293b;
+            font-weight: 900;
+            font-style: normal;
+        }
+        .card.suit-spades .card-suit {
+            font-family: 'Arial Black', 'Helvetica Bold', sans-serif;
+            transform: scaleX(0.9); /* Narrower, sharper look */
+        }
+        
+        /* ♥ HEARTS: Classic red, standard weight */
+        .card.suit-hearts {
+            color: #dc2626;
+            font-weight: 700;
+            font-style: normal;
+        }
+        .card.suit-hearts .card-suit {
+            font-family: 'Georgia', serif;
+        }
+        
+        /* ♦ DIAMONDS: Orange/amber (distinct from red), italic */
+        .card.suit-diamonds {
+            color: #d97706;
+            font-weight: 700;
+            font-style: italic;
+        }
+        .card.suit-diamonds .card-rank {
+            font-style: italic;
+        }
+        .card.suit-diamonds .card-suit {
+            font-family: 'Times New Roman', serif;
+        }
+        
+        /* ♣ CLUBS: Bright blue (NOT black!), bold rounded */
+        .card.suit-clubs {
+            color: #2563eb;
+            font-weight: 800;
+            font-style: normal;
+        }
+        .card.suit-clubs .card-suit {
+            font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', sans-serif;
+            transform: scaleX(1.1); /* Wider, rounder look */
+        }
+
         .card.red.heart {
             color: #dc2626
         }
@@ -2164,6 +2245,167 @@
         .log-entry.publish { background: rgba(33, 150, 243, 0.15); color: #64b5f6; }
         .log-entry.turn { background: rgba(255, 255, 255, 0.05); color: #aaa; }
 
+        /* ♿ v4.8: Accessibility Button & Modal */
+        .a11y-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            font-size: 14px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-left: 8px;
+            vertical-align: middle;
+            transition: all 0.2s;
+        }
+        
+        .a11y-btn:hover {
+            background: rgba(37, 99, 235, 0.5);
+            border-color: #2563eb;
+            transform: scale(1.1);
+        }
+        
+        .a11y-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            padding: 20px;
+        }
+        
+        .a11y-modal-overlay.active {
+            display: flex;
+        }
+        
+        .a11y-modal {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            width: 95%;
+            max-width: 600px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(37, 99, 235, 0.4);
+            overflow: hidden;
+        }
+        
+        .a11y-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(37, 99, 235, 0.1));
+            border-bottom: 1px solid rgba(37, 99, 235, 0.3);
+        }
+        
+        .a11y-modal-header h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .a11y-close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: background 0.2s;
+        }
+        
+        .a11y-close-btn:hover {
+            background: rgba(255, 100, 100, 0.3);
+        }
+        
+        .a11y-modal-content {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .a11y-section {
+            margin-bottom: 24px;
+        }
+        
+        .a11y-section h3 {
+            color: #ffd700;
+            font-size: 1.1rem;
+            margin: 0 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .a11y-section p {
+            margin: 0 0 12px 0;
+            font-size: 0.95rem;
+        }
+        
+        .suit-demo {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 16px 0;
+        }
+        
+        .suit-demo-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .suit-demo-item.spades { color: #1e293b; background: #f0f0f0; }
+        .suit-demo-item.hearts { color: #dc2626; background: rgba(220, 38, 38, 0.15); }
+        .suit-demo-item.diamonds { color: #d97706; background: rgba(217, 119, 6, 0.15); font-style: italic; }
+        .suit-demo-item.clubs { color: #2563eb; background: rgba(37, 99, 235, 0.15); }
+        
+        .a11y-tip {
+            background: rgba(74, 222, 128, 0.1);
+            border-left: 3px solid #4ade80;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0;
+            font-size: 0.9rem;
+        }
+        
+        .a11y-footer {
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        .a11y-footer a {
+            color: #4ade80;
+            text-decoration: none;
+        }
+        
+        .a11y-footer a:hover {
+            text-decoration: underline;
+        }
+
         /* fix-badge removed in v4.6 - game title now in compact header */
 
         /* Paste the entire contents of your local aob_shared.css here */
@@ -2361,7 +2603,7 @@
     <div class="game-container">
         <!-- 🎯 v4.6: Compact header - single row with all essential info -->
         <div class="compact-header">
-            <div class="game-title">🎴 Habib Punja</div>
+            <div class="game-title">🎴 Habib Punja <button id="accessibilityBtn" class="a11y-btn" title="Accessibility Info">♿</button></div>
             <div class="hand-info">Hand <span id="currentHand">1</span>: <span id="handRequirements">2T</span> · T<span id="turnCounter">0</span></div>
             <div class="turn-indicator" id="turnIndicator">Your Turn</div>
         </div>
@@ -2519,6 +2761,66 @@
         </div>
     </div>
 
+    <!-- ♿ v4.8: Accessibility Info Modal -->
+    <div id="a11yModalOverlay" class="a11y-modal-overlay">
+        <div class="a11y-modal">
+            <div class="a11y-modal-header">
+                <h2>♿ Accessibility Features</h2>
+                <button class="a11y-close-btn" id="a11yCloseBtn">✕</button>
+            </div>
+            <div class="a11y-modal-content">
+                <div class="a11y-section">
+                    <h3>🎨 Colorblind-Friendly Card Suits</h3>
+                    <p>Each suit has a <strong>unique color AND font style</strong> so you never have to rely on color alone:</p>
+                    <div class="suit-demo">
+                        <div class="suit-demo-item spades">♠ Spades - Dark & Bold</div>
+                        <div class="suit-demo-item hearts">♥ Hearts - Red & Serif</div>
+                        <div class="suit-demo-item diamonds">♦ Diamonds - Orange & Italic</div>
+                        <div class="suit-demo-item clubs">♣ Clubs - Blue & Rounded</div>
+                    </div>
+                    <div class="a11y-tip">
+                        💡 <strong>Tip:</strong> Even in low light or with color vision differences, you can identify suits by their font style: italic diamonds, bold blue clubs, etc.
+                    </div>
+                </div>
+
+                <div class="a11y-section">
+                    <h3>📜 Message Log</h3>
+                    <p>Flash messages move fast! Click the <strong>📜 Log</strong> button to review all game events at your own pace. Messages include timestamps so you know exactly when each action occurred.</p>
+                </div>
+
+                <div class="a11y-section">
+                    <h3>⏱️ Buy Window Timer</h3>
+                    <p>You have <strong>8 seconds</strong> to decide on buying a discarded card. AI players only get 3 seconds. Watch for the countdown on the Buy button!</p>
+                </div>
+
+                <div class="a11y-section">
+                    <h3>🔔 Visual Alerts</h3>
+                    <p>Important events show as <strong>colored toast notifications</strong> in the corner:</p>
+                    <ul style="margin: 8px 0 0 20px; line-height: 1.8;">
+                        <li><span style="color: #4ade80;">Green</span> - General info</li>
+                        <li><span style="color: #ffc107;">Yellow</span> - Someone bought a card</li>
+                        <li><span style="color: #ff6b35;">Orange</span> - Warning (opponent extended your sequence!)</li>
+                        <li><span style="color: #2196f3;">Blue</span> - AI published sequences</li>
+                        <li><span style="color: #ffd700;">Gold</span> - Victory!</li>
+                    </ul>
+                </div>
+
+                <div class="a11y-section">
+                    <h3>📱 Touch & Drag Support</h3>
+                    <p>On mobile, tap to select cards. On desktop, you can also drag cards to reorder your hand manually.</p>
+                </div>
+
+                <div class="a11y-section">
+                    <h3>🎯 Card Selection</h3>
+                    <p>Selected cards have a <strong>golden outline</strong> and lift up slightly. The selection counter shows how many cards you've picked.</p>
+                </div>
+            </div>
+            <div class="a11y-footer">
+                Designed with accessibility in mind • <a href="https://ageofbotsgames.com" target="_blank">AgeOfBotsGames.com</a>
+            </div>
+        </div>
+    </div>
+
     <!-- 🎯 v4.6: Sort Bottom Sheet Modal -->
     <div id="sortSheetOverlay" class="sort-sheet-overlay">
         <div class="sort-sheet">
@@ -2671,7 +2973,8 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v4.7 - HAND-AWARE AI', 'color: #9b59b6; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA v4.8 - ACCESSIBILITY UPDATE', 'color: #2563eb; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎨 Colorblind-Friendly Suits | ♠ Dark | ♥ Red | ♦ Orange | ♣ Blue', 'color: #d97706; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
@@ -2692,6 +2995,23 @@
             constructor(rank, suit) { this.rank = rank; this.suit = suit; this.id = Math.random().toString(36).substr(2, 9) }
             toString() { return `${this.rank}${this.suit}` }
             getValue() { if (this.rank === 'A') return 1; if (this.rank === 'J') return 11; if (this.rank === 'Q') return 12; if (this.rank === 'K') return 13; return parseInt(this.rank) }
+            
+            // 🎨 v4.8 ACCESSIBILITY: Each suit gets unique color + font style
+            // Spades: Black, bold sharp font
+            // Hearts: Red, standard
+            // Diamonds: Orange/amber, italic
+            // Clubs: Blue, rounded/bold
+            getSuitClass() {
+                switch(this.suit) {
+                    case '♠': return 'suit-spades';
+                    case '♥': return 'suit-hearts';
+                    case '♦': return 'suit-diamonds';
+                    case '♣': return 'suit-clubs';
+                    default: return '';
+                }
+            }
+            
+            // Legacy method for backward compatibility
             getColor() { return (this.suit === '♥' || this.suit === '♦') ? 'red' : 'black' }
             getPenaltyValue() { if (this.rank === 'A') return 20; if (['K', 'Q', 'J'].includes(this.rank)) return 15; return this.getValue() }
         }
@@ -7313,9 +7633,8 @@
                 container.innerHTML = '';
                 this.playerHands[0].forEach((card, i) => {
                     const el = document.createElement('div');
-                    el.className = `card ${card.getColor()}`;
-                    if (card.suit === '♥') el.classList.add('heart');
-                    if (card.suit === '♦') el.classList.add('diamond');
+                    // 🎨 v4.8: Use suit-specific class for accessibility
+                    el.className = `card ${card.getSuitClass()}`;
                     if (this.selectedCards.includes(i)) el.classList.add('selected');
                     el.innerHTML = `<div class="card-suit">${card.suit}</div><div class="card-rank">${card.rank}</div>`;
                     el.draggable = true;
@@ -7434,9 +7753,8 @@
                         seq.forEach(card => {
                             if (!seenIds.has(card.id)) {
                                 const el = document.createElement('div');
-                                el.className = `card ${card.getColor()}`;
-                                if (card.suit === '♥') el.classList.add('heart');
-                                if (card.suit === '♦') el.classList.add('diamond');
+                                // 🎨 v4.8: Use suit-specific class for accessibility
+                                el.className = `card ${card.getSuitClass()}`;
                                 el.style.transform = 'scale(0.7)';
                                 el.innerHTML = `<div class="card-suit">${card.suit}</div><div class="card-rank">${card.rank}</div>`;
                                 container.appendChild(el);
@@ -7524,9 +7842,8 @@
 
                     triple.forEach(card => {
                         const cardEl = document.createElement('div');
-                        cardEl.className = `card ${card.getColor()}`;
-                        if (card.suit === '♥') cardEl.classList.add('heart');
-                        if (card.suit === '♦') cardEl.classList.add('diamond');
+                        // 🎨 v4.8: Use suit-specific class for accessibility
+                        cardEl.className = `card ${card.getSuitClass()}`;
                         cardEl.style.transform = 'scale(0.8)';
                         cardEl.style.position = 'relative';
 
@@ -7565,9 +7882,8 @@
 
                     ladder.forEach(card => {
                         const cardEl = document.createElement('div');
-                        cardEl.className = `card ${card.getColor()}`;
-                        if (card.suit === '♥') cardEl.classList.add('heart');
-                        if (card.suit === '♦') cardEl.classList.add('diamond');
+                        // 🎨 v4.8: Use suit-specific class for accessibility
+                        cardEl.className = `card ${card.getSuitClass()}`;
                         cardEl.style.transform = 'scale(0.8)';
                         cardEl.style.position = 'relative';
 
@@ -7931,6 +8247,19 @@
             document.getElementById('logCloseBtn').addEventListener('click', hideLogModal);
             document.getElementById('logModalOverlay').addEventListener('click', (e) => {
                 if (e.target.id === 'logModalOverlay') hideLogModal();
+            });
+
+            // ♿ v4.8: Accessibility Modal
+            document.getElementById('accessibilityBtn').addEventListener('click', () => {
+                document.getElementById('a11yModalOverlay').classList.add('active');
+            });
+            document.getElementById('a11yCloseBtn').addEventListener('click', () => {
+                document.getElementById('a11yModalOverlay').classList.remove('active');
+            });
+            document.getElementById('a11yModalOverlay').addEventListener('click', (e) => {
+                if (e.target.id === 'a11yModalOverlay') {
+                    document.getElementById('a11yModalOverlay').classList.remove('active');
+                }
             });
 
             // 🎯 v4.6: Sort Bottom Sheet Modal
