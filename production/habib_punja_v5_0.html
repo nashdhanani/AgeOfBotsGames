@@ -2,16 +2,42 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 5.0.0 - YouTube Playables Ready
-  Release Date: December 18, 2025
+  Version: 5.1.0 - Banter Engine Edition
+  Release Date: December 19, 2025
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025 AgeOfBotsGames LLC. All rights reserved.
 
-  🎮 VERSION 5.0.0 - YouTube Playables Ready
+  🎮 VERSION 5.1.0 - BANTER ENGINE EDITION
   ═══════════════════════════════════════════════════════════════════════════
   
-  🎬 YOUTUBE PLAYABLES COMPATIBILITY FIXES
+  🌸 THE LOTUS MIND - Tri-Layer Cognitive Architecture
+  Built on v5.0.0 YouTube Playables foundation with character personality system.
+  
+  LAYER A: EventBus (Sensation Layer)
+  - 40+ game events for fine-grained game state awareness
+  - Decoupled event system for banter communication
+  
+  LAYER B: BanterEngine (Perception Layer)
+  - Character personality DNA: Habot (aggressive), Jabot (calculating)
+  - Strategic advisors: MuBot (wise), Joko (hype)
+  - Static seed pool for offline YouTube Playables
+  - Priority system: Advisors (10) > AI Opponents (5)
+  
+  LAYER C: BubbleManager (Expression Layer)
+  - Comic-style speech bubbles (Normal, Shout, Thought, Wavy)
+  - Max 2 bubbles rule with priority queue
+  - Auto-dismiss with word-count based duration
+  
+  Character Positions:
+  - 🧘 MuBot: Next to Draw Deck (wise advice)
+  - 🃏 Joko: Next to Discard Pile (hype commentary)
+  - 🐇 Habot: Near Habot's area (aggressive banter)
+  - 🐢 Jabot: Near Jabot's area (strategic thoughts)
+  
+  ═══════════════════════════════════════════════════════════════════════════
+  
+  🎬 YOUTUBE PLAYABLES COMPATIBILITY (from v5.0.0)
   Platform requirements for YouTube Shorts/Home tab gaming integration.
   
   🚫 FIX #1: Eliminated alert() Calls
@@ -2656,11 +2682,260 @@
                 transform: rotate(180deg) !important;
             }
         }
+
+        /* ═══════════════════════════════════════════════════════════════════════════
+           🌸 BANTER ENGINE v5.1.0 - COMIC BUBBLE STYLES
+           The Expression Layer: Visual rendering of character dialogue
+           ═══════════════════════════════════════════════════════════════════════════ */
+        
+        /* --- BUBBLE CONTAINERS: Positioned anchors for each character --- */
+        .bubble-anchor {
+            position: absolute;
+            z-index: 10002;
+            pointer-events: none;
+        }
+        
+        /* MuBot: Next to Deck (left side of center) */
+        #mubot-bubble-container {
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            max-width: 200px;
+        }
+        
+        /* Joko: Next to Discard (right side of center) */
+        #joko-bubble-container {
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            max-width: 200px;
+        }
+        
+        /* Habot: Near Habot's area (left) */
+        #habot-bubble-container {
+            left: 10px;
+            top: 120px;
+            max-width: 180px;
+        }
+        
+        /* Jabot: Near Jabot's area (right) */
+        #jabot-bubble-container {
+            right: 10px;
+            top: 120px;
+            max-width: 180px;
+        }
+        
+        /* --- BASE BUBBLE STYLE --- */
+        .aob-bubble {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            padding: 12px 16px;
+            background: #fff;
+            color: #222;
+            border-radius: 20px;
+            font-family: "Comic Neue", "Comic Sans MS", cursive, sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            line-height: 1.3;
+            box-shadow: 2px 6px 20px rgba(0, 0, 0, 0.3);
+            border: 2px solid #333;
+            opacity: 0;
+            transform: scale(0.8) translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: auto;
+            margin: 8px 0;
+        }
+        
+        .aob-bubble.visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        
+        .aob-bubble.dismissing {
+            opacity: 0;
+            transform: scale(0.8) translateY(-10px);
+        }
+        
+        /* --- BUBBLE TYPES --- */
+        
+        /* 💬 NORMAL: Standard speech bubble */
+        .aob-bubble.normal {
+            background: #ffffff;
+            border-color: #333;
+        }
+        
+        /* 🗯️ SHOUT: Spiky/jagged for excitement */
+        .aob-bubble.shout {
+            background: linear-gradient(135deg, #ffff00, #ffe066);
+            border: 3px solid #000;
+            font-size: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            clip-path: polygon(
+                0% 10%, 5% 0%, 15% 10%, 25% 0%, 35% 10%, 45% 0%, 55% 10%, 65% 0%, 75% 10%, 85% 0%, 95% 10%, 100% 0%,
+                100% 90%, 95% 100%, 85% 90%, 75% 100%, 65% 90%, 55% 100%, 45% 90%, 35% 100%, 25% 90%, 15% 100%, 5% 90%, 0% 100%
+            );
+            padding: 16px 20px;
+            animation: shoutPulse 0.5s ease-in-out;
+        }
+        
+        @keyframes shoutPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* ☁️ THOUGHT: Fluffy cloud bubble */
+        .aob-bubble.thought {
+            background: #f0f8ff;
+            border: 2px dashed #888;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            font-style: italic;
+            color: #555;
+        }
+        
+        .aob-bubble.thought::before {
+            content: "💭";
+            position: absolute;
+            bottom: -20px;
+            left: 20px;
+            font-size: 16px;
+        }
+        
+        /* 〰️ WAVY: Uncertain/emotional */
+        .aob-bubble.wavy {
+            background: linear-gradient(135deg, #ffe4e1, #fff0f5);
+            border: 2px solid #999;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: wavyBubble 2s ease-in-out infinite;
+        }
+        
+        @keyframes wavyBubble {
+            0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+            50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
+        }
+        
+        /* --- CHARACTER-SPECIFIC COLORS --- */
+        .aob-bubble.habot {
+            border-color: #e74c3c;
+            box-shadow: 2px 6px 20px rgba(231, 76, 60, 0.3);
+        }
+        
+        .aob-bubble.jabot {
+            border-color: #3498db;
+            box-shadow: 2px 6px 20px rgba(52, 152, 219, 0.3);
+        }
+        
+        .aob-bubble.mubot {
+            border-color: #9b59b6;
+            box-shadow: 2px 6px 20px rgba(155, 89, 182, 0.3);
+        }
+        
+        .aob-bubble.joko {
+            border-color: #f39c12;
+            box-shadow: 2px 6px 20px rgba(243, 156, 18, 0.3);
+        }
+        
+        /* --- CHARACTER NAME TAG --- */
+        .bubble-speaker {
+            font-size: 0.7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            opacity: 0.7;
+        }
+        
+        .aob-bubble.habot .bubble-speaker { color: #e74c3c; }
+        .aob-bubble.jabot .bubble-speaker { color: #3498db; }
+        .aob-bubble.mubot .bubble-speaker { color: #9b59b6; }
+        .aob-bubble.joko .bubble-speaker { color: #f39c12; }
+        
+        /* --- TAIL POINTERS --- */
+        .aob-bubble.left::after {
+            content: "";
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 8px solid transparent;
+            border-right-color: #fff;
+        }
+        
+        .aob-bubble.right::after {
+            content: "";
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 8px solid transparent;
+            border-left-color: #fff;
+        }
+        
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .bubble-anchor {
+                max-width: 150px;
+            }
+            
+            .aob-bubble {
+                font-size: 0.8rem;
+                padding: 10px 12px;
+            }
+            
+            .aob-bubble.shout {
+                font-size: 0.85rem;
+                padding: 12px 14px;
+            }
+            
+            #mubot-bubble-container,
+            #joko-bubble-container {
+                top: 40%;
+            }
+            
+            #habot-bubble-container,
+            #jabot-bubble-container {
+                top: 80px;
+            }
+        }
+        
+        /* --- PORTRAIT MODE --- */
+        @media (max-width: 768px) and (orientation: portrait) {
+            #mubot-bubble-container {
+                left: 5px;
+                top: 35%;
+                max-width: 130px;
+            }
+            
+            #joko-bubble-container {
+                right: 5px;
+                top: 35%;
+                max-width: 130px;
+            }
+            
+            #habot-bubble-container {
+                left: 5px;
+                top: 60px;
+                max-width: 120px;
+            }
+            
+            #jabot-bubble-container {
+                right: 5px;
+                top: 60px;
+                max-width: 120px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="game-container">
+        <!-- 🌸 BANTER ENGINE v5.1.0: Character Bubble Containers -->
+        <div id="mubot-bubble-container" class="bubble-anchor"></div>
+        <div id="joko-bubble-container" class="bubble-anchor"></div>
+        <div id="habot-bubble-container" class="bubble-anchor"></div>
+        <div id="jabot-bubble-container" class="bubble-anchor"></div>
+        
         <!-- 🎯 v4.6: Compact header - single row with all essential info -->
         <div class="compact-header">
             <div class="game-title">🎴 Habib Punja <button id="accessibilityBtn" class="a11y-btn" title="Accessibility Info">♿</button></div>
@@ -3031,10 +3306,556 @@
         }
 
         // ============================================================================
+        // 🌸 BANTER ENGINE v5.1.0 - THE LOTUS MIND
+        // ============================================================================
+        // Tri-Layer Cognitive Architecture:
+        // - Layer A: EventBus (Sensation Layer) - Game events
+        // - Layer B: BanterEngine (Perception Layer) - Character personality
+        // - Layer C: BubbleManager (Expression Layer) - Visual rendering
+        // ============================================================================
+
+        /**
+         * 📡 EVENT BUS - The Sensation Layer
+         * Decoupled event system for game-to-banter communication
+         */
+        class EventBus {
+            constructor() {
+                this.listeners = {};
+                this.eventHistory = [];
+                this.maxHistory = 50;
+            }
+
+            on(event, callback) {
+                if (!this.listeners[event]) {
+                    this.listeners[event] = [];
+                }
+                this.listeners[event].push(callback);
+            }
+
+            off(event, callback) {
+                if (!this.listeners[event]) return;
+                this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
+            }
+
+            emit(event, data = {}) {
+                // Add timestamp and log to history
+                const eventData = { event, data, timestamp: Date.now() };
+                this.eventHistory.push(eventData);
+                if (this.eventHistory.length > this.maxHistory) {
+                    this.eventHistory.shift();
+                }
+
+                // Notify listeners
+                if (this.listeners[event]) {
+                    this.listeners[event].forEach(callback => {
+                        try {
+                            callback(data);
+                        } catch (e) {
+                            console.error(`EventBus error in ${event}:`, e);
+                        }
+                    });
+                }
+
+                // Debug logging
+                if (DEBUG_MODE) {
+                    console.log(`%c📡 Event: ${event}`, 'color: #9b59b6;', data);
+                }
+            }
+
+            getHistory() {
+                return [...this.eventHistory];
+            }
+        }
+
+        // Global EventBus instance
+        const eventBus = new EventBus();
+
+        /**
+         * 💬 BUBBLE MANAGER - The Expression Layer
+         * Handles comic-style speech bubble rendering with priority queue
+         */
+        class BubbleManager {
+            constructor() {
+                this.activeBubbles = [];  // Max 2 concurrent bubbles
+                this.queue = [];          // Priority queue for overflow
+                this.priorities = {
+                    'mubot': 10,    // High: Strategic Advisor
+                    'joko': 10,     // High: Hype Commentator
+                    'habot': 5,     // Medium: AI Opponent
+                    'jabot': 5,     // Medium: AI Opponent
+                    'narration': 1, // Low: Game events
+                    'emergency': 15 // Critical: Always shows
+                };
+                this.maxActive = 2;
+                this.defaultDuration = 6000;  // 🌸 v5.1.0: Increased from 4s to 6s for better readability
+            }
+
+            /**
+             * Show a bubble for a character
+             */
+            show(speaker, type, text, duration = null) {
+                const bubble = {
+                    id: `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                    speaker: speaker.toLowerCase(),
+                    type,
+                    text,
+                    duration: duration || this.calculateDuration(text),
+                    priority: this.priorities[speaker.toLowerCase()] || 5,
+                    timestamp: Date.now()
+                };
+
+                // Decide: Display now or handle overflow
+                if (this.activeBubbles.length < this.maxActive) {
+                    this.display(bubble);
+                } else {
+                    this.handleOverflow(bubble);
+                }
+            }
+
+            handleOverflow(newBubble) {
+                // Find lowest priority currently on screen
+                const lowestPriority = Math.min(...this.activeBubbles.map(b => b.priority));
+
+                if (newBubble.priority > lowestPriority) {
+                    // High priority (Advisors) replaces Low priority (AI Bots)
+                    const toReplace = this.activeBubbles.find(b => b.priority === lowestPriority);
+                    this.dismiss(toReplace.id);
+                    this.display(newBubble);
+                } else {
+                    // Queue for later if priority is lower or equal
+                    if (this.queue.length < 10) {
+                        this.queue.push(newBubble);
+                        this.queue.sort((a, b) => b.priority - a.priority);
+                    }
+                }
+            }
+
+            display(bubble) {
+                this.activeBubbles.push(bubble);
+
+                // Create DOM element
+                const element = this.createBubbleElement(bubble);
+                const container = document.getElementById(`${bubble.speaker}-bubble-container`);
+                
+                if (container) {
+                    container.appendChild(element);
+                    // Trigger CSS animation
+                    requestAnimationFrame(() => element.classList.add('visible'));
+                }
+
+                // Auto-dismiss after duration
+                bubble.timeout = setTimeout(() => this.dismiss(bubble.id), bubble.duration);
+
+                // Notify event bus
+                eventBus.emit('bubble_shown', { speaker: bubble.speaker, text: bubble.text });
+            }
+
+            dismiss(id) {
+                const bubble = this.activeBubbles.find(b => b.id === id);
+                if (!bubble) return;
+
+                if (bubble.timeout) clearTimeout(bubble.timeout);
+                this.activeBubbles = this.activeBubbles.filter(b => b.id !== id);
+
+                const element = document.getElementById(`bubble-${id}`);
+                if (element) {
+                    element.classList.remove('visible');
+                    element.classList.add('dismissing');
+                    setTimeout(() => element.remove(), 300);
+                }
+
+                // Promote next from queue
+                this.promoteFromQueue();
+            }
+
+            promoteFromQueue() {
+                if (this.queue.length > 0 && this.activeBubbles.length < this.maxActive) {
+                    const next = this.queue.shift();
+                    this.display(next);
+                }
+            }
+
+            createBubbleElement(bubble) {
+                const div = document.createElement('div');
+                div.id = `bubble-${bubble.id}`;
+                div.className = `aob-bubble ${bubble.type} ${bubble.speaker}`;
+
+                // Add speaker name
+                const speakerEl = document.createElement('div');
+                speakerEl.className = 'bubble-speaker';
+                speakerEl.textContent = this.getSpeakerName(bubble.speaker);
+                div.appendChild(speakerEl);
+
+                // Add text
+                const textEl = document.createElement('span');
+                textEl.className = 'bubble-text';
+                textEl.textContent = bubble.text;
+                div.appendChild(textEl);
+
+                return div;
+            }
+
+            getSpeakerName(speaker) {
+                const names = {
+                    'habot': '🐇 Habot',
+                    'jabot': '🐢 Jabot',
+                    'mubot': '🧘 MuBot',
+                    'joko': '🃏 Joko'
+                };
+                return names[speaker] || speaker;
+            }
+
+            calculateDuration(text) {
+                // 🌸 v5.1.0: Increased durations for better readability
+                // 600ms per word, min 5s, max 12s
+                const words = text.split(' ').length;
+                return Math.min(Math.max(5000, words * 600), 12000);
+            }
+
+            dismissAll() {
+                [...this.activeBubbles].forEach(b => this.dismiss(b.id));
+                this.queue = [];
+            }
+        }
+
+        // Global BubbleManager instance
+        const bubbleManager = new BubbleManager();
+
+        /**
+         * 🧠 BANTER ENGINE - The Perception Layer
+         * Handles character personality and dialogue selection
+         */
+        class BanterEngine {
+            constructor(bubbleManager) {
+                this.bm = bubbleManager;
+                this.banterPool = null;
+                this.enabled = true;
+                this.lastSpeaker = null;
+                this.lastEventType = null;
+                this.cooldowns = {};  // Prevent spam from same character
+                this.cooldownMs = 3000;  // 3 second cooldown per character
+            }
+
+            async init() {
+                // For YouTube Playables: Load embedded static seed
+                // In production, this could fetch from /data/banter_pool.json
+                try {
+                    this.banterPool = BANTER_POOL_DATA;  // Embedded data (see below)
+                    console.log('%c🌸 Banter Engine: Static Seed Initialized', 'color: #9b59b6; font-weight: bold;');
+                    this.subscribeToEvents();
+                } catch (e) {
+                    console.error('🌸 Banter Engine: Initialization failed', e);
+                }
+            }
+
+            subscribeToEvents() {
+                // AI Turn Events
+                eventBus.on('ai_turn_started', (data) => {
+                    const speaker = data.player === 1 ? 'habot' : 'jabot';
+                    this.trigger(speaker, 'turn_started');
+                });
+
+                eventBus.on('ai_card_drawn', (data) => {
+                    const speaker = data.player === 1 ? 'habot' : 'jabot';
+                    this.trigger(speaker, 'card_drawn');
+                });
+
+                eventBus.on('ai_card_bought', (data) => {
+                    const speaker = data.player === 1 ? 'habot' : 'jabot';
+                    this.trigger(speaker, 'card_bought');
+                    // Joko reacts to buys
+                    if (Math.random() < 0.4) {
+                        setTimeout(() => this.trigger('joko', 'buy_window_opened'), 800);
+                    }
+                });
+
+                eventBus.on('ai_card_discarded', (data) => {
+                    const speaker = data.player === 1 ? 'habot' : 'jabot';
+                    this.trigger(speaker, 'card_discarded');
+                    // Joko reacts to interesting discards
+                    if (Math.random() < 0.3) {
+                        setTimeout(() => this.trigger('joko', 'card_discarded'), 600);
+                    }
+                });
+
+                eventBus.on('ai_published', (data) => {
+                    const speaker = data.player === 1 ? 'habot' : 'jabot';
+                    this.trigger(speaker, 'sequences_published');
+                    // Joko always reacts to publishes
+                    setTimeout(() => this.trigger('joko', 'sequences_published'), 1000);
+                });
+
+                eventBus.on('ai_extended', (data) => {
+                    const speaker = data.player === 1 ? 'habot' : 'jabot';
+                    this.trigger(speaker, 'sequence_extended');
+                });
+
+                // Player Events
+                eventBus.on('player_turn_started', () => {
+                    if (Math.random() < 0.3) {
+                        this.trigger('mubot', 'turn_started');
+                    }
+                });
+
+                eventBus.on('buy_window_opened', () => {
+                    // MuBot gives advice on buying
+                    if (Math.random() < 0.5) {
+                        this.trigger('mubot', 'buy_window_opened');
+                    }
+                });
+
+                eventBus.on('player_published', () => {
+                    // Both AIs react
+                    this.trigger('habot', 'human_published');
+                    setTimeout(() => this.trigger('jabot', 'human_published'), 800);
+                    // Joko celebrates
+                    setTimeout(() => this.trigger('joko', 'sequences_published'), 1200);
+                });
+
+                eventBus.on('player_low_cards', (data) => {
+                    this.trigger('mubot', 'player_low_cards');
+                    // AIs react to player being ahead
+                    if (data.count <= 3) {
+                        setTimeout(() => this.trigger('habot', 'human_ahead'), 1000);
+                        setTimeout(() => this.trigger('jabot', 'behind_in_game'), 1500);
+                    }
+                });
+
+                // Hand/Game Events
+                eventBus.on('hand_started', () => {
+                    this.trigger('mubot', 'hand_started');
+                });
+
+                eventBus.on('hand_won', (data) => {
+                    if (data.winner === 0) {
+                        // Player won
+                        this.trigger('joko', 'game_over');
+                    } else {
+                        const speaker = data.winner === 1 ? 'habot' : 'jabot';
+                        this.trigger(speaker, 'hand_won');
+                    }
+                });
+
+                eventBus.on('hand_lost', (data) => {
+                    const loser = data.loser === 1 ? 'habot' : 'jabot';
+                    this.trigger(loser, 'hand_lost');
+                });
+
+                eventBus.on('game_over', () => {
+                    this.trigger('joko', 'game_over');
+                    setTimeout(() => this.trigger('mubot', 'game_over'), 1500);
+                });
+            }
+
+            trigger(character, eventType) {
+                if (!this.enabled || !this.banterPool) return;
+
+                // Check cooldown
+                const cooldownKey = character;
+                if (this.cooldowns[cooldownKey] && Date.now() - this.cooldowns[cooldownKey] < this.cooldownMs) {
+                    return;  // Still in cooldown
+                }
+
+                const charData = this.banterPool.characters[character];
+                if (!charData) return;
+
+                const lines = charData.dialogue[eventType];
+                if (!lines || lines.length === 0) return;
+
+                // Random selection
+                const line = lines[Math.floor(Math.random() * lines.length)];
+                
+                // Show bubble
+                this.bm.show(character, line.type, line.text);
+                
+                // Set cooldown
+                this.cooldowns[cooldownKey] = Date.now();
+                this.lastSpeaker = character;
+                this.lastEventType = eventType;
+            }
+
+            setEnabled(enabled) {
+                this.enabled = enabled;
+                if (!enabled) {
+                    this.bm.dismissAll();
+                }
+            }
+        }
+
+        /**
+         * 📦 STATIC BANTER POOL DATA
+         * Embedded for YouTube Playables (no external fetch required)
+         */
+        const BANTER_POOL_DATA = {
+            "meta": { "version": "1.0.0", "scenario": "YouTube_Playables_Offline" },
+            "characters": {
+                "habot": {
+                    "name": "Habot", "emoji": "🐇", "priority": 5, "color": "#e74c3c",
+                    "dialogue": {
+                        "turn_started": [
+                            { "text": "My turn, let's go!", "type": "normal" },
+                            { "text": "Quick quick quick!", "type": "shout" }
+                        ],
+                        "card_drawn": [
+                            { "text": "Let's see what we got!", "type": "normal" },
+                            { "text": "Come on, come on!", "type": "shout" },
+                            { "text": "Draw time! ⚡", "type": "shout" },
+                            { "text": "Speed is everything!", "type": "normal" }
+                        ],
+                        "card_bought": [
+                            { "text": "Ooh, I'll take that!", "type": "shout" },
+                            { "text": "Mine!", "type": "shout" },
+                            { "text": "Yoink! 🛍️", "type": "normal" }
+                        ],
+                        "card_discarded": [
+                            { "text": "Don't need this one!", "type": "normal" },
+                            { "text": "Out you go!", "type": "normal" }
+                        ],
+                        "sequences_published": [
+                            { "text": "TIME TO SHINE! ⚡", "type": "shout" },
+                            { "text": "Let's DO this!", "type": "shout" },
+                            { "text": "Boom! Published!", "type": "shout" }
+                        ],
+                        "sequence_extended": [
+                            { "text": "Building momentum!", "type": "normal" },
+                            { "text": "Stack 'em up!", "type": "normal" }
+                        ],
+                        "hand_won": [
+                            { "text": "Speed wins! 🏆", "type": "shout" },
+                            { "text": "Too fast for you!", "type": "shout" }
+                        ],
+                        "hand_lost": [
+                            { "text": "Next time for sure!", "type": "normal" },
+                            { "text": "Just warming up...", "type": "normal" }
+                        ],
+                        "human_ahead": [
+                            { "text": "Uh oh... better hurry!", "type": "wavy" },
+                            { "text": "Not on my watch!", "type": "shout" }
+                        ],
+                        "human_published": [
+                            { "text": "Oh, it's ON now!", "type": "shout" },
+                            { "text": "Challenge accepted!", "type": "normal" }
+                        ]
+                    }
+                },
+                "jabot": {
+                    "name": "Jabot", "emoji": "🐢", "priority": 5, "color": "#3498db",
+                    "dialogue": {
+                        "turn_started": [
+                            { "text": "Evaluating options...", "type": "thought" },
+                            { "text": "Proceeding methodically.", "type": "normal" }
+                        ],
+                        "card_drawn": [
+                            { "text": "Calculating odds...", "type": "thought" },
+                            { "text": "Analyzing...", "type": "normal" },
+                            { "text": "Every card tells a story.", "type": "thought" }
+                        ],
+                        "card_bought": [
+                            { "text": "A logical choice.", "type": "normal" },
+                            { "text": "Strategic acquisition.", "type": "normal" },
+                            { "text": "This fits the plan.", "type": "normal" }
+                        ],
+                        "card_discarded": [
+                            { "text": "Calculated removal.", "type": "normal" },
+                            { "text": "Trimming inefficiency.", "type": "normal" }
+                        ],
+                        "sequences_published": [
+                            { "text": "The moment has arrived.", "type": "normal" },
+                            { "text": "All according to plan.", "type": "thought" },
+                            { "text": "Patience rewarded.", "type": "normal" }
+                        ],
+                        "sequence_extended": [
+                            { "text": "Building systematically.", "type": "normal" },
+                            { "text": "Progress continues.", "type": "normal" }
+                        ],
+                        "hand_won": [
+                            { "text": "Strategy prevails. 🏆", "type": "normal" },
+                            { "text": "The tortoise wins.", "type": "normal" }
+                        ],
+                        "hand_lost": [
+                            { "text": "A learning opportunity.", "type": "thought" },
+                            { "text": "Adjusting calculations...", "type": "normal" }
+                        ],
+                        "behind_in_game": [
+                            { "text": "The long game continues.", "type": "thought" },
+                            { "text": "Patience. Always patience.", "type": "thought" }
+                        ],
+                        "human_published": [
+                            { "text": "Interesting development.", "type": "thought" },
+                            { "text": "Noted. Adapting strategy.", "type": "normal" }
+                        ]
+                    }
+                },
+                "mubot": {
+                    "name": "MuBot", "emoji": "🧘", "priority": 10, "color": "#9b59b6",
+                    "dialogue": {
+                        "turn_started": [
+                            { "text": "Notice the pattern here. 🤔", "type": "thought" },
+                            { "text": "Consider all paths before choosing.", "type": "thought" }
+                        ],
+                        "buy_window_opened": [
+                            { "text": "Consider all options before acting.", "type": "thought" },
+                            { "text": "Each buy costs opportunity later.", "type": "thought" },
+                            { "text": "A wise player waits for the right moment.", "type": "normal" }
+                        ],
+                        "hand_started": [
+                            { "text": "Master the fundamentals, the rest follows.", "type": "thought" },
+                            { "text": "A new hand, a new opportunity.", "type": "normal" }
+                        ],
+                        "player_low_cards": [
+                            { "text": "You're close. Stay focused.", "type": "thought" },
+                            { "text": "The finish line approaches.", "type": "normal" }
+                        ],
+                        "game_over": [
+                            { "text": "Well played. Reflect and grow.", "type": "normal" },
+                            { "text": "Every game teaches something.", "type": "thought" }
+                        ]
+                    }
+                },
+                "joko": {
+                    "name": "Joko", "emoji": "🃏", "priority": 10, "color": "#f39c12",
+                    "dialogue": {
+                        "turn_started": [
+                            { "text": "Here we GO!", "type": "normal" },
+                            { "text": "Next move! Exciting!", "type": "normal" }
+                        ],
+                        "card_discarded": [
+                            { "text": "WHAT?! That card?!", "type": "shout" },
+                            { "text": "Bold move! 🔥", "type": "shout" }
+                        ],
+                        "buy_window_opened": [
+                            { "text": "Spicy! I like the hustle!", "type": "shout" },
+                            { "text": "OH! Did you SEE that?! 🔥", "type": "shout" },
+                            { "text": "Drama at the table!", "type": "normal" }
+                        ],
+                        "sequences_published": [
+                            { "text": "BOOM! Cards on the table!", "type": "shout" },
+                            { "text": "Now we're COOKING! 🔥", "type": "shout" },
+                            { "text": "The game just got REAL!", "type": "shout" }
+                        ],
+                        "human_ahead": [
+                            { "text": "You're on FIRE! 🔥", "type": "shout" },
+                            { "text": "Never boring with you!", "type": "normal" }
+                        ],
+                        "game_over": [
+                            { "text": "What a GAME! 🎉", "type": "shout" },
+                            { "text": "That was EPIC!", "type": "shout" },
+                            { "text": "Play again! Play again!", "type": "normal" }
+                        ]
+                    }
+                }
+            }
+        };
+
+        // Global BanterEngine instance
+        const banterEngine = new BanterEngine(bubbleManager);
+
+        // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA v5.0 - YOUTUBE PLAYABLES READY', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
-        console.log('%c🎬 8 Mobile Fixes: No alerts | Portrait | Safe areas | Touch | AI expand | Clean msgs | Dialog flow | No placeholders', 'color: #ffd700; font-weight: bold;');
+        console.log('%c🎮 HABIB PUNJA v5.1.0 - BANTER ENGINE EDITION', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
+        console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
         console.log('%c🌍 PATCH M Checks Global Published Sequences!', 'color: #ff9800; font-size: 14px; font-weight: bold;');
         console.log('%c© 2025 AgeOfBotsGames LLC', 'color: #666; font-size: 12px;');
@@ -3622,25 +4443,14 @@
 
                     console.log(`%c🎴 Initial discard card: ${initialDiscard.toString()}`, 'color: #ff9800; font-weight: bold;');
 
-                    // Add character commentary based on card value
-                    let commentary = '';
-                    const rank = initialDiscard.rank;
-
-                    if (['A', 'K', 'Q'].includes(rank)) {
-                        commentary = 'Habot: "Interesting start... that\'s a valuable card."\nJabot: "Indeed. The first player has a decision to make."';
-                    } else if (['J', '10', '9'].includes(rank)) {
-                        commentary = 'Jabot: "A reasonable starting card."\nHabot: "Could fit into several sequences."';
-                    } else {
-                        commentary = 'Habot: "Low card on the pile - probably not worth the buy."\nJabot: "We shall see. Every card has its place."';
-                    }
-
+                    // 🌸 v5.1.0: Removed hardcoded commentary - now handled by Banter Engine bubbles
                     showInfoModal(
                         '🎴 Starting Card',
-                        `The discard pile begins with:\n\n${initialDiscard.toString()}\n\n━━━━━━━━━━━━━━━\n${commentary}\n━━━━━━━━━━━━━━━\n\nFirst player may take it or draw from deck.`,
+                        `The discard pile begins with:\n\n${initialDiscard.toString()}\n\nFirst player may take it or draw from deck.`,
                         'Start Playing!',
                         '🃏',
                         true,
-                        4000  // 4 seconds
+                        3000  // 3 seconds (reduced since no commentary)
                     );
                 }
 
@@ -3699,6 +4509,9 @@
                 console.log(`   Cards after sort: ${this.playerHands[0].map(c => c.toString()).join(', ')}`);
                 console.log(`%c✅ Sort complete!`, 'color: #00ff00; font-weight: bold;');
                 console.log(`%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'color: #2196f3;');
+
+                // 🌸 v5.1.0: Emit hand started event
+                eventBus.emit('hand_started', { hand: this.currentHand, cards: this.playerHands[0].length });
 
                 this.selectedCards = [];
             }
@@ -5866,6 +6679,12 @@
 
                 const playerNames = ['Human', 'Habot', 'Jabot'];
                 console.log(`%c🔔 Buy window opened for ${playerNames[buyWindowPlayer]} (${card.toString()}) - ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
+                
+                // 🌸 v5.1.0: Emit buy window opened event (for player buy opportunities)
+                if (buyWindowPlayer === 0) {
+                    eventBus.emit('buy_window_opened', { card: card.toString(), forPlayer: true });
+                }
+                
                 if (buyWindowPlayer === 0) document.getElementById('buyBtn').disabled = false;
                 this.updateBuyTimer();
             }
@@ -6201,6 +7020,9 @@
                             this.playerBuys[aiPlayer]--;
                             showBuyToast(aiName, card);
                             this.updateUI();
+                            
+                            // 🌸 v5.1.0: Emit AI card bought event
+                            eventBus.emit('ai_card_bought', { player: aiPlayer, name: aiName, card: card.toString() });
                         }
                     }
                     document.getElementById(`${statusId}-status`).classList.remove('active');
@@ -6247,6 +7069,9 @@
                 const statusId = ai === 1 ? 'habot' : 'jabot';
 
                 console.log(`%c🤖 ${aiName} starting turn`, 'color: #3498db; font-weight: bold;');
+                
+                // 🌸 v5.1.0: Emit AI turn started event
+                eventBus.emit('ai_turn_started', { player: ai, name: aiName });
 
                 // 🎯 v4.0.7 FIX: Reset publish flag at START of turn (not end of previous turn!)
                 // This ensures AI cannot extend on the SAME turn as publishing
@@ -6571,6 +7396,10 @@
                     const drawnCard = this.deck.pop();
                     this.playerHands[ai].push(drawnCard);
                     this.setAIStatus(statusId, `Analyzed hand`);
+                    
+                    // 🌸 v5.1.0: Emit AI card drawn event
+                    const aiName = ai === 1 ? 'Habot' : 'Jabot';
+                    eventBus.emit('ai_card_drawn', { player: ai, name: aiName, card: drawnCard.toString() });
                 }
             }
 
@@ -6883,6 +7712,9 @@
                                     console.log(`%c  📂 v5.0: Auto-expanded ${aiName}'s area to show published sequences`, 'color: #17a2b8;');
                                 }
                             }
+                            
+                            // 🌸 v5.1.0: Emit AI published event
+                            eventBus.emit('ai_published', { player: ai, name: aiName });
                         } else {
                             console.log(`%c  ❌ ${aiName} publish FAILED`, 'color: #dc3545; font-weight: bold;');
                         }
@@ -6954,6 +7786,9 @@
                         this.lastDiscardByPlayer = ai;
                         // 🎯 v4.6: Simplified status - just show the discard, no prefix
                         this.setAIStatus(statusId, `Discarded: ${worst.toString()}`);
+                        
+                        // 🌸 v5.1.0: Emit AI card discarded event
+                        eventBus.emit('ai_card_discarded', { player: ai, name: aiName, card: worst.toString() });
                     }
                 }
                 if (this.playerHands[ai].length === 0) {
@@ -7167,6 +8002,10 @@
                     this.playerHands[i].forEach(c => score += c.getPenaltyValue());
                     this.playerScores[i] += score;
                 }
+                
+                // 🌸 v5.1.0: Emit hand won event
+                eventBus.emit('hand_won', { winner, name: winnerName, hand: this.currentHand });
+                
                 // 🎯 v5.0: Auto-dismiss "Hand Complete" after 2 seconds (don't require OK click)
                 // This prevents modal overlap with hand selection/final results
                 setTimeout(() => { 
@@ -7635,6 +8474,10 @@
                 if (this.currentPlayer === 0) {
                     turnIndicator.classList.add('your-turn');
                     turnIndicator.classList.remove('ai-turn');
+                    // 🌸 v5.1.0: Emit player turn started (only when draw phase)
+                    if (this.gamePhase === 'draw') {
+                        eventBus.emit('player_turn_started', { handSize: this.playerHands[0].length });
+                    }
                 } else {
                     turnIndicator.classList.remove('your-turn');
                     turnIndicator.classList.add('ai-turn');
@@ -8366,6 +9209,10 @@
         // EVENT LISTENERS (v4.1.1 - CSP Compliance)
         // ============================================
         window.onload = () => {
+            // 🌸 v5.1.0: Initialize Banter Engine
+            banterEngine.init();
+            console.log('%c🌸 Banter Engine Ready!', 'color: #9b59b6; font-weight: bold;');
+            
             // Main action buttons
             document.getElementById('publishBtn').addEventListener('click', publishSequences);
             document.getElementById('discardBtn').addEventListener('click', discardCard);
@@ -8852,6 +9699,10 @@
             else {
                 game.autoPublish(0);
                 game.justPublished = true;
+                
+                // 🌸 v5.1.0: Emit player published event
+                eventBus.emit('player_published', { player: 0 });
+                
                 if (game.playerHands[0].length === 0) { game.endHand(0); return }
                 game.updateUI();
             }
