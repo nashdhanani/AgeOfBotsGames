@@ -2692,66 +2692,90 @@
         /* --- CRITICAL FIX: Targeted Mobile/Portrait Overrides (Screen Fit & Collapse) --- */
         @media only screen and (max-width: 768px) and (orientation: portrait) {
 
-            /* 1. Body: Allow scrolling on mobile - fix for Chrome iOS */
+            /* 🔄 v5.1.2: MOBILE SCALING - Fit entire game on screen without scrolling */
+            /* This mimics what the user sees when pinching to zoom out */
+            
+            /* 1. Body: Fixed viewport, no scrolling needed */
             body {
                 padding: 0 !important;
-                /* Use dvh (dynamic viewport height) for mobile browser chrome */
-                min-height: 100vh !important;
-                min-height: 100dvh !important; /* Modern browsers */
-                height: auto !important;
-                /* ALLOW scrolling on body for mobile */
-                overflow-y: auto !important;
-                overflow-x: hidden !important;
+                margin: 0 !important;
+                height: 100vh !important;
+                height: 100dvh !important;
+                overflow: hidden !important;
                 /* iOS safe area padding */
-                padding-bottom: env(safe-area-inset-bottom, 20px) !important;
+                padding-top: env(safe-area-inset-top, 0px) !important;
             }
 
-            /* 2. Game Container: Allow natural height flow */
+            /* 2. Game Container: Scale down to fit everything */
             .game-container {
-                min-height: 100vh !important;
-                min-height: 100dvh !important;
+                height: 100vh !important;
+                height: 100dvh !important;
                 width: 100vw !important;
-                /* CRITICAL: Force Flexbox stacking and height control */
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: flex-start !important;
-                /* Let body handle scrolling */
-                overflow: visible !important;
-                padding-bottom: 20px !important;
+                overflow: hidden !important;
+                padding: 4px !important;
+                box-sizing: border-box !important;
+                /* 🔄 v5.1.2: Scale down to fit - like pinch zoom */
+                transform: scale(0.88) !important;
+                transform-origin: top center !important;
+            }
+            
+            /* 3. Compact header - prevent "Your Turn" cutoff */
+            .compact-header {
+                padding: 6px 8px !important;
+                padding-top: max(6px, env(safe-area-inset-top, 6px)) !important;
+                gap: 4px !important;
+                margin-bottom: 6px !important;
+                flex-wrap: nowrap !important;
+            }
+            
+            .game-title {
+                font-size: 0.8rem !important;
+                flex-shrink: 1 !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+            
+            .hand-info {
+                font-size: 0.75rem !important;
+                padding: 3px 6px !important;
+                flex-shrink: 0 !important;
+            }
+            
+            .turn-indicator {
+                font-size: 0.75rem !important;
+                padding: 4px 8px !important;
+                flex-shrink: 0 !important;
             }
 
-            /* 3. Central Board: Natural height, no forced overflow */
+            /* 4. Central Board: Natural height, no forced overflow */
             #game-board {
                 flex-grow: 1 !important;
                 overflow: visible !important;
             }
 
-            /* 4. Player's Hand Area: Prevent clipping of the cards */
+            /* 5. Player's Hand Area: Prevent clipping of the cards */
             .player-area-center {
-                /* Prevents the hand area from shrinking when the board grows */
                 flex-shrink: 0 !important;
-                /* Allows horizontal scrolling for a wide hand */
                 overflow-x: auto !important;
-                /* Ensure there's enough space for the hand to fully display */
                 padding-bottom: 5px !important;
-                /* 🎯 v4.6: Fix right border cutoff on mobile */
-                margin-left: 8px !important;
-                margin-right: 8px !important;
+                margin-left: 4px !important;
+                margin-right: 4px !important;
                 box-sizing: border-box !important;
             }
 
-            /* ADD/REPLACE WITH THIS CORRECT BLOCK INSIDE THE MEDIA QUERY: */
+            /* 6. Cards maintain size in flex layout */
             .card {
-                /* Ensures the card appears and maintains its size in the flex-column layout */
                 position: relative !important;
                 z-index: 100 !important;
                 display: inline-block !important;
-                /* CRITICAL: Prevents the card from shrinking to zero height */
                 flex-shrink: 0 !important;
                 flex-grow: 0 !important;
             }
 
-            /* 5. AI Containers: Collapse them by default on mobile, but allow expansion */
+            /* 7. AI Containers: Collapse them by default on mobile, but allow expansion */
             #habot-area .ai-content.collapsed,
             #jabot-area .ai-content.collapsed {
                 max-height: 0 !important;
