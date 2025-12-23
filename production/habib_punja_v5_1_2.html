@@ -2012,7 +2012,7 @@
             font-size: 15px;
             font-weight: 900;
             letter-spacing: .2px;
-            transition: transform .12s, box-shadow .12s;
+            transition: transform .12s, box-shadow .12s, background .3s;
             box-shadow: 0 6px 16px rgba(0, 0, 0, .25);
             /* 👆 v5.0: Eliminate 300ms touch delay for YouTube Playables */
             touch-action: manipulation;
@@ -2030,6 +2030,42 @@
             cursor: not-allowed;
             opacity: .7;
             box-shadow: none
+        }
+        
+        /* 🔄 v5.1.2: Buy Button Three-State System */
+        /* ♿ v5.1.2: Accessibility - uses color + icon + border + animation for colorblind support */
+        
+        /* GREEN - Active for Human (can click to buy) */
+        #buyBtn.buy-human {
+            background: linear-gradient(180deg, #3ddc84, #1fae63) !important;
+            color: #052e1a !important;
+            opacity: 1 !important;
+            cursor: pointer !important;
+            animation: pulse-green 1.5s infinite;
+            border: 3px solid #052e1a !important;
+        }
+        
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 6px 16px rgba(61, 220, 132, 0.4); }
+            50% { box-shadow: 0 6px 24px rgba(61, 220, 132, 0.8); }
+        }
+        
+        /* YELLOW/AMBER - Active for AI (showing buy window is open for AI) */
+        #buyBtn.buy-ai {
+            background: linear-gradient(180deg, #f59e0b, #d97706) !important;
+            color: #1f2937 !important;
+            opacity: 1 !important;
+            cursor: not-allowed !important;
+            border: 3px dashed #92400e !important;
+        }
+        
+        /* RED - Inactive (no buy window) */
+        #buyBtn.buy-inactive {
+            background: linear-gradient(180deg, #ef4444, #b91c1c) !important;
+            color: #fef2f2 !important;
+            opacity: 0.85 !important;
+            cursor: not-allowed !important;
+            border: 1px solid #7f1d1d !important;
         }
 
         .buy-info {
@@ -2750,6 +2786,96 @@
             #jabot-area .ai-header[data-expanded="true"] .collapse-icon {
                 transform: rotate(180deg) !important;
             }
+            
+            /* ═══════════════════════════════════════════════════════════════════════════
+               🔄 v5.1.2: COMPACT MOBILE MODE - ~15-20% vertical space savings
+               ═══════════════════════════════════════════════════════════════════════════ */
+            
+            /* 1. Smaller Deck/Discard cards (92x132 → 78x112) - saves ~20px */
+            .deck,
+            .discard-pile {
+                width: 78px !important;
+                height: 112px !important;
+                border-radius: 10px !important;
+            }
+            
+            .deck div,
+            .discard-pile div {
+                font-size: 0.8rem !important;
+            }
+            
+            #topDiscard span {
+                font-size: 1.4rem !important;
+            }
+            
+            /* 2. Compact center scoreboard (vertical → horizontal) - saves ~20px */
+            .center-scoreboard {
+                flex-direction: row !important;
+                gap: 8px !important;
+                padding: 6px 10px !important;
+                min-width: auto !important;
+            }
+            
+            .score-item {
+                flex-direction: column !important;
+                gap: 2px !important;
+                font-size: 0.75rem !important;
+            }
+            
+            .score-name {
+                font-size: 0.8rem !important;
+            }
+            
+            /* 3. Smaller card count badge (28 → 24px) - saves ~4px */
+            .card-count-badge {
+                padding: 3px 8px !important;
+                font-size: 0.8rem !important;
+            }
+            
+            /* 4. Tighter AI header - saves ~4px but keeps readability */
+            .ai-header {
+                padding: 8px 10px !important;
+                margin-bottom: 4px !important;
+            }
+            
+            /* 5. Increased AI content padding (15 → 18px) per user request */
+            #habot-area .ai-content:not(.collapsed),
+            #jabot-area .ai-content:not(.collapsed) {
+                padding: 18px !important;
+            }
+            
+            /* 6. Smaller published cards in AI areas (70% → 60%) - saves ~10px */
+            .opponent-published .published-cards .card {
+                transform: scale(0.6) !important;
+            }
+            
+            /* 7. Reduced center table padding - saves ~10px */
+            .center-table-area {
+                padding: 10px 0 !important;
+            }
+            
+            .deck-area-compact {
+                gap: 12px !important;
+                margin-bottom: 10px !important;
+            }
+            
+            /* 8. Smaller AI status area - saves ~8px */
+            .ai-status-compact {
+                padding: 6px 10px !important;
+                min-height: 32px !important;
+                font-size: 0.8rem !important;
+            }
+            
+            /* 9. Compact opponent published section */
+            .opponent-published {
+                margin-bottom: 8px !important;
+                min-height: 30px !important;
+            }
+            
+            .opponent-published .published-header {
+                font-size: 0.7rem !important;
+                margin-bottom: 4px !important;
+            }
         }
 
         /* ═══════════════════════════════════════════════════════════════════════════
@@ -2757,41 +2883,45 @@
            The Expression Layer: Visual rendering of character dialogue
            ═══════════════════════════════════════════════════════════════════════════ */
         
-        /* --- BUBBLE CONTAINERS: Positioned anchors for each character --- */
+        /* --- BUBBLE CONTAINERS: Fixed positions, stacked vertically --- */
+        /* 🔄 v5.1.2: Two positions (LEFT/RIGHT) with vertical stacking */
         .bubble-anchor {
             position: absolute;
             z-index: 10002;
             pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
         
-        /* MuBot: Above center area (not covering deck) */
+        /* LEFT POSITION: MuBot (primary) above Habot (secondary) */
         #mubot-bubble-container {
-            left: 50%;
-            transform: translateX(-70%);
-            top: 180px;
-            max-width: 200px;
+            left: 15px;
+            top: 130px;
+            max-width: 180px;
+            z-index: 10003; /* Higher priority advisors on top */
         }
         
-        /* Joko: Above center area (not covering discard) */
-        #joko-bubble-container {
-            left: 50%;
-            transform: translateX(-30%);
-            top: 180px;
-            max-width: 200px;
-        }
-        
-        /* Habot: Near Habot's area (left) */
         #habot-bubble-container {
-            left: 10px;
-            top: 100px;
+            left: 15px;
+            top: 200px; /* Below MuBot - stacked vertically */
             max-width: 180px;
+            z-index: 10002;
         }
         
-        /* Jabot: Near Jabot's area (right) */
-        #jabot-bubble-container {
-            right: 10px;
-            top: 100px;
+        /* RIGHT POSITION: Joko (primary) above Jabot (secondary) */
+        #joko-bubble-container {
+            right: 15px;
+            top: 130px;
             max-width: 180px;
+            z-index: 10003; /* Higher priority advisors on top */
+        }
+        
+        #jabot-bubble-container {
+            right: 15px;
+            top: 200px; /* Below Joko - stacked vertically */
+            max-width: 180px;
+            z-index: 10002;
         }
         
         /* --- BASE BUBBLE STYLE --- */
@@ -2958,28 +3088,41 @@
                 padding: 14px 16px;
             }
             
-            /* Move bubbles to corners on mobile to avoid deck/discard */
+            /* 🔄 v5.1.2: Two positions on mobile, stacked vertically */
+            /* LEFT POSITION: MuBot (top) and Habot (below) */
             #mubot-bubble-container {
                 left: 5px;
-                top: auto;
-                bottom: 280px;
+                top: 45px;
+                bottom: auto;
                 transform: none;
-            }
-            
-            #joko-bubble-container {
-                right: 5px;
-                left: auto;
-                top: auto;
-                bottom: 280px;
-                transform: none;
+                z-index: 10003;
             }
             
             #habot-bubble-container {
-                top: 70px;
+                left: 5px;
+                top: 110px; /* Below MuBot */
+                bottom: auto;
+                transform: none;
+                z-index: 10002;
+            }
+            
+            /* RIGHT POSITION: Joko (top) and Jabot (below) */
+            #joko-bubble-container {
+                right: 5px;
+                left: auto;
+                top: 45px;
+                bottom: auto;
+                transform: none;
+                z-index: 10003;
             }
             
             #jabot-bubble-container {
-                top: 70px;
+                right: 5px;
+                left: auto;
+                top: 110px; /* Below Joko */
+                bottom: auto;
+                transform: none;
+                z-index: 10002;
             }
         }
         
@@ -2994,24 +3137,27 @@
                 padding: 10px 12px;
             }
             
+            /* 🔄 v5.1.2: Portrait mode - stacked vertically */
+            /* LEFT: MuBot at top, Habot below */
             #mubot-bubble-container {
                 left: 5px;
-                bottom: 320px;
-            }
-            
-            #joko-bubble-container {
-                right: 5px;
-                bottom: 320px;
+                top: 40px;
             }
             
             #habot-bubble-container {
                 left: 5px;
-                top: 55px;
+                top: 100px;
+            }
+            
+            /* RIGHT: Joko at top, Jabot below */
+            #joko-bubble-container {
+                right: 5px;
+                top: 40px;
             }
             
             #jabot-bubble-container {
                 right: 5px;
-                top: 55px;
+                top: 100px;
             }
         }
     </style>
@@ -3162,7 +3308,7 @@
             <div class="button-row">
                 <button class="btn" id="sortBtn">Sort ▾</button>
                 <button class="btn" id="discardBtn" disabled>Discard</button>
-                <button class="btn" id="buyBtn" disabled>Buy <span id="buyTimer" style="display:none;"></span></button>
+                <button class="btn buy-inactive" id="buyBtn" disabled>✗ Buy <span id="buyTimer" style="display:none;"></span></button>
             </div>
             <div class="button-row">
                 <button class="btn" id="publishBtn" disabled>Publish</button>
@@ -3477,6 +3623,16 @@
                 };
                 this.maxActive = 2;
                 this.defaultDuration = 6000;  // 🌸 v5.1.0: Increased from 4s to 6s for better readability
+                
+                // 🔄 v5.1.2: Side-based timing to prevent overlap
+                this.sides = {
+                    'mubot': 'left',
+                    'habot': 'left',
+                    'joko': 'right',
+                    'jabot': 'right'
+                };
+                this.lastBubbleTime = { left: 0, right: 0 };
+                this.sideDelay = 4000; // 4 second minimum between bubbles on same side
             }
 
             /**
@@ -3493,7 +3649,28 @@
                     timestamp: Date.now()
                 };
 
+                // 🔄 v5.1.2: Check side-based timing
+                const side = this.sides[bubble.speaker];
+                const timeSinceLastOnSide = Date.now() - this.lastBubbleTime[side];
+                
+                if (side && timeSinceLastOnSide < this.sideDelay) {
+                    // Delay this bubble to prevent overlap
+                    const delay = this.sideDelay - timeSinceLastOnSide + 500; // +500ms buffer
+                    console.log(`%c🌸 Bubble delay: ${bubble.speaker} waiting ${delay}ms (same side: ${side})`, 'color: #9b59b6;');
+                    setTimeout(() => this.showDelayed(bubble), delay);
+                    return;
+                }
+
                 // Decide: Display now or handle overflow
+                if (this.activeBubbles.length < this.maxActive) {
+                    this.display(bubble);
+                } else {
+                    this.handleOverflow(bubble);
+                }
+            }
+            
+            // 🔄 v5.1.2: Delayed show after side timing
+            showDelayed(bubble) {
                 if (this.activeBubbles.length < this.maxActive) {
                     this.display(bubble);
                 } else {
@@ -3521,6 +3698,12 @@
 
             display(bubble) {
                 this.activeBubbles.push(bubble);
+                
+                // 🔄 v5.1.2: Track when this side last showed a bubble
+                const side = this.sides[bubble.speaker];
+                if (side) {
+                    this.lastBubbleTime[side] = Date.now();
+                }
 
                 // Create DOM element
                 const element = this.createBubbleElement(bubble);
@@ -4091,6 +4274,44 @@
         
         function hideLogModal() {
             document.getElementById('logModalOverlay').classList.remove('active');
+        }
+        
+        // 🔄 v5.1.2: Buy Button State Management
+        // ♿ Accessibility: Uses color + icon + text + border for colorblind support
+        // States: 'human' (green), 'ai' (yellow/amber), 'inactive' (red)
+        function setBuyButtonState(state) {
+            const buyBtn = document.getElementById('buyBtn');
+            const timerEl = document.getElementById('buyTimer');
+            if (!buyBtn) return;
+            
+            // Remove all state classes
+            buyBtn.classList.remove('buy-human', 'buy-ai', 'buy-inactive');
+            
+            // Get current timer text if visible
+            const timerText = timerEl && timerEl.style.display !== 'none' ? timerEl.outerHTML : '';
+            
+            // Add appropriate class and set disabled state + accessible text
+            switch (state) {
+                case 'human':
+                    buyBtn.classList.add('buy-human');
+                    buyBtn.disabled = false;
+                    buyBtn.innerHTML = `👆 BUY! ${timerText}`;
+                    console.log(`%c🟢 Buy button: GREEN (Human can buy)`, 'color: #3ddc84; font-weight: bold;');
+                    break;
+                case 'ai':
+                    buyBtn.classList.add('buy-ai');
+                    buyBtn.disabled = true;
+                    buyBtn.innerHTML = `⏳ AI... ${timerText}`;
+                    console.log(`%c🟡 Buy button: YELLOW (AI buy window)`, 'color: #f59e0b; font-weight: bold;');
+                    break;
+                case 'inactive':
+                default:
+                    buyBtn.classList.add('buy-inactive');
+                    buyBtn.disabled = true;
+                    buyBtn.innerHTML = `✗ Buy <span id="buyTimer" style="display:none;"></span>`;
+                    console.log(`%c🔴 Buy button: RED (No buy window)`, 'color: #ef4444; font-weight: bold;');
+                    break;
+            }
         }
 
         class GameState {
@@ -7081,32 +7302,43 @@
             // ✅ FIX 3: Reduced buy window after publishing (5s instead of 10s)
             startBuyWindow(card, discardingPlayer) {
                 if (!card) { console.log(`%c⚠️ Cannot open buy window - no card provided`, 'color: #ff6600; font-weight: bold;'); return }
-                const buyWindowPlayer = (discardingPlayer + 2) % 3;
+                let buyWindowPlayer = (discardingPlayer + 2) % 3;
+                const playerNames = ['Human', 'Habot', 'Jabot'];
 
-                // 🎯 CRITICAL: Don't open buy window if player has no buys left!
+                // 🔄 v5.1.2 FIX: If first buyer has no buys, ROTATE to next buyer instead of advancing turn
                 if (this.playerBuys[buyWindowPlayer] <= 0) {
-                    const playerNames = ['Human', 'Habot', 'Jabot'];
-                    console.log(`%c⏭️ SKIP: ${playerNames[buyWindowPlayer]} has no buys left (${this.playerBuys[buyWindowPlayer]}) - no buy window`, 'color: #9e9e9e; font-weight: bold;');
-
-                    // 🐛 v4.0.7 FIX: Advance to next player when skipping buy window!
-                    const nextPlayer = (this.currentPlayer + 1) % this.players;
-                    console.log(`%c▶️ Advancing to next player: Player ${nextPlayer}`, 'color: #4a90e2; font-weight: bold;');
-                    setTimeout(() => {
-                        this.currentPlayer = nextPlayer;
-                        this.gamePhase = 'draw';
-                        this.updateUI();
-                        if (this.currentPlayer !== 0) {
-                            this.aiTurn();
-                        }
-                    }, 500);
-                    return;
+                    console.log(`%c⏭️ SKIP: ${playerNames[buyWindowPlayer]} has no buys left (${this.playerBuys[buyWindowPlayer]})`, 'color: #9e9e9e; font-weight: bold;');
+                    
+                    // Try next player in rotation
+                    const nextBuyPlayer = (buyWindowPlayer + 2) % 3;
+                    
+                    // Check if next player is valid (not the discarding player and has buys)
+                    if (nextBuyPlayer !== discardingPlayer && this.playerBuys[nextBuyPlayer] > 0) {
+                        console.log(`%c🔄 v5.1.2: Rotating buy window to ${playerNames[nextBuyPlayer]}`, 'color: #ffc107; font-weight: bold;');
+                        buyWindowPlayer = nextBuyPlayer;
+                        // Continue to open buy window for this player
+                    } else {
+                        // No one can buy - advance to next turn
+                        console.log(`%c⏭️ No eligible buyers - advancing turn`, 'color: #9e9e9e;');
+                        const nextPlayer = (this.currentPlayer + 1) % this.players;
+                        console.log(`%c▶️ Advancing to next player: Player ${nextPlayer}`, 'color: #4a90e2; font-weight: bold;');
+                        setTimeout(() => {
+                            this.currentPlayer = nextPlayer;
+                            this.gamePhase = 'draw';
+                            this.updateUI();
+                            if (this.currentPlayer !== 0) {
+                                this.aiTurn();
+                            }
+                        }, 500);
+                        return;
+                    }
                 }
 
                 if (this.buyWindow.active) this.closeBuyWindow();
 
-                // 🎯 v4.0.7: Longer buy window for humans (8s), shorter for AI (3s)
-                const duration = buyWindowPlayer === 0 ? 8000 : 3000;
-                console.log(`%c⏱️ v4.0.7: Buy window duration: ${duration / 1000}s (${buyWindowPlayer === 0 ? 'Human' : 'AI'})`, 'color: #ffc107; font-weight: bold;');
+                // 🔄 v5.1.2: Longer buy window for humans (16s for mobile), shorter for AI (3s)
+                const duration = buyWindowPlayer === 0 ? 16000 : 3000;
+                console.log(`%c⏱️ v5.1.2: Buy window duration: ${duration / 1000}s (${buyWindowPlayer === 0 ? 'Human' : 'AI'})`, 'color: #ffc107; font-weight: bold;');
 
                 this.buyWindow.active = true;
                 this.buyWindow.card = card;
@@ -7114,7 +7346,6 @@
                 this.buyWindow.buyWindowPlayer = buyWindowPlayer;
                 this.buyWindow.expiresAt = Date.now() + duration; // ✅ FIX 3: Variable duration
 
-                const playerNames = ['Human', 'Habot', 'Jabot'];
                 console.log(`%c🔔 Buy window opened for ${playerNames[buyWindowPlayer]} (${card.toString()}) - ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
                 
                 // 🌸 v5.1.0: Emit buy window opened event (for player buy opportunities)
@@ -7122,7 +7353,13 @@
                     eventBus.emit('buy_window_opened', { card: card.toString(), forPlayer: true });
                 }
                 
-                if (buyWindowPlayer === 0) document.getElementById('buyBtn').disabled = false;
+                // 🔄 v5.1.2: Set buy button state based on who has the window
+                if (buyWindowPlayer === 0) {
+                    setBuyButtonState('human'); // GREEN - Human can buy
+                } else {
+                    setBuyButtonState('ai'); // YELLOW - AI has buy window
+                }
+                
                 this.updateBuyTimer();
             }
 
@@ -7136,14 +7373,14 @@
                     return false; // No buy window opened
                 }
 
-                const buyWindowPlayer = (this.lastDiscardByPlayer + 2) % 3;
+                const initialBuyWindowPlayer = (this.lastDiscardByPlayer + 2) % 3;
                 console.log(`%c  💡 Buy window check after ${aiName} discard`, 'color: #9b59b6; font-weight: bold;');
                 console.log(`     lastDiscard: ${this.lastDiscard.toString()}`);
                 console.log(`     lastDiscardByPlayer: ${this.lastDiscardByPlayer}`);
-                console.log(`     buyWindowPlayer: ${buyWindowPlayer} (${['Human', 'Habot', 'Jabot'][buyWindowPlayer]})`);
+                console.log(`     initialBuyWindowPlayer: ${initialBuyWindowPlayer} (${['Human', 'Habot', 'Jabot'][initialBuyWindowPlayer]})`);
 
                 // Validate buy window conditions
-                if (buyWindowPlayer === currentAI || buyWindowPlayer === this.lastDiscardByPlayer) {
+                if (initialBuyWindowPlayer === currentAI || initialBuyWindowPlayer === this.lastDiscardByPlayer) {
                     console.log(`     ❌ Buy window blocked: invalid player configuration`);
                     return false;
                 }
@@ -7154,12 +7391,16 @@
                 const nextPlayer = (this.currentPlayer + 1) % this.players;
                 this.buyWindow.pendingNextPlayer = nextPlayer;
 
-                // Open the buy window
+                // Open the buy window (may rotate to different player if initial has no buys)
                 this.startBuyWindow(this.lastDiscard, this.lastDiscardByPlayer);
+                
+                // 🔄 v5.1.2 FIX: Use ACTUAL buyWindowPlayer after potential rotation in startBuyWindow
+                const actualBuyWindowPlayer = this.buyWindow.buyWindowPlayer;
+                console.log(`     Actual buyWindowPlayer after rotation: ${actualBuyWindowPlayer} (${['Human', 'Habot', 'Jabot'][actualBuyWindowPlayer]})`);
 
-                // Handle AI buy window if needed
-                if (buyWindowPlayer > 0) {
-                    this.handleAIBuyWindow(buyWindowPlayer);
+                // Handle AI buy window if needed (only if ACTUAL player is AI, not Human)
+                if (actualBuyWindowPlayer > 0 && this.buyWindow.active) {
+                    this.handleAIBuyWindow(actualBuyWindowPlayer);
                 }
 
                 // Clean up status after a delay
@@ -7190,7 +7431,8 @@
                     this.buyWindow.timerInterval = null;
                 }
 
-                document.getElementById('buyBtn').disabled = true;
+                // 🔄 v5.1.2: Set buy button to RED (inactive)
+                setBuyButtonState('inactive');
                 const timerEl = document.getElementById('buyTimer');
                 if (timerEl) timerEl.style.display = 'none';
 
@@ -7242,6 +7484,7 @@
                                     header.setAttribute('data-expanded', 'true');
                                 }
                             }
+                            this.updateUI(); // 🔄 v5.1.2 FIX: Render published cards
                         }
                         this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
@@ -7272,6 +7515,7 @@
                                     header.setAttribute('data-expanded', 'true');
                                 }
                             }
+                            this.updateUI(); // 🔄 v5.1.2 FIX: Render published cards
                         }
                         this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
@@ -7301,6 +7545,7 @@
                                     header.setAttribute('data-expanded', 'true');
                                 }
                             }
+                            this.updateUI(); // 🔄 v5.1.2 FIX: Render published cards
                         }
                         this.drawDeckCardForAI(ai, statusId);
                         this.continueAITurnAfterDraw(ai, statusId);
@@ -7326,12 +7571,22 @@
                 if (!this.buyWindow.active) return;
                 const remaining = Math.ceil((this.buyWindow.expiresAt - Date.now()) / 1000);
                 if (remaining <= 0) { this.closeBuyWindow('expired'); return }
-                const timerEl = document.getElementById('buyTimer');
-                if (timerEl) {
-                    timerEl.textContent = ` (${remaining}s)`;
-                    timerEl.style.display = 'inline';
-                    timerEl.style.color = remaining <= 2 ? '#ff6b35' : '#ffd700';
+                
+                const buyBtn = document.getElementById('buyBtn');
+                const isHuman = this.buyWindow.buyWindowPlayer === 0;
+                
+                // ♿ v5.1.2: Update button text with icon + timer for accessibility
+                if (buyBtn) {
+                    const timerColor = remaining <= 2 ? '#ff6b35' : (isHuman ? '#052e1a' : '#1f2937');
+                    const timerSpan = `<span id="buyTimer" style="display:inline; color:${timerColor};">(${remaining}s)</span>`;
+                    
+                    if (isHuman) {
+                        buyBtn.innerHTML = `👆 BUY! ${timerSpan}`;
+                    } else {
+                        buyBtn.innerHTML = `⏳ AI... ${timerSpan}`;
+                    }
                 }
+                
                 this.buyWindow.timerInterval = setTimeout(() => this.updateBuyTimer(), 100);
             }
 
@@ -7380,7 +7635,7 @@
 
                     // If next player is human, enable buy button
                     if (nextBuyPlayer === 0) {
-                        document.getElementById('buyBtn').disabled = false;
+                        setBuyButtonState('human'); // GREEN - Human can now buy
                         this.updateBuyTimer();
                     } else {
                         // Next player is AI, handle their buy window
@@ -7415,7 +7670,7 @@
                         this.buyWindow.buyWindowPlayer = nextBuyPlayer;
 
                         if (nextBuyPlayer === 0) {
-                            document.getElementById('buyBtn').disabled = false;
+                            setBuyButtonState('human'); // GREEN - Human can now buy
                             this.updateBuyTimer();
                         } else {
                             this.handleAIBuyWindow(nextBuyPlayer);
@@ -7627,6 +7882,7 @@
                                     header.setAttribute('data-expanded', 'true');
                                 }
                             }
+                            this.updateUI(); // 🔄 v5.1.2 FIX: Render published cards
                             // Update hand size after publishing
                             const newHandSize = this.playerHands[ai].length;
                             console.log(`%c   Hand size reduced from ${currentHandSize} to ${newHandSize}`, 'color: #27ae60;');
@@ -8116,6 +8372,7 @@
                                 console.log(`%c  📂 v5.0: Auto-expanded ${aiName}'s area to show published sequences`, 'color: #17a2b8;');
                             }
                         }
+                        this.updateUI(); // 🔄 v5.1.2 FIX: Render published cards
                     } else {
                         console.log(`%c⚠️ PATCH 4: ${aiName} publish FAILED - no valid sequences`, 'color: #f39c12; font-weight: bold;');
                     }
@@ -8234,6 +8491,9 @@
                                 }
                             }
                             
+                            // 🔄 v5.1.2 FIX: Must call updateUI() to render published cards!
+                            this.updateUI();
+                            
                             // 🌸 v5.1.0: Emit AI published event
                             eventBus.emit('ai_published', { player: ai, name: aiName });
                         } else {
@@ -8330,20 +8590,26 @@
                 // Flag now resets at START of NEXT turn, not end of THIS turn
                 // This prevents extending on same turn as publishing
 
-                // ✅ Check if buy window should open after AI discarded
-                const buyWindowOpened = this.checkAndOpenBuyWindowAfterDiscard(ai, statusId);
-
-                if (buyWindowOpened) {
-                    // Buy window is open - it will handle game continuation
-                    return;
-                }
-
-                // No buy window - continue normally
-                setTimeout(() => { document.getElementById(`${statusId}-status`).classList.remove('active') }, 2000);
-                this.currentPlayer = (this.currentPlayer + 1) % this.players;
-                this.gamePhase = 'draw';
+                // 🔄 v5.1.2: Render the discarded card FIRST, then open buy window
                 this.updateUI();
-                if (this.currentPlayer !== 0) this.aiTurn();
+                
+                // ✅ Check if buy window should open after AI discarded
+                // Use setTimeout to ensure visual update completes before buy window activates
+                setTimeout(() => {
+                    const buyWindowOpened = this.checkAndOpenBuyWindowAfterDiscard(ai, statusId);
+
+                    if (buyWindowOpened) {
+                        // Buy window is open - it will handle game continuation
+                        return;
+                    }
+
+                    // No buy window - continue normally
+                    setTimeout(() => { document.getElementById(`${statusId}-status`).classList.remove('active') }, 2000);
+                    this.currentPlayer = (this.currentPlayer + 1) % this.players;
+                    this.gamePhase = 'draw';
+                    this.updateUI();
+                    if (this.currentPlayer !== 0) this.aiTurn();
+                }, 300); // 300ms delay for card to visually appear first
             }
 
             tryAddToPublished(aiIdx) {
@@ -9076,7 +9342,16 @@
                     this.gamePhase !== 'discard' ||
                     (!canPublishNew && !canExtendExisting);
 
-                document.getElementById('buyBtn').disabled = !this.buyWindow.active || this.buyWindow.buyWindowPlayer !== 0 || this.playerBuys[0] <= 0;
+                // 🔄 v5.1.2: Update buy button state using three-state system
+                if (!this.buyWindow.active) {
+                    setBuyButtonState('inactive'); // RED - No buy window
+                } else if (this.buyWindow.buyWindowPlayer === 0 && this.playerBuys[0] > 0) {
+                    setBuyButtonState('human'); // GREEN - Human can buy
+                } else if (this.buyWindow.buyWindowPlayer > 0) {
+                    setBuyButtonState('ai'); // YELLOW - AI has buy window
+                } else {
+                    setBuyButtonState('inactive'); // RED - Human has no buys
+                }
 
                 // 🎯 v2.5.0: Check last card for all players (show alert only once per player)
                 [0, 1, 2].forEach(p => {
@@ -9753,6 +10028,9 @@
             banterEngine.init();
             console.log('%c🌸 Banter Engine Ready!', 'color: #9b59b6; font-weight: bold;');
             
+            // 🔄 v5.1.2: Set initial buy button state to RED (inactive)
+            setBuyButtonState('inactive');
+            
             // Main action buttons
             document.getElementById('publishBtn').addEventListener('click', publishSequences);
             document.getElementById('discardBtn').addEventListener('click', discardCard);
@@ -10211,16 +10489,38 @@
             if (!game || game.currentPlayer !== 0 || game.gamePhase !== 'discard' || game.selectedCards.length !== 1) return;
             const card = game.playerHands[0].splice(game.selectedCards[0], 1)[0];
             game.discardPile.push(card);
+            game.trackDiscardedCard(card); // 🔄 v5.1.2: Track in matrix
             game.discardPileAccessible = true; // 🔒 v4.1.3: Unlock vault - new card on top of glass
             game.selectedCards = [];
             game.lastDiscard = card;
             game.lastDiscardByPlayer = 0;
             game.justPublished = false;
+            
             if (game.playerHands[0].length === 0) { game.updateUI(); setTimeout(() => { game.endHand(0) }, 500); return }
-            game.currentPlayer = 1;
-            game.gamePhase = 'draw';
+            
+            // 🔄 v5.1.2: Render the discarded card FIRST
             game.updateUI();
-            if (game.currentPlayer !== 0) game.aiTurn();
+            
+            // 🔄 v5.1.2: Open buy window for Jabot (player 2) after human discards
+            // Jabot is "out of turn" since Habot plays next
+            // Use setTimeout to ensure card visually appears before buy window activates
+            setTimeout(() => {
+                const buyWindowPlayer = 2; // Jabot
+                if (game.playerBuys[buyWindowPlayer] > 0) {
+                    console.log(`%c💡 v5.1.2: Opening buy window for Jabot after Human discard`, 'color: #9b59b6; font-weight: bold;');
+                    game.buyWindow.pendingNextPlayer = 1; // Habot plays next
+                    game.startBuyWindow(game.lastDiscard, 0); // Human discarded
+                    // handleAIBuyWindow will be called for Jabot (shows YELLOW button)
+                    game.handleAIBuyWindow(2);
+                } else {
+                    // Jabot has no buys - continue to Habot's turn
+                    console.log(`%c⏭️ v5.1.2: Jabot has no buys - skipping to Habot's turn`, 'color: #9e9e9e;');
+                    game.currentPlayer = 1;
+                    game.gamePhase = 'draw';
+                    game.updateUI();
+                    game.aiTurn();
+                }
+            }, 300); // 300ms delay for card to visually appear first
         }
 
         function publishSequences() {
