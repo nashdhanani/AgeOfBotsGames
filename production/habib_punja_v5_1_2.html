@@ -6666,7 +6666,44 @@
                         rankCounts[card.rank] = (rankCounts[card.rank] || 0) + 1;
                     });
                     
-                    // Find ranks with 2+ cards (wasteful in ladder games)
+                    // 🔄 v5.1.2 FIX: In a ladder game with N ladders needed, having N+1 or more of same rank is GUARANTEED waste
+                    // For 2L game: can use at most 2 of each rank, so 3+ is always wasteful
+                    const excessDuplicateRanks = Object.keys(rankCounts).filter(r => rankCounts[r] > laddersNeeded);
+                    
+                    if (excessDuplicateRanks.length > 0) {
+                        console.log(`%c  🚨 EXCESS DUPLICATES: ${excessDuplicateRanks.map(r => `${r}(${rankCounts[r]})`).join(', ')} - can only use ${laddersNeeded} per rank!`, 'color: #e74c3c; font-weight: bold;');
+                        
+                        // Find the worst excess card (fewest neighbors in its suit)
+                        let worstExcess = null;
+                        let worstScore = Infinity;
+                        
+                        for (const rank of excessDuplicateRanks) {
+                            const dupeCards = hand.filter(c => c.rank === rank);
+                            
+                            for (const card of dupeCards) {
+                                const cardVal = this.cardValue(card.rank);
+                                const suitCards = hand.filter(c => c.suit === card.suit && c.id !== card.id);
+                                const neighbors = suitCards.filter(c => {
+                                    const val = this.cardValue(c.rank);
+                                    return Math.abs(val - cardVal) === 1;
+                                }).length;
+                                
+                                console.log(`    ${card.toString()}: ${neighbors} neighbors`);
+                                
+                                if (neighbors < worstScore) {
+                                    worstScore = neighbors;
+                                    worstExcess = card;
+                                }
+                            }
+                        }
+                        
+                        if (worstExcess) {
+                            console.log(`%c  🗑️ EXCESS DISCARD: ${worstExcess.toString()} (${worstScore} neighbors) - rank has ${rankCounts[worstExcess.rank]} copies but can only use ${laddersNeeded}`, 'color: #e74c3c; font-weight: bold;');
+                            return worstExcess;
+                        }
+                    }
+                    
+                    // Find ranks with 2+ cards (may be wasteful depending on ladder count)
                     const duplicateRanks = Object.keys(rankCounts).filter(r => rankCounts[r] >= 2);
                     
                     if (duplicateRanks.length > 0) {
@@ -6698,7 +6735,8 @@
                             }
                         }
                         
-                        if (worstDuplicate && worstScore <= 1) {
+                        // 🔄 v5.1.2: More aggressive - discard if neighbors <= 1 OR if we have many duplicates
+                        if (worstDuplicate && (worstScore <= 1 || duplicateRanks.length >= 3)) {
                             console.log(`%c  → Discarding duplicate: ${worstDuplicate.toString()} (only ${worstScore} neighbors)`, 'color: #e74c3c; font-weight: bold;');
                             return worstDuplicate;
                         }
