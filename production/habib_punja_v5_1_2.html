@@ -6567,6 +6567,95 @@
                 const req = this.handReqs[this.currentHand].seqs;
                 const isLadderOnlyGame = req.every(s => s === 'ladder');
                 const needsLadders = req.some(s => s === 'ladder');
+                const laddersNeeded = req.filter(s => s === 'ladder').length;
+                
+                // 🔄 v5.1.2: ORPHAN SUIT DETECTION - Discard cards from suits with no ladder potential
+                if (needsLadders && hand.length >= 12 && !this.publishedSequences[pIdx].length) {
+                    console.log(`%c🪜 v5.1.2: Checking for ORPHAN SUIT cards (need ${laddersNeeded} ladders)`, 'color: #9b59b6; font-weight: bold;');
+                    
+                    // Group cards by suit and analyze ladder potential
+                    const suitAnalysis = {};
+                    const suits = ['♠', '♥', '♦', '♣'];
+                    
+                    for (const suit of suits) {
+                        const suitCards = hand.filter(c => c.suit === suit);
+                        if (suitCards.length === 0) continue;
+                        
+                        // Sort by value
+                        suitCards.sort((a, b) => this.cardValue(a.rank) - this.cardValue(b.rank));
+                        
+                        // Find longest consecutive run
+                        let maxRun = 1;
+                        let currentRun = 1;
+                        for (let i = 1; i < suitCards.length; i++) {
+                            const prevVal = this.cardValue(suitCards[i-1].rank);
+                            const currVal = this.cardValue(suitCards[i].rank);
+                            if (currVal === prevVal + 1) {
+                                currentRun++;
+                                maxRun = Math.max(maxRun, currentRun);
+                            } else if (currVal !== prevVal) { // Skip duplicates
+                                currentRun = 1;
+                            }
+                        }
+                        
+                        suitAnalysis[suit] = {
+                            cards: suitCards,
+                            count: suitCards.length,
+                            maxRun: maxRun,
+                            viable: maxRun >= 3 || (maxRun === 2 && suitCards.length >= 3) // Has or could get a ladder
+                        };
+                        
+                        console.log(`    ${suit}: ${suitCards.length} cards, max run: ${maxRun}, viable: ${suitAnalysis[suit].viable}`);
+                    }
+                    
+                    // Count viable suits
+                    const viableSuits = Object.keys(suitAnalysis).filter(s => suitAnalysis[s].viable);
+                    const orphanSuits = Object.keys(suitAnalysis).filter(s => !suitAnalysis[s].viable);
+                    
+                    console.log(`    Viable suits: ${viableSuits.join(', ')} | Orphan suits: ${orphanSuits.join(', ')}`);
+                    
+                    // If we have orphan suits, discard from them first!
+                    if (orphanSuits.length > 0 && viableSuits.length >= laddersNeeded) {
+                        // Find the worst card from orphan suits (highest value = most points to lose)
+                        let orphanCards = [];
+                        for (const suit of orphanSuits) {
+                            orphanCards = orphanCards.concat(suitAnalysis[suit].cards);
+                        }
+                        
+                        if (orphanCards.length > 0) {
+                            // Sort by value descending (discard high cards first to minimize loss)
+                            orphanCards.sort((a, b) => this.cardValue(b.rank) - this.cardValue(a.rank));
+                            console.log(`%c  🗑️ ORPHAN DISCARD: ${orphanCards[0].toString()} from orphan suit`, 'color: #e74c3c; font-weight: bold;');
+                            return orphanCards[0];
+                        }
+                    }
+                    
+                    // 🔄 v5.1.2: SUIT FOCUS - If too many suits, discard from weakest
+                    const suitCount = Object.keys(suitAnalysis).length;
+                    if (suitCount > laddersNeeded + 1) {
+                        console.log(`%c  ⚠️ Too many suits (${suitCount}) for ${laddersNeeded} ladders needed!`, 'color: #e67e22;');
+                        
+                        // Find the weakest suit (lowest maxRun, then lowest count)
+                        let weakestSuit = null;
+                        let weakestScore = Infinity;
+                        
+                        for (const suit of Object.keys(suitAnalysis)) {
+                            const analysis = suitAnalysis[suit];
+                            const score = analysis.maxRun * 10 + analysis.count; // Prioritize maxRun
+                            if (score < weakestScore) {
+                                weakestScore = score;
+                                weakestSuit = suit;
+                            }
+                        }
+                        
+                        if (weakestSuit && suitAnalysis[weakestSuit]) {
+                            const weakCards = suitAnalysis[weakestSuit].cards;
+                            weakCards.sort((a, b) => this.cardValue(b.rank) - this.cardValue(a.rank));
+                            console.log(`%c  🗑️ SUIT FOCUS: Discarding ${weakCards[0].toString()} from weakest suit ${weakestSuit}`, 'color: #e74c3c; font-weight: bold;');
+                            return weakCards[0];
+                        }
+                    }
+                }
                 
                 if (isLadderOnlyGame && !this.publishedSequences[pIdx].length) {
                     console.log(`%c🪜 v5.1.2: LADDER-ONLY game - checking for wasteful duplicate ranks`, 'color: #9b59b6; font-weight: bold;');
@@ -7342,10 +7431,26 @@
                         buyWindowPlayer = nextBuyPlayer;
                         // Continue to open buy window for this player
                     } else {
-                        // No one can buy - advance to next turn
-                        console.log(`%c⏭️ No eligible buyers - advancing turn`, 'color: #9e9e9e;');
+                        // No one can buy
+                        console.log(`%c⏭️ No eligible buyers`, 'color: #9e9e9e;');
+                        
+                        // 🔄 v5.1.2 FIX: Check if there's a pending deck draw (AI was mid-turn)
+                        if (this.buyWindow.pendingDeckDraw) {
+                            const { ai, statusId } = this.buyWindow.pendingDeckDraw;
+                            const aiName = ai === 1 ? 'Habot' : 'Jabot';
+                            console.log(`%c🔄 v5.1.2: Resuming ${aiName}'s turn after buy window (pendingDeckDraw)`, 'color: #9b59b6; font-weight: bold;');
+                            this.buyWindow.pendingDeckDraw = null;
+                            setTimeout(() => {
+                                this.drawDeckCardForAI(ai, statusId);
+                                this.continueAITurnAfterDraw(ai, statusId);
+                            }, 500);
+                            return;
+                        }
+                        
+                        // No pending draw - advance to next turn normally
+                        console.log(`%c▶️ Advancing to next player`, 'color: #4a90e2; font-weight: bold;');
                         const nextPlayer = (this.currentPlayer + 1) % this.players;
-                        console.log(`%c▶️ Advancing to next player: Player ${nextPlayer}`, 'color: #4a90e2; font-weight: bold;');
+                        console.log(`%c▶️ Next player: Player ${nextPlayer}`, 'color: #4a90e2;');
                         setTimeout(() => {
                             this.currentPlayer = nextPlayer;
                             this.gamePhase = 'draw';
