@@ -9346,7 +9346,22 @@
 
                     Object.values(laddersBySuit).forEach(suitCards => {
                         if (suitCards.length >= 4) {
-                            suitCards.sort((a, b) => a.getValue() - b.getValue());
+                            // 🃏 FIX: Context-aware ladder sorting (Ace can be high or low)
+                            const hasAce = suitCards.some(c => c.rank === 'A');
+                            const hasKing = suitCards.some(c => c.rank === 'K');
+                            const isHighAceLadder = hasAce && hasKing;
+                            
+                            suitCards.sort((a, b) => {
+                                let aVal = a.getValue();
+                                let bVal = b.getValue();
+                                // If high-ace ladder (A-K-Q-J), treat Ace as 14
+                                if (isHighAceLadder) {
+                                    if (a.rank === 'A') aVal = 14;
+                                    if (b.rank === 'A') bVal = 14;
+                                }
+                                return aVal - bVal;
+                            });
+                            
                             sequences.push(suitCards);
                         }
                     });
