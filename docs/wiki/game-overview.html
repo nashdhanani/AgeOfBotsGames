@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Overview | Habib Punja Wiki</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        /* --- PASTE CSS FROM strategy-guide.html HERE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        nav {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+            .nav-links a {
+                color: white;
+                text-decoration: none;
+                font-size: 15px;
+                opacity: 0.9;
+            }
+
+                .nav-links a:hover {
+                    color: #ffd700;
+                    opacity: 1;
+                }
+
+        .wiki-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            padding: 0 20px;
+        }
+
+        .wiki-sidebar {
+            background: rgba(0,0,0,0.2);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            align-self: start;
+            position: sticky;
+            top: 100px;
+        }
+
+            .wiki-sidebar h3 {
+                color: #ffd700;
+                font-size: 14px;
+                text-transform: uppercase;
+                margin-bottom: 15px;
+                letter-spacing: 1px;
+            }
+
+            .wiki-sidebar ul {
+                list-style: none;
+            }
+
+            .wiki-sidebar li {
+                margin-bottom: 10px;
+            }
+
+            .wiki-sidebar a {
+                color: #e2e8f0;
+                text-decoration: none;
+                display: block;
+                padding: 5px 0;
+                transition: 0.2s;
+            }
+
+                .wiki-sidebar a:hover, .wiki-sidebar a.active {
+                    color: #22d3ee;
+                    transform: translateX(5px);
+                }
+
+                .wiki-sidebar a.active {
+                    color: #ffd700;
+                    font-weight: bold;
+                }
+
+        .wiki-content {
+            background: rgba(0,0,0,0.25);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+            .wiki-content h1 {
+                font-size: 2.5em;
+                margin-bottom: 0.5em;
+                color: #ffd700;
+                border-bottom: 2px solid rgba(255,255,255,0.1);
+                padding-bottom: 15px;
+            }
+
+            .wiki-content h2 {
+                font-size: 1.8em;
+                margin-top: 1.5em;
+                margin-bottom: 0.5em;
+                color: #fff;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                padding-bottom: 5px;
+            }
+
+            .wiki-content h3 {
+                font-size: 1.4em;
+                margin-top: 1.2em;
+                margin-bottom: 0.5em;
+                color: #22d3ee;
+            }
+
+            .wiki-content p {
+                margin-bottom: 1.2em;
+                font-size: 1.1em;
+                color: #cbd5e1;
+            }
+
+            .wiki-content ul, .wiki-content ol {
+                margin-bottom: 1.2em;
+                padding-left: 25px;
+                color: #cbd5e1;
+            }
+
+            .wiki-content li {
+                margin-bottom: 0.5em;
+            }
+
+            .wiki-content a {
+                color: #22d3ee;
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+            }
+
+                .wiki-content a:hover {
+                    border-bottom-color: #22d3ee;
+                }
+
+        blockquote {
+            border-left: 4px solid #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+            font-style: italic;
+            color: #fef08a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            text-align: left;
+            color: #ffd700;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            margin: 40px 0;
+        }
+
+        @media (max-width: 800px) {
+            .wiki-container {
+                grid-template-columns: 1fr;
+            }
+
+            .wiki-sidebar {
+                position: relative;
+                top: 0;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="logo">🎴 AgeOfBotsGames</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/production/habib_punja_v5_1_2.html">Play Game</a></li>
+            <li><a href="index.html">Wiki</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="wiki-container">
+        <aside class="wiki-sidebar">
+            <h3>Habib Punja:<br>Strategic 7-Hand War</h3>
+            <ul>
+                <li><a href="index.html">Wiki Home</a></li>
+                <li><a href="game-overview.html" class="active">Game Overview</a></li>
+                <li><a href="strategy-guide.html">Strategy & Tactics</a></li>
+                <li><a href="characters.html">Characters</a></li>
+                <li><a href="banter-system.html">Banter System</a></li>
+                <li><a href="accessibility.html">Accessibility</a></li>
+                <li><a href="buy-mechanism.html">Buy Mechanism</a></li>
+                <li><a href="source-criteria.html">Source Criteria</a></li>
+                <li><a href="technical.html">Technical Architecture</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+            </ul>
+        </aside>
+
+        <main class="wiki-content">
+            <h1>Habib Punja: Strategic 7-Hand War (v5.1.2)</h1>
+
+            <p><strong>Play:</strong> <a href="/production/habib_punja_v5_1_2.html">AgeOfBotsGames.com</a></p>
+
+            <p>Habib Punja is a 3-player strategic card game presented as a <strong>7-hand championship</strong>. The objective is not just to win every hand, but to <strong>win the war</strong> by managing risk and avoiding devastating losses.</p>
+
+            <hr>
+
+            <h2>Core Concepts</h2>
+            <h3>The 7-Hand War</h3>
+            <ul>
+                <li>One hand lost ≠ game lost</li>
+                <li>Avoid catastrophic "nuke" hands</li>
+                <li>Winning <strong>4+ hands</strong> typically secures the championship</li>
+                <li>Maintain a <strong>"battle vs war"</strong> mentality</li>
+            </ul>
+
+            <h3>Builds and Requirements</h3>
+            <p>Requirements increase in complexity across the seven hands.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hand</th>
+                        <th>Name</th>
+                        <th>Requirement</th>
+                        <th>Difficulty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>Foundations</td><td>2 Triples</td><td>⭐</td></tr>
+                    <tr><td>2</td><td>Balance</td><td>1 Triple + 1 Ladder</td><td>⭐⭐</td></tr>
+                    <tr><td>3</td><td>Ascent</td><td>2 Ladders</td><td>⭐⭐</td></tr>
+                    <tr><td>4</td><td>Crowd</td><td>3 Triples</td><td>⭐⭐⭐</td></tr>
+                    <tr><td>5</td><td>Architect</td><td>2 Triples + 1 Ladder</td><td>⭐⭐⭐</td></tr>
+                    <tr><td>6</td><td>Duel</td><td>1 Triple + 2 Ladders</td><td>⭐⭐⭐⭐</td></tr>
+                    <tr><td>7</td><td>Master</td><td>3 Ladders (fewer buys)</td><td>⭐⭐⭐⭐⭐</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Buying</h3>
+            <p>Buying adds a card to your hand "out of turn," but comes with a <strong>penalty card</strong> and reduces your limited buy count.</p>
+
+            <h3>Publishing</h3>
+            <p>
+                Once you meet the requirement, you can <strong>Publish</strong>. This locks your cards on the table, safe from point penalties.
+                <br><strong>Trade-off:</strong> Early publishing wins tempo but locks your strategy. Late publishing offers stability but risks being outpaced.
+            </p>
+
+            <h3>The Glass Vault (Discard Pile)</h3>
+            <ul>
+                <li>Only the <strong>top card</strong> is available.</li>
+                <li>When someone takes it, the vault <strong>locks</strong> until a new discard occurs.</li>
+            </ul>
+
+            <hr>
+
+            <h2>Win Condition</h2>
+            <p>The championship is determined by the lowest score across seven hands. Optimize for:</p>
+            <ul>
+                <li>Maximizing hand wins</li>
+                <li>Minimizing "nukes" (large point penalties)</li>
+                <li>Exploiting opponent tendencies (Habot vs Jabot)</li>
+            </ul>
+
+            <hr>
+
+            <h2>The Opponents</h2>
+            <p>
+                <strong>Habot (Rabbit) 🐰</strong>: Fast, aggressive. Counter by baiting into overcommitting.<br>
+                <strong>Jabot (Tortoise) 🐢</strong>: Patient, surgical. Counter by applying tempo pressure.
+            </p>
+
+            <p>See: <a href="characters.html">Characters</a> for full profiles.</p>
+        </main>
+    </div>
+
+    <footer style="text-align: center; padding: 40px; color: #94a3b8; font-size: 14px;">
+        <p style="margin-bottom: 10px;">
+            <a href="/" style="color: #7dd3fc; text-decoration: none;">← Back to Home</a> · 
+            <a href="/production/habib_punja_v5_1_2.html" style="color: #7dd3fc; text-decoration: none;">Play Game</a> · 
+            <a href="/contact.html" style="color: #7dd3fc; text-decoration: none;">Contact</a>
+        </p>
+        <p>© 2025 AgeOfBotsGames LLC. Cultivating Digital Minds.</p>
+    </footer>
+
+</body>
+</html>

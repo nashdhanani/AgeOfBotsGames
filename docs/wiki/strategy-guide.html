@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy & Tactics | Habib Punja Wiki</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        /* --- CORE THEME --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+            .nav-links a {
+                color: white;
+                text-decoration: none;
+                font-size: 15px;
+                opacity: 0.9;
+            }
+
+                .nav-links a:hover {
+                    color: #ffd700;
+                    opacity: 1;
+                }
+
+        /* --- WIKI LAYOUT --- */
+        .wiki-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            padding: 0 20px;
+        }
+
+        .wiki-sidebar {
+            background: rgba(0,0,0,0.2);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            align-self: start;
+            position: sticky;
+            top: 100px;
+        }
+
+            .wiki-sidebar h3 {
+                color: #ffd700;
+                font-size: 14px;
+                text-transform: uppercase;
+                margin-bottom: 15px;
+                letter-spacing: 1px;
+            }
+
+            .wiki-sidebar ul {
+                list-style: none;
+            }
+
+            .wiki-sidebar li {
+                margin-bottom: 10px;
+            }
+
+            .wiki-sidebar a {
+                color: #e2e8f0;
+                text-decoration: none;
+                display: block;
+                padding: 5px 0;
+                transition: 0.2s;
+            }
+
+                .wiki-sidebar a:hover, .wiki-sidebar a.active {
+                    color: #22d3ee;
+                    transform: translateX(5px);
+                }
+
+                .wiki-sidebar a.active {
+                    color: #ffd700;
+                    font-weight: bold;
+                }
+
+        /* --- CONTENT STYLES --- */
+        .wiki-content {
+            background: rgba(0,0,0,0.25);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+            .wiki-content h1 {
+                font-size: 2.5em;
+                margin-bottom: 0.5em;
+                color: #ffd700;
+                border-bottom: 2px solid rgba(255,255,255,0.1);
+                padding-bottom: 15px;
+            }
+
+            .wiki-content h2 {
+                font-size: 1.8em;
+                margin-top: 1.5em;
+                margin-bottom: 0.5em;
+                color: #fff;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                padding-bottom: 5px;
+            }
+
+            .wiki-content h3 {
+                font-size: 1.4em;
+                margin-top: 1.2em;
+                margin-bottom: 0.5em;
+                color: #22d3ee;
+            }
+
+            .wiki-content p {
+                margin-bottom: 1.2em;
+                font-size: 1.1em;
+                color: #cbd5e1;
+            }
+
+            .wiki-content ul, .wiki-content ol {
+                margin-bottom: 1.2em;
+                padding-left: 25px;
+                color: #cbd5e1;
+            }
+
+            .wiki-content li {
+                margin-bottom: 0.5em;
+            }
+
+            .wiki-content a {
+                color: #22d3ee;
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+            }
+
+                .wiki-content a:hover {
+                    border-bottom-color: #22d3ee;
+                }
+
+        /* Special Elements */
+        blockquote {
+            border-left: 4px solid #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+            font-style: italic;
+            color: #fef08a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            text-align: left;
+            color: #ffd700;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            margin: 40px 0;
+        }
+
+        @media (max-width: 800px) {
+            .wiki-container {
+                grid-template-columns: 1fr;
+            }
+
+            .wiki-sidebar {
+                position: relative;
+                top: 0;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="logo">🎴 AgeOfBotsGames</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/production/habib_punja_v5_1_2.html">Play Game</a></li>
+            <li><a href="index.html">Wiki</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="wiki-container">
+        <aside class="wiki-sidebar">
+            <h3>Habib Punja:<br>Strategic 7-Hand War</h3>
+            <ul>
+                <li><a href="index.html">Wiki Home</a></li>
+                <li><a href="game-overview.html">Game Overview</a></li>
+                <li><a href="strategy-guide.html" class="active">Strategy & Tactics</a></li>
+                <li><a href="characters.html">Characters</a></li>
+                <li><a href="banter-system.html">Banter System</a></li>
+                <li><a href="accessibility.html">Accessibility</a></li>
+                <li><a href="buy-mechanism.html">Buy Mechanism</a></li>
+                <li><a href="source-criteria.html">Source Criteria</a></li>
+                <li><a href="technical.html">Technical Architecture</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+            </ul>
+        </aside>
+
+        <main class="wiki-content">
+            <h1>Strategy & Tactics (v5.1.2)</h1>
+
+            <p>This guide covers <strong>strategy (war-level thinking)</strong>, <strong>tactics (hand-level execution)</strong>, and <strong>practical guidance</strong> for players learning the system.</p>
+
+            <hr>
+
+            <h2>The Strategic Frame: Battle vs War</h2>
+            <p><strong>Winning the championship</strong> is the objective. Individual hands are battles within the war.</p>
+
+            <h3>Core Principles</h3>
+            <ul>
+                <li>One hand lost ≠ game lost</li>
+                <li>Avoid nukes (devastating outcomes)</li>
+                <li>Winning <strong>4+ hands</strong> typically wins the championship</li>
+                <li>Consistent small losses are better than one catastrophic hand</li>
+                <li>Play your opponents, not just your cards</li>
+                <li>
+                    Mastery comes from adapting strategy as constraints tighten:
+                    <ul>
+                        <li>Early hands reward flexibility</li>
+                        <li>Mid-game demands discipline</li>
+                        <li>Late hands punish impatience</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <hr>
+
+            <h2>Tactical Fundamentals</h2>
+
+            <h3>1) Buying Discipline</h3>
+            <p>Buys are a <strong>scarce strategic resource</strong>, not a reflex action.</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>When to Buy ✅</th>
+                        <th>When NOT to Buy ❌</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Card completes or nearly completes a sequence</td>
+                        <td>Card only marginally improves your hand</td>
+                    </tr>
+                    <tr>
+                        <td>Card is a key rank you've been tracking</td>
+                        <td>You're low on buys and it's not Hand 7 yet</td>
+                    </tr>
+                    <tr>
+                        <td>Denying an opponent a critical card</td>
+                        <td>The penalty card risk outweighs the gain</td>
+                    </tr>
+                    <tr>
+                        <td>Early in a hand when you have buys to spare</td>
+                        <td>You're already close to publishing</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Buy Window Awareness (v5.1.2):</strong></p>
+            <ul>
+                <li>Watch the button state: 🟢 GREEN = your opportunity</li>
+                <li>You have <strong>16 seconds</strong> to decide</li>
+                <li>🟡 AMBER means an AI is deciding—watch and learn their patterns</li>
+            </ul>
+
+            <h3>2) Publishing Timing</h3>
+            <p>Publishing locks your build and makes you safe from 100% of your points, but it limits your ability to pivot.</p>
+            <ul>
+                <li><strong>Habot (Rabbit) Strategy:</strong> Publish ASAP to pressure others. Best for Hands 1-3.</li>
+                <li><strong>Jabot (Tortoise) Strategy:</strong> Wait until you can play on others' piles. Best for Hands 4-7.</li>
+            </ul>
+
+            <hr>
+
+            <h2>Hand-by-Hand Breakdown</h2>
+
+            <h3>Hand 1: Foundations (2 Triples)</h3>
+            <ul>
+                <li><strong>Focus:</strong> Speed & Pairs</li>
+                <li><strong>Risk Level:</strong> Low</li>
+                <li><strong>Tip:</strong> Don't hoard high cards hoping for a ladder</li>
+            </ul>
+
+            <h3>Hand 2: Balance (1 Triple + 1 Ladder)</h3>
+            <ul>
+                <li><strong>Focus:</strong> Ladder connection</li>
+                <li><strong>Risk Level:</strong> Low</li>
+                <li><strong>Tip:</strong> Build the ladder first; triples are easier to find later</li>
+            </ul>
+
+            <h3>Hand 3: Ascent (2 Ladders)</h3>
+            <ul>
+                <li><strong>Focus:</strong> Suit purity</li>
+                <li><strong>Risk Level:</strong> Medium</li>
+                <li><strong>Tip:</strong> Discard cards that don't match your 2 primary suits</li>
+            </ul>
+
+            <h3>Hand 4: Crowd (3 Triples)</h3>
+            <ul>
+                <li><strong>Focus:</strong> Rank tracking</li>
+                <li><strong>Risk Level:</strong> Medium</li>
+                <li><strong>Tip:</strong> If you see 3 Kings on the table, drop your pair of Kings</li>
+            </ul>
+
+            <h3>Hand 5: Architect (2 Triples + 1 Ladder)</h3>
+            <ul>
+                <li><strong>Focus:</strong> Structural integrity</li>
+                <li><strong>Risk Level:</strong> High</li>
+                <li><strong>Tip:</strong> Get your ladder started early</li>
+            </ul>
+
+            <h3>Hand 6: Duel (1 Triple + 2 Ladders)</h3>
+            <ul>
+                <li><strong>Focus:</strong> Strong ladder suit commitment</li>
+                <li><strong>Risk Level:</strong> High</li>
+                <li><strong>Tip:</strong> Your triple should come naturally</li>
+            </ul>
+
+            <h3>Hand 7: Master (3 Ladders)</h3>
+            <ul>
+                <li><strong>Focus:</strong> Three coherent ladder paths</li>
+                <li><strong>Risk Level:</strong> Very High</li>
+                <li><strong>Tip:</strong> Fewer buys—use them wisely</li>
+                <li><strong>Warning:</strong> This hand decides many championships</li>
+            </ul>
+
+            <hr>
+
+            <h2>Final Wisdom (MuBot)</h2>
+            <blockquote>
+                "The difference between a good player and a master is:<br><br>
+                Good players win hands. Masters win games.<br>
+                Good players avoid losses. Masters minimize devastation.<br>
+                Good players play their cards. Masters play their opponents."
+            </blockquote>
+
+            <hr>
+
+            <h2>Resources</h2>
+            <ul>
+                <li><strong>Full Strategy Guide:</strong> <a href="strategy-guide.html">Strategy & Tactics</a></li>
+                <li><strong>Buy Mechanism:</strong> <a href="buy-mechanism.html">Buy Mechanism Details</a></li>
+                <li><strong>Characters:</strong> <a href="characters.html">Know Your Enemy</a></li>
+            </ul>
+        </main>
+    </div>
+
+        <footer style="text-align: center; padding: 40px; color: #94a3b8; font-size: 14px;">
+        <p style="margin-bottom: 10px;">
+            <a href="/" style="color: #7dd3fc; text-decoration: none;">← Back to Home</a> · 
+            <a href="/production/habib_punja_v5_1_2.html" style="color: #7dd3fc; text-decoration: none;">Play Game</a> · 
+            <a href="/contact.html" style="color: #7dd3fc; text-decoration: none;">Contact</a>
+        </p>
+        <p>© 2025 AgeOfBotsGames LLC. Cultivating Digital Minds.</p>
+    </footer>
+
+</body>
+</html>

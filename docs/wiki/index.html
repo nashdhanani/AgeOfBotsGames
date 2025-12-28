@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wiki Home | Habib Punja Wiki</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        /* --- PASTE CSS FROM strategy-guide.html HERE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        nav {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+            .nav-links a {
+                color: white;
+                text-decoration: none;
+                font-size: 15px;
+                opacity: 0.9;
+            }
+
+                .nav-links a:hover {
+                    color: #ffd700;
+                    opacity: 1;
+                }
+
+        .wiki-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            padding: 0 20px;
+        }
+
+        .wiki-sidebar {
+            background: rgba(0,0,0,0.2);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            align-self: start;
+            position: sticky;
+            top: 100px;
+        }
+
+            .wiki-sidebar h3 {
+                color: #ffd700;
+                font-size: 14px;
+                text-transform: uppercase;
+                margin-bottom: 15px;
+                letter-spacing: 1px;
+                line-height: 1.4;
+            }
+
+            .wiki-sidebar ul {
+                list-style: none;
+            }
+
+            .wiki-sidebar li {
+                margin-bottom: 10px;
+            }
+
+            .wiki-sidebar a {
+                color: #e2e8f0;
+                text-decoration: none;
+                display: block;
+                padding: 5px 0;
+                transition: 0.2s;
+            }
+
+                .wiki-sidebar a:hover, .wiki-sidebar a.active {
+                    color: #22d3ee;
+                    transform: translateX(5px);
+                }
+
+                .wiki-sidebar a.active {
+                    color: #ffd700;
+                    font-weight: bold;
+                }
+
+        .wiki-content {
+            background: rgba(0,0,0,0.25);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+            .wiki-content h1 {
+                font-size: 2.5em;
+                margin-bottom: 0.5em;
+                color: #ffd700;
+                border-bottom: 2px solid rgba(255,255,255,0.1);
+                padding-bottom: 15px;
+            }
+
+            .wiki-content h2 {
+                font-size: 1.8em;
+                margin-top: 1.5em;
+                margin-bottom: 0.5em;
+                color: #fff;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                padding-bottom: 5px;
+            }
+
+            .wiki-content h3 {
+                font-size: 1.4em;
+                margin-top: 1.2em;
+                margin-bottom: 0.5em;
+                color: #22d3ee;
+            }
+
+            .wiki-content p {
+                margin-bottom: 1.2em;
+                font-size: 1.1em;
+                color: #cbd5e1;
+            }
+
+            .wiki-content ul, .wiki-content ol {
+                margin-bottom: 1.2em;
+                padding-left: 25px;
+                color: #cbd5e1;
+            }
+
+            .wiki-content li {
+                margin-bottom: 0.5em;
+            }
+
+            .wiki-content a {
+                color: #22d3ee;
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+            }
+
+                .wiki-content a:hover {
+                    border-bottom-color: #22d3ee;
+                }
+
+        blockquote {
+            border-left: 4px solid #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+            font-style: italic;
+            color: #fef08a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            text-align: left;
+            color: #ffd700;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            margin: 40px 0;
+        }
+
+        pre {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            margin: 20px 0;
+            font-family: 'Consolas', monospace;
+            color: #38bdf8;
+        }
+
+        @media (max-width: 800px) {
+            .wiki-container {
+                grid-template-columns: 1fr;
+            }
+
+            .wiki-sidebar {
+                position: relative;
+                top: 0;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="logo">🎴 AgeOfBotsGames</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/production/habib_punja_v5_1_2.html">Play Game</a></li>
+            <li><a href="index.html">Wiki</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="wiki-container">
+        <aside class="wiki-sidebar">
+            <h3>Habib Punja:<br>Strategic 7-Hand War</h3>
+            <ul>
+                <li><a href="index.html" class="active">Wiki Home</a></li>
+                <li><a href="game-overview.html">Game Overview</a></li>
+                <li><a href="strategy-guide.html">Strategy & Tactics</a></li>
+                <li><a href="characters.html">Characters</a></li>
+                <li><a href="banter-system.html">Banter System</a></li>
+                <li><a href="accessibility.html">Accessibility</a></li>
+                <li><a href="buy-mechanism.html">Buy Mechanism</a></li>
+                <li><a href="source-criteria.html">Source Criteria</a></li>
+                <li><a href="technical.html">Technical Architecture</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+            </ul>
+        </aside>
+
+        <main class="wiki-content">
+            <h1>AgeOfBotsGames Wiki</h1>
+            <p>Welcome to <strong>AgeOfBotsGames</strong> — a studio focused on competitive, personality-driven games where humans face evolving AI minds.</p>
+
+            <p>
+                <strong>Current Game:</strong> <strong>Habib Punja: Strategic 7-Hand War</strong> (v5.1.2)<br>
+                <strong>Platform:</strong> Web (Mobile & Desktop)<br>
+                <strong>Play:</strong> <a href="/production/habib_punja_v5_1_2.html">Play Now</a>
+            </p>
+
+            <hr>
+
+            <h2>What is Habib Punja?</h2>
+            <p><em>Habib Punja: Strategic 7-Hand War</em> is a competitive card strategy game where victory is earned through discipline, foresight, and controlled risk—not luck.</p>
+
+            <p>Built around a single idea:</p>
+            <blockquote>
+                <strong>Good players win hands. Masters win games.</strong>
+            </blockquote>
+
+            <p>Players compete across seven escalating hands, balancing tactical decisions with long-term strategy while facing adaptive AI opponents. The game rewards consistency, patience, and the ability to minimize devastation rather than chase reckless wins.</p>
+
+            <hr>
+
+            <h2>The Four Minds at the Table</h2>
+            <p>You're not playing against "random bots." You're facing distinct personalities:</p>
+            <ul>
+                <li><strong>Habot (Rabbit)</strong> — Fast, aggressive, momentum-driven AI opponent.</li>
+                <li><strong>Jabot (Tortoise)</strong> — Patient, threshold-based, surgical AI opponent.</li>
+                <li><strong>MuBot (Zen Master)</strong> — Wisdom and strategic guidance (commentator).</li>
+                <li><strong>Joko (Provocateur)</strong> — Playful chaos and table energy (commentator).</li>
+            </ul>
+
+            <hr>
+
+            <h2>The Lotus Philosophy</h2>
+            <p>Like the lotus flower that rises pure from muddy waters, we believe AI should emerge with grace, wisdom, and purpose. Each bot we create carries a unique personality and strategic mind—designed to challenge, teach, and inspire through play.</p>
+
+            <blockquote>
+                <strong>"We don't build algorithms. We cultivate minds."</strong>
+            </blockquote>
+
+            <hr>
+
+            <h2>Quick Navigation</h2>
+            <ul>
+                <li><strong><a href="game-overview.html">Game Overview / Rules</a></strong></li>
+                <li><strong><a href="strategy-guide.html">Strategy & Tactics</a></strong></li>
+                <li><strong><a href="characters.html">Characters</a></strong></li>
+                <li><strong><a href="buy-mechanism.html">Buy Mechanism</a></strong></li>
+                <li><strong><a href="banter-system.html">Banter System</a></strong></li>
+                <li><strong><a href="accessibility.html">Accessibility</a></strong></li>
+                <li><strong><a href="technical.html">Technical Architecture</a></strong></li>
+                <li><strong><a href="source-criteria.html">Source Selection Criteria</a></strong></li>
+                <li><strong><a href="roadmap.html">Roadmap</a></strong></li>
+            </ul>
+        </main>
+    </div>
+
+    <footer style="text-align: center; padding: 40px; color: #94a3b8; font-size: 14px;">
+        <p style="margin-bottom: 10px;">
+            <a href="/" style="color: #7dd3fc; text-decoration: none;">← Back to Home</a> · 
+            <a href="/production/habib_punja_v5_1_2.html" style="color: #7dd3fc; text-decoration: none;">Play Game</a> · 
+            <a href="/contact.html" style="color: #7dd3fc; text-decoration: none;">Contact</a>
+        </p>
+        <p>© 2025 AgeOfBotsGames LLC. Cultivating Digital Minds.</p>
+    </footer>
+
+</body>
+</html>

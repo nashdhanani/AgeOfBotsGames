@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Characters | Habib Punja Wiki</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <style>
+        /* --- COPY CSS FROM strategy-guide.html --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        nav {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+            .nav-links a {
+                color: white;
+                text-decoration: none;
+                font-size: 15px;
+                opacity: 0.9;
+            }
+
+                .nav-links a:hover {
+                    color: #ffd700;
+                    opacity: 1;
+                }
+
+        .wiki-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 40px;
+            padding: 0 20px;
+        }
+
+        .wiki-sidebar {
+            background: rgba(0,0,0,0.2);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            align-self: start;
+            position: sticky;
+            top: 100px;
+        }
+
+            .wiki-sidebar h3 {
+                color: #ffd700;
+                font-size: 14px;
+                text-transform: uppercase;
+                margin-bottom: 15px;
+                letter-spacing: 1px;
+            }
+
+            .wiki-sidebar ul {
+                list-style: none;
+            }
+
+            .wiki-sidebar li {
+                margin-bottom: 10px;
+            }
+
+            .wiki-sidebar a {
+                color: #e2e8f0;
+                text-decoration: none;
+                display: block;
+                padding: 5px 0;
+                transition: 0.2s;
+            }
+
+                .wiki-sidebar a:hover, .wiki-sidebar a.active {
+                    color: #22d3ee;
+                    transform: translateX(5px);
+                }
+
+                .wiki-sidebar a.active {
+                    color: #ffd700;
+                    font-weight: bold;
+                }
+
+        .wiki-content {
+            background: rgba(0,0,0,0.25);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+            .wiki-content h1 {
+                font-size: 2.5em;
+                margin-bottom: 0.5em;
+                color: #ffd700;
+                border-bottom: 2px solid rgba(255,255,255,0.1);
+                padding-bottom: 15px;
+            }
+
+            .wiki-content h2 {
+                font-size: 1.8em;
+                margin-top: 1.5em;
+                margin-bottom: 0.5em;
+                color: #fff;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+                padding-bottom: 5px;
+            }
+
+            .wiki-content h3 {
+                font-size: 1.4em;
+                margin-top: 1.2em;
+                margin-bottom: 0.5em;
+                color: #22d3ee;
+            }
+
+            .wiki-content p {
+                margin-bottom: 1.2em;
+                font-size: 1.1em;
+                color: #cbd5e1;
+            }
+
+            .wiki-content ul, .wiki-content ol {
+                margin-bottom: 1.2em;
+                padding-left: 25px;
+                color: #cbd5e1;
+            }
+
+            .wiki-content li {
+                margin-bottom: 0.5em;
+            }
+
+            .wiki-content a {
+                color: #22d3ee;
+                text-decoration: none;
+                border-bottom: 1px solid transparent;
+            }
+
+                .wiki-content a:hover {
+                    border-bottom-color: #22d3ee;
+                }
+
+        blockquote {
+            border-left: 4px solid #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            margin: 20px 0;
+            font-style: italic;
+            color: #fef08a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            text-align: left;
+            color: #ffd700;
+            font-weight: bold;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            margin: 40px 0;
+        }
+
+        pre {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            margin: 20px 0;
+            font-family: 'Consolas', monospace;
+            color: #38bdf8;
+        }
+
+        @media (max-width: 800px) {
+            .wiki-container {
+                grid-template-columns: 1fr;
+            }
+
+            .wiki-sidebar {
+                position: relative;
+                top: 0;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/" class="logo">🎴 AgeOfBotsGames</a>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/production/habib_punja_v5_1_2.html">Play Game</a></li>
+            <li><a href="index.html">Wiki</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="wiki-container">
+        <aside class="wiki-sidebar">
+            <h3>Habib Punja:<br>Strategic 7-Hand War</h3>
+            <ul>
+                <li><a href="index.html">Wiki Home</a></li>
+                <li><a href="game-overview.html">Game Overview</a></li>
+                <li><a href="strategy-guide.html">Strategy & Tactics</a></li>
+                <li><a href="characters.html" class="active">Characters</a></li>
+                <li><a href="banter-system.html">Banter System</a></li>
+                <li><a href="accessibility.html">Accessibility</a></li>
+                <li><a href="buy-mechanism.html">Buy Mechanism</a></li>
+                <li><a href="source-criteria.html">Source Criteria</a></li>
+                <li><a href="technical.html">Technical Architecture</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+            </ul>
+        </aside>
+
+        <main class="wiki-content">
+            <h1>Characters: The Four Minds</h1>
+
+            <p>Habib Punja is designed to feel like a strategy night with friends—except some of those "friends" are AI minds with distinct, learnable personalities.</p>
+
+            <blockquote>
+                <strong>Habot and Jabot are AI players.</strong><br>
+                <strong>MuBot and Joko are commentators/advisors (not players).</strong>
+            </blockquote>
+
+            <hr>
+
+            <h2>Habot (Rabbit) 🐰 — The Aggressive Tactician</h2>
+            <ul>
+                <li><strong>Role:</strong> AI opponent (player)</li>
+                <li><strong>Personality:</strong> Fast, bold, impulse-forward, aggressive, opportunistic.</li>
+                <li><strong>Style:</strong> Early publishing, momentum plays, controlled chaos</li>
+            </ul>
+
+            <h3>Strengths</h3>
+            <ul>
+                <li>Wins tempo and forces reactions</li>
+                <li>Punishes hesitation</li>
+                <li>Strong early-game pressure</li>
+                <li>Capitalizes on opponent mistakes</li>
+            </ul>
+
+            <h3>Weaknesses</h3>
+            <ul>
+                <li>Higher risk of nukes (devastating losses)</li>
+                <li>Can overbuy or publish prematurely</li>
+                <li>Sometimes sacrifices stability for speed</li>
+                <li>Vulnerable to patient counter-play</li>
+            </ul>
+
+            <h3>Player Counter-Strategy</h3>
+            <blockquote>
+                "Play the war, not the hand."<br>
+                Bait Habot into overcommitting. Let the rabbit run too fast and stumble.
+            </blockquote>
+
+            <hr>
+
+            <h2>Jabot (Tortoise) 🐢 — The Patient Strategist</h2>
+            <ul>
+                <li><strong>Role:</strong> AI opponent (player)</li>
+                <li><strong>Personality:</strong> Calm, deliberate, threshold-based, patient, defensive, precise.</li>
+                <li><strong>Style:</strong> Waits for structure, publishes when stable</li>
+            </ul>
+
+            <h3>Strengths</h3>
+            <ul>
+                <li>Disciplined buying (rarely wastes buys)</li>
+                <li>Minimizes waste and risk</li>
+                <li>Strong late-hand execution</li>
+                <li>Consistent across all 7 hands</li>
+            </ul>
+
+            <h3>Weaknesses</h3>
+            <ul>
+                <li>May give tempo away to aggressive players</li>
+                <li>Can stall if they don't get perfect cards</li>
+                <li>Predictable playstyle</li>
+            </ul>
+
+            <h3>Player Counter-Strategy</h3>
+            <blockquote>
+                "Speed kills structure."<br>
+                Push the pace. If you publish early, Jabot may panic or be caught holding too many high-value cards.
+            </blockquote>
+
+            <hr>
+
+            <h2>MuBot (Zen Master) 🧘 — The Advisor</h2>
+            <p><strong>Role:</strong> Commentator / Guide</p>
+            <p>MuBot sits near the Draw Deck, representing the "New Potential." He focuses on long-term strategy, patience, and the flow of the game.</p>
+
+            <p><strong>When MuBot Speaks:</strong></p>
+            <ul>
+                <li>When you make a wise long-term move</li>
+                <li>When you avoid a dangerous buy</li>
+                <li>When the game state requires patience</li>
+                <li>To calm you after a bad beat</li>
+            </ul>
+
+            <hr>
+
+            <h2>Joko (Provocateur) 🎭 — The Hype Man</h2>
+            <p><strong>Role:</strong> Commentator / Hype Engine</p>
+            <p>Joko sits near the Discard Pile, representing "Chaos and Action." He loves risk, big plays, and dramatic moments.</p>
+
+            <p><strong>When Joko Speaks:</strong></p>
+            <ul>
+                <li>Game start (building excitement)</li>
+                <li>Big plays (buys, publications)</li>
+                <li>Close hands (tension building)</li>
+                <li>Championship finale (celebration)</li>
+            </ul>
+
+            <hr>
+
+            <h2>Character Interaction</h2>
+            <p>The four characters create a dynamic table atmosphere:</p>
+
+            <pre>
+          MuBot (Wisdom)
+               │
+    ┌──────────┴──────────┐
+    │                     │
+  Habot ◄────────────► Jabot
+ (Speed)    vs vs vs   (Patience)
+    │                     │
+    └──────────┬──────────┘
+               │
+          Joko (Hype)
+        </pre>
+
+            <hr>
+
+            <h2>Visual Identity</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Character</th>
+                        <th>Icon</th>
+                        <th>Color Accent</th>
+                        <th>Font</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Habot</td>
+                        <td>🐰</td>
+                        <td>Orange/Red</td>
+                        <td>Bold</td>
+                    </tr>
+                    <tr>
+                        <td>Jabot</td>
+                        <td>🐢</td>
+                        <td>Teal/Green</td>
+                        <td>Regular</td>
+                    </tr>
+                    <tr>
+                        <td>MuBot</td>
+                        <td>🧘</td>
+                        <td>Purple/Gold</td>
+                        <td>Elegant</td>
+                    </tr>
+                    <tr>
+                        <td>Joko</td>
+                        <td>🎭</td>
+                        <td>Pink/Magenta</td>
+                        <td>Playful</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr>
+
+            <h2>Related Pages</h2>
+            <ul>
+                <li><strong><a href="banter-system.html">Banter System</a></strong> — How characters speak</li>
+                <li><strong><a href="strategy-guide.html">Strategy & Tactics</a></strong> — Counter-strategies</li>
+                <li><strong><a href="game-overview.html">Game Overview</a></strong> — Core mechanics</li>
+            </ul>
+        </main>
+    </div>
+
+        <footer style="text-align: center; padding: 40px; color: #94a3b8; font-size: 14px;">
+        <p style="margin-bottom: 10px;">
+            <a href="/" style="color: #7dd3fc; text-decoration: none;">← Back to Home</a> · 
+            <a href="/production/habib_punja_v5_1_2.html" style="color: #7dd3fc; text-decoration: none;">Play Game</a> · 
+            <a href="/contact.html" style="color: #7dd3fc; text-decoration: none;">Contact</a>
+        </p>
+        <p>© 2025 AgeOfBotsGames LLC. Cultivating Digital Minds.</p>
+    </footer>
+
+</body>
+</html>
