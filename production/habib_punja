@@ -9251,9 +9251,22 @@
                         seq.push(card);
 
                         // v4.6 FIX: Auto-sort ladder after extension for visual clarity
+                        // 🃏 FIX: Context-aware sorting (Ace can be high or low)
                         if (forceType === 'ladder') {
-                            seq.sort((a, b) => a.getValue() - b.getValue());
-                            console.log(`%c  🔄 v4.6: Re-sorted ladder after extension: ${seq.map(c => c.toString()).join('-')}`, 'color:#3b82f6;font-weight:bold');
+                            const hasAce = seq.some(c => c.rank === 'A');
+                            const hasKing = seq.some(c => c.rank === 'K');
+                            const isHighAceLadder = hasAce && hasKing;
+                            
+                            seq.sort((a, b) => {
+                                let aVal = a.getValue();
+                                let bVal = b.getValue();
+                                if (isHighAceLadder) {
+                                    if (a.rank === 'A') aVal = 14;
+                                    if (b.rank === 'A') bVal = 14;
+                                }
+                                return aVal - bVal;
+                            });
+                            console.log(`%c  🔄 v4.6: Re-sorted ladder after extension: ${seq.map(c => c.toString()).join('-')}${isHighAceLadder ? ' (high-ace)' : ''}`, 'color:#3b82f6;font-weight:bold');
                         }
 
                         console.log(`%c  ✅ v4.6: Added ${card.toString()} to ${forceType} sequence: ${seq.map(c => c.toString()).join(' ')}`, 'color:#28a745;font-weight:bold');
