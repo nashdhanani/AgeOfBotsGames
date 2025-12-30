@@ -7646,7 +7646,8 @@
 
                 // Handle pendingDeckDraw (buy window opened during deck draw)
                 // Resume if buy window closed without anyone buying
-                const noBuyReasons = ['expired', 'no-buy-after-publish', 'no-buys', 'ai-no-buyback', 'invalid'];
+                // 🐛 v5.1.2 HOTFIX: Added 'current-player' - turn must resume when buy window rotates back to current player
+                const noBuyReasons = ['expired', 'no-buy-after-publish', 'no-buys', 'ai-no-buyback', 'invalid', 'current-player'];
                 if (pendingDraw && noBuyReasons.includes(reason)) {
                     const { ai, statusId } = pendingDraw;
                     const aiName = ai === 1 ? 'Habot' : 'Jabot';
@@ -8875,11 +8876,15 @@
 
                                 for (let seqIdx = 0; seqIdx < this.publishedSequences[p].length; seqIdx++) {
                                     const seq = this.publishedSequences[p][seqIdx];
-                                    const seqRanks = seq.map(c => c.rank);
-
-                                    // Check if this sequence contains matching rank
-                                    if (seqRanks.includes(card.rank)) {
-                                        // Found the matching sequence - add card directly
+                                    
+                                    // 🐛 v5.1.2 HOTFIX: Must verify this is actually a TRIPLE sequence!
+                                    // Old bug: seqRanks.includes(card.rank) would match ANY sequence with that rank
+                                    // Fix: Check that ALL cards in sequence have the SAME rank (= triple)
+                                    const isTripleSequence = seq.length >= 3 && seq.every(c => c.rank === seq[0].rank);
+                                    
+                                    // Only extend if it's a triple AND the rank matches
+                                    if (isTripleSequence && seq[0].rank === card.rank) {
+                                        // Found the matching triple sequence - add card directly
                                         this.publishedSequences[p][seqIdx].push(card);
                                         this.playerHands[aiIdx].splice(i, 1);
                                         extendedSequence = true;
