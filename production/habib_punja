@@ -3860,9 +3860,30 @@
             }
 
             subscribeToEvents() {
-                // AI Turn Events
+                // 🎉 Special Event triggers (New Year resolutions) - fire at specific early turns
                 eventBus.on('ai_turn_started', (data) => {
                     const speaker = data.player === 1 ? 'habot' : 'jabot';
+                    const turn = data.turn || 0;
+                    
+                    // Trigger special_event at specific turns (before turn 15)
+                    // Turn 3: Habot shares resolution
+                    // Turn 5: Jabot shares resolution  
+                    // Turn 8: Joko shares resolution
+                    // Turn 11: MuBot shares resolution
+                    if (turn === 3 && data.player === 1) {
+                        this.trigger('habot', 'special_event');
+                        return; // Skip regular turn_started
+                    } else if (turn === 5 && data.player === 2) {
+                        this.trigger('jabot', 'special_event');
+                        return;
+                    } else if (turn === 8) {
+                        this.trigger('joko', 'special_event');
+                        // Still let AI speak too
+                    } else if (turn === 11) {
+                        this.trigger('mubot', 'special_event');
+                        // Still let AI speak too
+                    }
+                    
                     this.trigger(speaker, 'turn_started');
                 });
 
@@ -3933,7 +3954,21 @@
                 });
 
                 // Hand/Game Events
+                eventBus.on('game_started', () => {
+                    // 🎉 New Year's chorus - quick succession like a group cheer!
+                    // Note: _gameJustStarted flag is set in newGame() before GameState creation
+                    this.trigger('joko', 'game_started');
+                    setTimeout(() => this.trigger('habot', 'game_started'), 800);
+                    setTimeout(() => this.trigger('jabot', 'game_started'), 1600);
+                    setTimeout(() => {
+                        this.trigger('mubot', 'game_started');
+                        this._gameJustStarted = false;  // Clear flag after MuBot's greeting
+                    }, 2400);
+                });
+
                 eventBus.on('hand_started', () => {
+                    // Skip if game just started (MuBot will say Happy New Year instead)
+                    if (this._gameJustStarted) return;
                     this.trigger('mubot', 'hand_started');
                 });
 
@@ -4003,6 +4038,14 @@
                 "habot": {
                     "name": "Habot", "emoji": "🐇", "priority": 5, "color": "#e74c3c",
                     "dialogue": {
+                        "game_started": [
+                            { "text": "🎉 HAPPY NEW YEAR 2026!", "type": "shout" }
+                        ],
+                        "special_event": [
+                            { "text": "My 2026 resolution? WIN FASTER! ⚡", "type": "shout" },
+                            { "text": "This year I'm breaking speed records! 🚀", "type": "shout" },
+                            { "text": "2026 goal: No more second place!", "type": "shout" }
+                        ],
                         "turn_started": [
                             { "text": "My turn, let's go!", "type": "normal" },
                             { "text": "Here we go!", "type": "shout" },
@@ -4019,7 +4062,8 @@
                             { "text": "Another card for the pile!", "type": "normal" },
                             { "text": "Keep 'em coming!", "type": "normal" },
                             { "text": "Fortune favors the fast!", "type": "normal" },
-                            { "text": "Let's see if luck's on my side!", "type": "normal" }
+                            { "text": "Let's see if luck's on my side!", "type": "normal" },
+                            { "text": "2026 resolution: Draw faster! ⚡", "type": "shout" }
                         ],
                         "card_bought": [
                             { "text": "Ooh, I'll take that!", "type": "shout" },
@@ -4027,7 +4071,8 @@
                             { "text": "Yoink! 🛍️", "type": "normal" },
                             { "text": "Don't mind if I do!", "type": "normal" },
                             { "text": "Opportunity knocks!", "type": "shout" },
-                            { "text": "Snag that card!", "type": "normal" }
+                            { "text": "Snag that card!", "type": "normal" },
+                            { "text": "New year, same quick reflexes! 🐇", "type": "shout" }
                         ],
                         "card_discarded": [
                             { "text": "Don't need this one!", "type": "normal" },
@@ -4042,7 +4087,8 @@
                             { "text": "Let's DO this!", "type": "shout" },
                             { "text": "Boom! Published!", "type": "shout" },
                             { "text": "Check this out!", "type": "shout" },
-                            { "text": "On the board!", "type": "shout" }
+                            { "text": "On the board!", "type": "shout" },
+                            { "text": "Resolution KEPT: Win faster! 🏆", "type": "shout" }
                         ],
                         "sequence_extended": [
                             { "text": "Building momentum!", "type": "normal" },
@@ -4076,6 +4122,14 @@
                 "jabot": {
                     "name": "Jabot", "emoji": "🐢", "priority": 5, "color": "#3498db",
                     "dialogue": {
+                        "game_started": [
+                            { "text": "🎉 Happy New Year 2026.", "type": "normal" }
+                        ],
+                        "special_event": [
+                            { "text": "My 2026 resolution: Even MORE patience. 🐢", "type": "thought" },
+                            { "text": "This year I optimize my strategy further.", "type": "thought" },
+                            { "text": "2026 goal: Perfect calculation, zero errors.", "type": "thought" }
+                        ],
                         "turn_started": [
                             { "text": "Evaluating options...", "type": "thought" },
                             { "text": "Proceeding methodically.", "type": "normal" },
@@ -4090,28 +4144,32 @@
                             { "text": "Every card tells a story.", "type": "thought" },
                             { "text": "Interesting possibilities.", "type": "thought" },
                             { "text": "Assessing the situation.", "type": "normal" },
-                            { "text": "Processing new data.", "type": "normal" }
+                            { "text": "Processing new data.", "type": "normal" },
+                            { "text": "2026 resolution: Better analysis. 🐢", "type": "thought" }
                         ],
                         "card_bought": [
                             { "text": "A logical choice.", "type": "normal" },
                             { "text": "Strategic acquisition.", "type": "normal" },
                             { "text": "This fits the plan.", "type": "normal" },
                             { "text": "Optimal selection.", "type": "normal" },
-                            { "text": "Worth the investment.", "type": "normal" }
+                            { "text": "Worth the investment.", "type": "normal" },
+                            { "text": "New year, smarter purchases.", "type": "thought" }
                         ],
                         "card_discarded": [
                             { "text": "Calculated removal.", "type": "normal" },
                             { "text": "Trimming inefficiency.", "type": "normal" },
                             { "text": "Reducing variables.", "type": "normal" },
                             { "text": "Strategic pruning.", "type": "normal" },
-                            { "text": "This card doesn't fit.", "type": "normal" }
+                            { "text": "This card doesn't fit.", "type": "normal" },
+                            { "text": "Resolution: Discard doubt. Keep focus.", "type": "thought" }
                         ],
                         "sequences_published": [
                             { "text": "The moment has arrived.", "type": "normal" },
                             { "text": "All according to plan.", "type": "thought" },
                             { "text": "Patience rewarded.", "type": "normal" },
                             { "text": "Execution time.", "type": "normal" },
-                            { "text": "Precision pays off.", "type": "normal" }
+                            { "text": "Precision pays off.", "type": "normal" },
+                            { "text": "Resolution KEPT: Patience wins. 🐢", "type": "normal" }
                         ],
                         "sequence_extended": [
                             { "text": "Building systematically.", "type": "normal" },
@@ -4145,6 +4203,14 @@
                 "mubot": {
                     "name": "MuBot", "emoji": "🧘", "priority": 10, "color": "#9b59b6",
                     "dialogue": {
+                        "game_started": [
+                            { "text": "🎉 Happy New Year 2026!", "type": "normal" }
+                        ],
+                        "special_event": [
+                            { "text": "My 2026 resolution: Find balance in every hand. 🧘", "type": "thought" },
+                            { "text": "This year, play with intention and wisdom.", "type": "thought" },
+                            { "text": "2026 goal: Inner peace, outer victory.", "type": "thought" }
+                        ],
                         "turn_started": [
                             { "text": "Notice the pattern here. 🤔", "type": "thought" },
                             { "text": "Consider all paths before choosing.", "type": "thought" }
@@ -4152,51 +4218,68 @@
                         "buy_window_opened": [
                             { "text": "Consider all options before acting.", "type": "thought" },
                             { "text": "Each buy costs opportunity later.", "type": "thought" },
-                            { "text": "A wise player waits for the right moment.", "type": "normal" }
+                            { "text": "A wise player waits for the right moment.", "type": "normal" },
+                            { "text": "2026 resolution: Choose wisely. 🧘", "type": "thought" }
                         ],
                         "hand_started": [
                             { "text": "Master the fundamentals, the rest follows.", "type": "thought" },
-                            { "text": "A new hand, a new opportunity.", "type": "normal" }
+                            { "text": "A new hand, a new opportunity.", "type": "normal" },
+                            { "text": "Each hand in 2026 is a fresh start.", "type": "thought" }
                         ],
                         "player_low_cards": [
                             { "text": "You're close. Stay focused.", "type": "thought" },
-                            { "text": "The finish line approaches.", "type": "normal" }
+                            { "text": "The finish line approaches.", "type": "normal" },
+                            { "text": "Resolution: Finish what you start. 🏁", "type": "thought" }
                         ],
                         "game_over": [
                             { "text": "Well played. Reflect and grow.", "type": "normal" },
-                            { "text": "Every game teaches something.", "type": "thought" }
+                            { "text": "Every game teaches something.", "type": "thought" },
+                            { "text": "May 2026 bring many victories. 🧘", "type": "normal" }
                         ]
                     }
                 },
                 "joko": {
                     "name": "Joko", "emoji": "🃏", "priority": 10, "color": "#f39c12",
                     "dialogue": {
+                        "game_started": [
+                            { "text": "🎉 HAPPY NEW YEAR 2026!! 🎊", "type": "shout" }
+                        ],
+                        "special_event": [
+                            { "text": "My 2026 resolution? MORE DRAMA! 🎭", "type": "shout" },
+                            { "text": "This year is gonna be LEGENDARY! 🔥", "type": "shout" },
+                            { "text": "2026 goal: Maximum excitement ALWAYS!", "type": "shout" }
+                        ],
                         "turn_started": [
                             { "text": "Here we GO!", "type": "normal" },
                             { "text": "Next move! Exciting!", "type": "normal" }
                         ],
                         "card_discarded": [
                             { "text": "WHAT?! That card?!", "type": "shout" },
-                            { "text": "Bold move! 🔥", "type": "shout" }
+                            { "text": "Bold move! 🔥", "type": "shout" },
+                            { "text": "2026 resolution: MORE bold moves!", "type": "shout" }
                         ],
                         "buy_window_opened": [
                             { "text": "Spicy! I like the hustle!", "type": "shout" },
                             { "text": "OH! Did you SEE that?! 🔥", "type": "shout" },
-                            { "text": "Drama at the table!", "type": "normal" }
+                            { "text": "Drama at the table!", "type": "normal" },
+                            { "text": "Resolution: More DRAMA in 2026! 🎭", "type": "shout" }
                         ],
                         "sequences_published": [
                             { "text": "BOOM! Cards on the table!", "type": "shout" },
                             { "text": "Now we're COOKING! 🔥", "type": "shout" },
-                            { "text": "The game just got REAL!", "type": "shout" }
+                            { "text": "The game just got REAL!", "type": "shout" },
+                            { "text": "2026 is already EPIC!! 🎉", "type": "shout" }
                         ],
                         "human_ahead": [
                             { "text": "You're on FIRE! 🔥", "type": "shout" },
-                            { "text": "Never boring with you!", "type": "normal" }
+                            { "text": "Never boring with you!", "type": "normal" },
+                            { "text": "2026 is YOUR year! Go go go!", "type": "shout" }
                         ],
                         "game_over": [
                             { "text": "What a GAME! 🎉", "type": "shout" },
                             { "text": "That was EPIC!", "type": "shout" },
-                            { "text": "Play again! Play again!", "type": "normal" }
+                            { "text": "Play again! Play again!", "type": "normal" },
+                            { "text": "Best way to start 2026! 🎊", "type": "shout" }
                         ]
                     }
                 }
@@ -7968,8 +8051,8 @@
 
                 console.log(`%c🤖 ${aiName} starting turn`, 'color: #3498db; font-weight: bold;');
                 
-                // 🌸 v5.1.0: Emit AI turn started event
-                eventBus.emit('ai_turn_started', { player: ai, name: aiName });
+                // 🌸 v5.1.0: Emit AI turn started event (with turn counter for special events)
+                eventBus.emit('ai_turn_started', { player: ai, name: aiName, turn: this.turnCounter });
 
                 // 🎯 v4.0.7 FIX: Reset publish flag at START of turn (not end of previous turn!)
                 // This ensures AI cannot extend on the SAME turn as publishing
@@ -10671,16 +10754,24 @@
                 console.log('%c🎮 Creating new GameState...', 'color: #2196f3; font-weight: bold;');
                 persistentScores = [0, 0, 0];
                 clearMessageLog();  // 📜 v4.7: Clear message log on new game
+                
+                // 🎉 v5.1.2: Set flag BEFORE creating GameState to skip MuBot's hand_started
+                banterEngine._gameJustStarted = true;
+                
                 game = new GameState(false, selectedHand);
                 
                 // 🔄 v5.1.2: Verify game was created properly
                 if (!game || !game.playerHands || game.playerHands[0].length === 0) {
                     console.error('%c❌ CRITICAL: Game created but no cards dealt!', 'color: #ff0000; font-weight: bold;');
                     showToast('Error starting game - please try again', 'error');
+                    banterEngine._gameJustStarted = false;  // Reset flag on error
                     return;
                 }
                 
                 console.log(`%c✅ New game started! Hand ${game.currentHand}, Player has ${game.playerHands[0].length} cards`, 'color: #27ae60; font-weight: bold;');
+                
+                // 🎉 v5.1.2: Trigger New Year's banter!
+                eventBus.emit('game_started', { hand: game.currentHand });
             } catch (error) {
                 console.error('%c❌ Error in newGame:', 'color: #ff0000; font-weight: bold;', error);
                 showToast('Error starting game - please try again', 'error');
