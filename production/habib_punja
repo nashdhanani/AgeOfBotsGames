@@ -5577,32 +5577,38 @@
                         const hasKing = values.includes(13);
 
                         if (hasAce && hasKing) {
-                            // Potential wrap-around - check if we have consecutive high cards leading to King
-                            const nonAceCards = suitCards.filter(c => c.getValue() !== 1);
-                            nonAceCards.sort((a, b) => b.getValue() - a.getValue()); // Sort high to low
+                            // v5.1.4 FIX: Check if Ace belongs to a LOW ladder first
+                            // If A-2-3-4 exists, Ace should stay low — don't wrap it high
+                            const lowCards = suitCards.filter(c => c.getValue() >= 1 && c.getValue() <= 4);
+                            const lowValues = lowCards.map(c => c.getValue()).sort((a, b) => a - b);
+                            const aceBelongsToLowLadder = lowValues.length >= 4 &&
+                                lowValues[0] === 1 && lowValues[1] === 2 && lowValues[2] === 3 && lowValues[3] === 4;
 
-                            // Build wrap ladder from King downward
-                            let wrapLadder = [];
-                            let expectedValue = 13; // Start at King
+                            if (!aceBelongsToLowLadder) {
+                                // Original wrap-around logic (only when Ace is truly high)
+                                const nonAceCards = suitCards.filter(c => c.getValue() !== 1);
+                                nonAceCards.sort((a, b) => b.getValue() - a.getValue());
 
-                            for (let card of nonAceCards) {
-                                if (card.getValue() === expectedValue) {
-                                    wrapLadder.push(card);
-                                    expectedValue--;
-                                } else {
-                                    break; // Gap found
+                                let wrapLadder = [];
+                                let expectedValue = 13;
+
+                                for (let card of nonAceCards) {
+                                    if (card.getValue() === expectedValue) {
+                                        wrapLadder.push(card);
+                                        expectedValue--;
+                                    } else {
+                                        break;
+                                    }
                                 }
-                            }
 
-                            // If we have 3+ consecutive high cards (K, Q, J minimum), add Ace at front
-                            if (wrapLadder.length >= 3) {
-                                const aceCard = suitCards.find(c => c.getValue() === 1);
-                                wrapLadder.unshift(aceCard); // Add Ace at the beginning
-                                sequences.push([...wrapLadder]);
+                                if (wrapLadder.length >= 3) {
+                                    const aceCard = suitCards.find(c => c.getValue() === 1);
+                                    wrapLadder.unshift(aceCard);
+                                    sequences.push([...wrapLadder]);
 
-                                // Remove used cards from suitCards for normal ladder processing
-                                const usedIds = new Set(wrapLadder.map(c => c.id));
-                                suitCards = suitCards.filter(c => !usedIds.has(c.id));
+                                    const usedIds = new Set(wrapLadder.map(c => c.id));
+                                    suitCards = suitCards.filter(c => !usedIds.has(c.id));
+                                }
                             }
                         }
 
