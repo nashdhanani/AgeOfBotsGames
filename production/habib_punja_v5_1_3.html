@@ -7784,6 +7784,12 @@
                 this.buyWindow.pendingDeckDraw = null;
                 this.buyWindow.pendingNextPlayer = null; // ✅ NEW
 
+                // 🔄 v5.1.4 FIX: Clear lastDiscard after buy window resolves.
+                // This prevents handleDeckDraw from re-opening a duplicate buy window
+                // for a card that everyone already had a chance to buy.
+                this.lastDiscard = null;
+                this.lastDiscardByPlayer = -1;
+
                 if (this.buyWindow.timerInterval) {
                     clearTimeout(this.buyWindow.timerInterval);
                     this.buyWindow.timerInterval = null;
@@ -10951,25 +10957,17 @@
             // 🔄 v5.1.2: Render the discarded card FIRST
             game.updateUI();
             
-            // 🔄 v5.1.2: Open buy window for Jabot (player 2) after human discards
-            // Jabot is "out of turn" since Habot plays next
-            // Use setTimeout to ensure card visually appears before buy window activates
+            // 🔄 v5.1.4 FIX: After Human discards, advance to Habot's turn normally.
+            // Habot (next in turn order) gets FIRST right to pick up the discard on their turn.
+            // If Habot passes (draws from deck), THEN the buy window opens for Jabot
+            // via handleDeckDraw/checkAndOpenBuyWindowAfterDiscard.
+            // Previously this opened a buy window for Jabot BEFORE Habot's turn,
+            // letting Jabot steal the card before Habot could even evaluate it.
             setTimeout(() => {
-                const buyWindowPlayer = 2; // Jabot
-                if (game.playerBuys[buyWindowPlayer] > 0) {
-                    console.log(`%c💡 v5.1.2: Opening buy window for Jabot after Human discard`, 'color: #9b59b6; font-weight: bold;');
-                    game.buyWindow.pendingNextPlayer = 1; // Habot plays next
-                    game.startBuyWindow(game.lastDiscard, 0); // Human discarded
-                    // handleAIBuyWindow will be called for Jabot (shows YELLOW button)
-                    game.handleAIBuyWindow(2);
-                } else {
-                    // Jabot has no buys - continue to Habot's turn
-                    console.log(`%c⏭️ v5.1.2: Jabot has no buys - skipping to Habot's turn`, 'color: #9e9e9e;');
-                    game.currentPlayer = 1;
-                    game.gamePhase = 'draw';
-                    game.updateUI();
-                    game.aiTurn();
-                }
+                game.currentPlayer = 1; // Habot plays next
+                game.gamePhase = 'draw';
+                game.updateUI();
+                game.aiTurn();
             }, 300); // 300ms delay for card to visually appear first
         }
 
