@@ -5615,6 +5615,18 @@
                         // Now find regular consecutive ladders in remaining cards
                         if (suitCards.length >= 4) {
                             suitCards.sort((a, b) => a.getValue() - b.getValue());
+                            
+                            // 🔄 v5.1.4 FIX: Count how many ladders we still need
+                            const laddersNeeded = req.filter(s => s === 'ladder').length;
+                            const laddersAlreadyFound = sequences.filter(seq => {
+                                if (seq.length < 4) return false;
+                                const suits = [...new Set(seq.map(c => c.suit))];
+                                return suits.length === 1; // single suit = ladder
+                            }).length;
+                            const laddersStillNeeded = laddersNeeded - laddersAlreadyFound;
+                            
+                            // Build consecutive runs
+                            const runs = [];
                             let currentLadder = [suitCards[0]];
 
                             for (let i = 1; i < suitCards.length; i++) {
@@ -5624,17 +5636,39 @@
                                 if (currValue === prevValue + 1) {
                                     currentLadder.push(suitCards[i]);
                                 } else {
-                                    // Gap found - save current ladder if valid, start new one
                                     if (currentLadder.length >= 4) {
-                                        sequences.push([...currentLadder]);
+                                        runs.push([...currentLadder]);
                                     }
                                     currentLadder = [suitCards[i]];
                                 }
                             }
-
-                            // Don't forget the last ladder!
                             if (currentLadder.length >= 4) {
-                                sequences.push(currentLadder);
+                                runs.push(currentLadder);
+                            }
+                            
+                            // 🔄 v5.1.4: If we have a single long run but need multiple ladders,
+                            // split it into separate sequences so each can be extended independently.
+                            for (const run of runs) {
+                                if (run.length >= 8 && laddersStillNeeded >= 2) {
+                                    // Split this run into laddersStillNeeded equal(ish) parts
+                                    const splitCount = Math.min(laddersStillNeeded, Math.floor(run.length / 4));
+                                    const splitSize = Math.floor(run.length / splitCount);
+                                    const remainder = run.length % splitCount;
+                                    
+                                    console.log(`%c🔄 v5.1.4: Splitting ${run.length}-card ${run[0].suit} ladder into ${splitCount} sequences`, 'color: #e67e22; font-weight: bold;');
+                                    
+                                    let startIdx = 0;
+                                    for (let s = 0; s < splitCount; s++) {
+                                        // Distribute remainder cards to earlier splits
+                                        const thisSize = splitSize + (s < remainder ? 1 : 0);
+                                        const splitLadder = run.slice(startIdx, startIdx + thisSize);
+                                        sequences.push(splitLadder);
+                                        console.log(`   Split ${s + 1}: ${splitLadder.map(c => c.toString()).join('-')}`);
+                                        startIdx += thisSize;
+                                    }
+                                } else {
+                                    sequences.push(run);
+                                }
                             }
                         }
                     }
@@ -9143,33 +9177,32 @@
                                                 // Found the matching sequence - add card directly
                                                 this.publishedSequences[p][seqIdx].push(card);
                                                 
-                                                // 🐛 v5.1.3 FIX: Sort ladder after AI extension (was missing!)
-                                                // Match the sorting logic from executeAddToPublished
-                                                const extSeq = this.publishedSequences[p][seqIdx];
-                                                const hasAce = extSeq.some(c => c.rank === 'A');
-                                                const hasKing = extSeq.some(c => c.rank === 'K');
-                                                const isHighAceLadder = hasAce && hasKing;
-                                                extSeq.sort((a, b) => {
-                                                    let aVal = a.getValue();
-                                                    let bVal = b.getValue();
-                                                    if (isHighAceLadder) {
-                                                        if (a.rank === 'A') aVal = 14;
-                                                        if (b.rank === 'A') bVal = 14;
-                                                    }
-                                                    return aVal - bVal;
-                                                });
-                                                console.log(`  🔄 v5.1.3: Sorted ladder after AI extension: ${extSeq.map(c => c.toString()).join('-')}`);
-                                                
-                                                this.playerHands[aiIdx].splice(i, 1);
-                                                extendedSequence = true;
-                                                console.log(`  ✅ v4.6: Extended ${['You', 'Habot', 'Jabot'][p]}'s ladder sequence ${seqIdx + 1} with ${card.toString()}`);
-                                                
-                                                // 🎯 v4.5.13: Show toast for extension
-                                                const aiName = aiIdx === 1 ? 'Habot' : 'Jabot';
-                                                const targetName = p === 0 ? 'your' : p === aiIdx ? 'own' : (p === 1 ? "Habot's" : "Jabot's");
-                                                showExtensionToast(aiName, card.toString(), targetName);
-                                                
-                                                break;
+                                        // 🐛 v5.1.3 FIX: Sort ladder after AI extension (was missing!)
+                                        const extSeq = this.publishedSequences[p][seqIdx];
+                                        const hasAce = extSeq.some(c => c.rank === 'A');
+                                        const hasKing = extSeq.some(c => c.rank === 'K');
+                                        const isHighAceLadder = hasAce && hasKing;
+                                        extSeq.sort((a, b) => {
+                                            let aVal = a.getValue();
+                                            let bVal = b.getValue();
+                                            if (isHighAceLadder) {
+                                                if (a.rank === 'A') aVal = 14;
+                                                if (b.rank === 'A') bVal = 14;
+                                            }
+                                            return aVal - bVal;
+                                        });
+                                        console.log(`  🔄 v5.1.3: Sorted ladder after AI extension: ${extSeq.map(c => c.toString()).join('-')}`);
+                                        
+                                        this.playerHands[aiIdx].splice(i, 1);
+                                        extendedSequence = true;
+                                        console.log(`  ✅ v4.6: Extended ${['You', 'Habot', 'Jabot'][p]}'s ladder sequence ${seqIdx + 1} with ${card.toString()}`);
+                                        
+                                        // 🎯 v4.5.13: Show toast for extension
+                                        const aiName = aiIdx === 1 ? 'Habot' : 'Jabot';
+                                        const targetName = p === 0 ? 'your' : p === aiIdx ? 'own' : (p === 1 ? "Habot's" : "Jabot's");
+                                        showExtensionToast(aiName, card.toString(), targetName);
+                                        
+                                        break;
                                             }
                                         }
                                     }
