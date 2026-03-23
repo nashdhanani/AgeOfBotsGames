@@ -41,8 +41,16 @@
   kept accumulating more and more cards in an endless draw-discard cycle.
   Fix: AI with 13+ cards can still evaluate the discard pile normally, but
   is blocked from TAKING cards unless they extend a published sequence
-  (which helps shed cards). This lets the AI continue playing strategically
-  while prioritizing hand reduction.
+  AND have already published (so they can actually play the extension).
+  An unpublished AI grabbing extension cards just passes them to opponents.
+  
+  🐛 FIX #4: UNPUBLISHED AI GRABBING EXTENSION CARDS FOR OPPONENTS
+  Problem: Habot (unpublished, 14 cards) took Human's 7♠ because it "extended
+  Jabot's ladder." But Habot can't extend - it hasn't published yet! Habot then
+  immediately discarded the 7♠ as an orphan suit, and Jabot picked it up for free,
+  effectively stealing Human's card through a relay.
+  Rule: A player who hasn't published (or just published this turn) CANNOT extend
+  anyone's sequences. The bloated-hand exception now enforces this.
 
   🎮 VERSION 5.1.4 - BUG FIX EDITION
   ═══════════════════════════════════════════════════════════════════════════
@@ -8533,21 +8541,33 @@
                     }
 
                     // 🔄 v5.1.5: If hand is bloated (13+), only take discard if it extends a published sequence
-                    // Taking random cards just makes the problem worse. AI needs to SHED cards, not accumulate.
+                    // AND the AI has already published (so it can actually play the extension).
+                    // An AI that hasn't published yet CANNOT extend anyone's sequences, so taking
+                    // extension cards when bloated just passes them to opponents on discard.
                     if (shouldTake && blockBuying && this.discardPile.length > 0) {
                         const topCard = this.discardPile[this.discardPile.length - 1];
-                        let extendsPublished = false;
-                        for (let p = 0; p < this.players; p++) {
-                            if (this.publishedSequences[p].length > 0 && this.couldExtendSequence(topCard, p)) {
-                                extendsPublished = true;
-                                break;
-                            }
-                        }
-                        if (!extendsPublished) {
-                            console.log(`%c  🛑 v5.1.5: PATCH 2 blocking take - ${aiName} has ${currentHandSize} cards, ${topCard.toString()} doesn't extend any sequence`, 'color: #e74c3c; font-weight: bold;');
+                        const aiHasPublishedAlready = this.publishedSequences[ai].length > 0;
+                        const aiCanExtend = aiHasPublishedAlready && !this.aiJustPublished[ai];
+                        
+                        if (!aiCanExtend) {
+                            // AI hasn't published or just published this turn - can't extend anything
+                            console.log(`%c  🛑 v5.1.5: PATCH 2 blocking take - ${aiName} has ${currentHandSize} cards and hasn't published yet (can't extend)`, 'color: #e74c3c; font-weight: bold;');
                             shouldTake = false;
                         } else {
-                            console.log(`%c  ✅ v5.1.5: PATCH 2 allowing take - ${topCard.toString()} extends a published sequence (helps shed cards)`, 'color: #27ae60; font-weight: bold;');
+                            // AI can extend - but only allow if card actually extends a sequence
+                            let extendsPublished = false;
+                            for (let p = 0; p < this.players; p++) {
+                                if (this.publishedSequences[p].length > 0 && this.couldExtendSequence(topCard, p)) {
+                                    extendsPublished = true;
+                                    break;
+                                }
+                            }
+                            if (!extendsPublished) {
+                                console.log(`%c  🛑 v5.1.5: PATCH 2 blocking take - ${aiName} has ${currentHandSize} cards, ${topCard.toString()} doesn't extend any sequence`, 'color: #e74c3c; font-weight: bold;');
+                                shouldTake = false;
+                            } else {
+                                console.log(`%c  ✅ v5.1.5: PATCH 2 allowing take - ${aiName} published & ${topCard.toString()} extends a sequence (can play it to shed cards)`, 'color: #27ae60; font-weight: bold;');
+                            }
                         }
                     }
 
