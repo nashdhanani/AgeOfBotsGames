@@ -9700,8 +9700,12 @@
                 }
 
                 if (!addedToSequence) {
-                    console.log(`%c  ⚠️ v4.6: Could not add to existing ${forceType} sequence, creating new`, 'color:#f59e0b;');
-                    published.push([card]);
+                    // 🔄 v5.1.5 FIX: Card cannot legally extend any existing sequence of this type.
+                    // Put the card BACK in the player's hand instead of creating an orphan sequence.
+                    // This happens when rank already exists in a ladder (duplicate rank rejection).
+                    console.log(`%c  ❌ v5.1.5: Cannot add ${card.toString()} to any ${forceType} sequence - returning to hand`, 'color:#e74c3c;font-weight:bold');
+                    this.playerHands[0].splice(cardIdx, 0, card);  // Put card back at original position
+                    showToast(`Cannot add ${card.toString()} — rank already exists in that ladder`, 'warning', 2500);
                 }
 
                 this.selectedCards = [];
