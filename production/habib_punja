@@ -52,6 +52,29 @@
   Rule: A player who hasn't published (or just published this turn) CANNOT extend
   anyone's sequences. The bloated-hand exception now enforces this.
 
+  🧠 PHASE 1: AI COMPETITIVENESS — STRATEGY GUIDE ALIGNMENT
+  ═══════════════════════════════════════════════════════════════════════════
+  Applied 4 quick-win improvements from strategy guide analysis:
+
+  📋 FIX #5: BUY DISCIPLINE (shouldAllowBuy)
+  - Triple hands (1,4): Buy only if < 4 doubles, stop after first triple formed
+  - Ladder hands (3): Max 2 buys, turn-aware (aggressive early, stop by turn 15)
+  - Aligned with guide: "Buy if fewer than 4 doubles. Stop after first triple."
+
+  📋 FIX #6: PUBLISH TIMING (shouldPublish)
+  - Rabbit (Habot): Publishes IMMEDIATELY when able — no waiting for optimal size
+  - Multi-opponent detection: If 2+ players published, race is on — publish now
+  - Guide: "Habot publishes aggressively, loves momentum"
+
+  📋 FIX #7: ACE MANAGEMENT (evaluateCard)
+  - Aces penalized -10 in ladder hands unless part of A-2-3 run
+  - Guide: "Avoid Aces as ladder endpoints. 20-point penalties and dead ends."
+
+  📋 FIX #8: PENALTY AWARENESS (findWorstCard)
+  - After turn 30 without publishing, AI sheds high-penalty cards (A, K, Q, J)
+  - Risk factor scales with turn count — more aggressive shedding as game drags
+  - Guide: "Discard high-penalty first. One bad hand is recoverable; a nuke is not."
+
   🎮 VERSION 5.1.4 - BUG FIX EDITION
   ═══════════════════════════════════════════════════════════════════════════
 
@@ -6697,6 +6720,21 @@
                 const req = this.handReqs[this.currentHand].seqs;
                 const hasOnlyTriples = req.every(s => s === 'triple');
                 const isLadderOnlyGame = req.every(s => s === 'ladder');
+                const needsLaddersEval = req.some(s => s === 'ladder');
+
+                // 🔄 v5.1.5 PHASE 1: Ace Management (Strategy Guide)
+                // "Avoid Aces as ladder endpoints. Aces are 20-point penalties and dead ends."
+                if (needsLaddersEval && card.rank === 'A') {
+                    // Check if Ace fits into an existing A-2-3 run in hand
+                    const hasA23Run = sameSuit.some(c => c.getValue() === 2) && 
+                                      sameSuit.some(c => c.getValue() === 3);
+                    if (hasA23Run) {
+                        val += 5; // Ace completes a low-end sequence — acceptable
+                    } else {
+                        val -= 10; // Ace as standalone or pair is a 20-point liability
+                        console.log(`%c  ♠ v5.1.5: Ace penalty in ladder hand - dead end + 20pt risk`, 'color: #e74c3c;');
+                    }
+                }
 
                 // Count existing pairs in hand
                 const rankCounts = {};
@@ -6807,6 +6845,34 @@
                     deadCards.sort((a, b) => this.cardValue(b.rank) - this.cardValue(a.rank));
                     console.log(`      → Discarding dead card: ${deadCards[0].toString()}`);
                     return deadCards[0];
+                }
+                
+                // 🔄 v5.1.5 PHASE 1: PENALTY AWARENESS (Strategy Guide)
+                // "Discard high-penalty cards first: A > K/Q/J > 10 > low ranks."
+                // "One bad hand is recoverable; a nuclear penalty is often not."
+                // When AI hasn't published and it's getting late, prioritize shedding high-penalty cards.
+                // This minimizes "nuke" damage if the AI loses the hand.
+                if (!this.publishedSequences[pIdx].length && this.turnCounter > 30 && pIdx > 0) {
+                    const aiName = pIdx === 1 ? 'Habot' : 'Jabot';
+                    // Calculate risk factor: higher as turns progress without publishing
+                    const riskFactor = Math.min(0.6, (this.turnCounter - 30) / 50);
+                    
+                    // Find high-penalty cards that aren't part of promising sequences
+                    const seqs = this.findSequences(hand);
+                    const sequenceCardIds = new Set();
+                    seqs.triples.forEach(t => t.forEach(c => sequenceCardIds.add(c.id)));
+                    seqs.ladders.forEach(l => l.forEach(c => sequenceCardIds.add(c.id)));
+                    
+                    const unprotectedHighPenalty = hand.filter(c => 
+                        !sequenceCardIds.has(c.id) && c.getPenaltyValue() >= 15
+                    );
+                    
+                    if (unprotectedHighPenalty.length > 0 && riskFactor > 0.2) {
+                        // Sort by penalty value descending (Ace=20, then K/Q/J=15)
+                        unprotectedHighPenalty.sort((a, b) => b.getPenaltyValue() - a.getPenaltyValue());
+                        console.log(`%c💣 v5.1.5: ${aiName} penalty awareness - shedding ${unprotectedHighPenalty[0].toString()} (${unprotectedHighPenalty[0].getPenaltyValue()}pts, risk: ${(riskFactor * 100).toFixed(0)}%)`, 'color: #e74c3c; font-weight: bold;');
+                        return unprotectedHighPenalty[0];
+                    }
                 }
                 
                 // 🔄 v5.1.2: DUPLICATE RANK PENALTY for ladder games
@@ -7558,13 +7624,43 @@
                 const penaltyValue = discardCard.getPenaltyValue();
                 const cardValue = strategicValue + penaltyValue;
                 switch (this.currentHand) {
-                    case 1: if (buysUsed >= 2) return false; if (!hasTriple && cardValue < 30) return false; return hasTriple || cardValue >= 30;
-                    case 2: if (buysUsed >= 2) return false; const hasSequence = hasTriple || hasLadder; return hasSequence && cardValue >= 25;
-                    case 3:
-                        if (buysUsed < 2) return cardValue >= 35;
-                        if (buysUsed === 2) { const has3CardProgress = this.hasThreeCardLadderProgress(hand); return has3CardProgress && cardValue >= 30 }
-                        return false;
-                    case 4: if (buysUsed >= 2) return false; return hasTriple && cardValue >= 25;
+                    case 1: case 4: {
+                        // 🔄 v5.1.5 PHASE 1: Strategy Guide Triple Buy Discipline
+                        // "Buy if you have fewer than 4 doubles. Stop buying after first triple is formed."
+                        if (buysUsed >= 2) return false;
+                        const rankCounts1 = {};
+                        hand.forEach(c => rankCounts1[c.rank] = (rankCounts1[c.rank] || 0) + 1);
+                        const doubles1 = Object.values(rankCounts1).filter(n => n >= 2).length;
+                        if (doubles1 >= 4) {
+                            console.log(`%c  🎯 v5.1.5: Blocking buy - already have ${doubles1} doubles (guide: stop at 4)`, 'color: #f39c12;');
+                            return false;
+                        }
+                        if (hasTriple) {
+                            console.log(`%c  🎯 v5.1.5: Blocking buy - first triple already formed (guide: stop buying)`, 'color: #f39c12;');
+                            return false;
+                        }
+                        return cardValue >= 20;
+                    }
+                    case 2: {
+                        if (buysUsed >= 2) return false;
+                        const hasSequence = hasTriple || hasLadder;
+                        return hasSequence && cardValue >= 25;
+                    }
+                    case 3: {
+                        // 🔄 v5.1.5 PHASE 1: Strategy Guide Ladder Buy Discipline
+                        // "Immediately buy on turn 1; second buy on turn 4. Stop buying after turn 5."
+                        // Max 2 buys total. Turn-aware: aggressive early, stop mid-game.
+                        if (buysUsed >= 2) return false;
+                        // Turn 5 per player ≈ turn 15 in game counter (3 players)
+                        if (this.turnCounter > 15) {
+                            console.log(`%c  🎯 v5.1.5: Blocking buy - turn ${this.turnCounter} > 15 (guide: stop after ~turn 5)`, 'color: #f39c12;');
+                            return false;
+                        }
+                        // Early turns: very aggressive; mid turns: moderate
+                        if (this.turnCounter <= 6) return cardValue >= 15;  // Turns 1-2: aggressive
+                        if (this.turnCounter <= 12) return cardValue >= 25; // Turns 3-4: moderate
+                        return cardValue >= 35; // Turns 5: selective
+                    }
                     case 5: if (buysUsed >= 2) return false; const hasAnySequence = hasTriple || hasLadder; return hasAnySequence && cardValue >= 30;
                     case 6:
                     case 7:
@@ -8932,13 +9028,28 @@
                     if (opponentDanger) shouldPublish = true;
                     const personality = this.getAIPersonality(ai);
 
-                    //Nash: changed it from 22 : 30 to make the game faster
-                    const turnLimit = personality === 'rabbit' ? 15 : 20;
+                    // 🔄 v5.1.5 PHASE 1: Strategy Guide Publish Timing
+                    // "Publish quickly if multiple players have already published."
+                    const publishedCount = this.publishedSequences.filter(s => s.length > 0).length;
+                    if (publishedCount >= 2) {
+                        console.log(`%c  🏁 v5.1.5: ${publishedCount} players published - RACE IS ON!`, 'color: #e74c3c; font-weight: bold;');
+                        shouldPublish = true;
+                    }
+                    
+                    // 🔄 v5.1.5 PHASE 1: Rabbit = publish the MOMENT it can (aggressive tempo)
+                    // "Habot publishes aggressively, loves momentum"
+                    if (personality === 'rabbit') {
+                        console.log(`%c  🐇 v5.1.5: Rabbit personality - publish immediately!`, 'color: #27ae60; font-weight: bold;');
+                        shouldPublish = true;
+                    }
+                    
+                    // Tortoise waits for optimal conditions but has limits
+                    const turnLimit = personality === 'rabbit' ? 10 : 20;
                     if (this.turnCounter >= turnLimit) shouldPublish = true;
-                    else {
+                    else if (personality !== 'rabbit') {
+                        // Tortoise/neutral: wait for optimal hand size
                         let optimalSize = this.currentHand <= 3 ? 7 : 6;
-                        if (personality === 'rabbit') optimalSize += 1;
-                        else if (personality === 'tortoise') optimalSize -= 1;
+                        if (personality === 'tortoise') optimalSize -= 1;
                         if (this.playerHands[ai].length <= optimalSize) shouldPublish = true;
                     }
                     
