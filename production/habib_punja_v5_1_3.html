@@ -4598,6 +4598,7 @@
                 this.lastDiscardByPlayer = -1; this.aiJustPublished = [false, false, false];
                 this.turnCounter = 0;
                 this.buyWindow = { active: false, card: null, discardingPlayer: -1, buyWindowPlayer: -1, expiresAt: 0, timerInterval: null, pendingDeckDraw: null };
+                this.pendingPassedDiscard = null; // 🔄 v5.1.5: Deferred buy window after human passes on discard
                 this.lastAIDiscard = [null, null, null];
                 this.aiPersonality = { 1: 'rabbit', 2: 'tortoise' };
                 this.lastCardWarningShown = null;
@@ -9845,6 +9846,7 @@
                 this.lastAIDiscard = [null, null, null];
                 this.lastCardWarningShown = null;
                 this.buyWindow = { active: false, card: null, discardingPlayer: -1, buyWindowPlayer: -1, expiresAt: 0, timerInterval: null, pendingDeckDraw: null };
+                this.pendingPassedDiscard = null; // 🔄 v5.1.5: Deferred buy window
 
                 // 🏗️ v4.6 FIX: Initialize staged construction when jumping to Hands 6-7
                 if (handNum >= 6) {
@@ -11113,10 +11115,18 @@
             if (!game || game.currentPlayer !== 0 || game.gamePhase !== 'draw') return;
             if (game.buyWindow.active) game.closeBuyWindow('player-turn');
             
-            // 🔄 v5.1.5: Human passed on the discard pile - open buy window for third player
-            // The third player (not next in turn, not the discarder) gets a buy opportunity
-            const passedDiscard = game.lastDiscard;
-            const passedDiscardBy = game.lastDiscardByPlayer;
+            // 🔄 v5.1.5: Human passed on the discard pile - save info for buy window after discard
+            // We DON'T trigger the buy window here because it re-renders UI and destroys
+            // card selection state. Instead, save the passed discard and trigger the buy
+            // window after the human completes their discard action.
+            if (game.lastDiscard && game.lastDiscardByPlayer !== -1 && game.lastDiscardByPlayer !== 0) {
+                game.pendingPassedDiscard = {
+                    card: game.lastDiscard,
+                    discardedBy: game.lastDiscardByPlayer
+                };
+            } else {
+                game.pendingPassedDiscard = null;
+            }
             
             if (game.deck.length === 0) { if (!game.reshuffleDeck()) { showToast('Deck is empty - no cards to reshuffle!', 'warning'); return } game.updateUI() }
             if (game.deck.length > 0) {
@@ -11125,27 +11135,6 @@
                 game.gamePhase = 'discard';
                 game.turnCounter++;
                 game.updateUI();
-                
-                // 🔄 v5.1.5: Now check if there's a valid discard that a third player can buy
-                if (passedDiscard && passedDiscardBy !== -1 && passedDiscardBy !== 0) {
-                    // Human (0) just passed. The discarder was an AI.
-                    // The third player (not Human, not the discarder) gets a buy window.
-                    const thirdPlayer = (passedDiscardBy === 1) ? 2 : 1; // If Habot discarded, Jabot buys; if Jabot discarded, Habot buys
-                    const thirdName = thirdPlayer === 1 ? 'Habot' : 'Jabot';
-                    
-                    // Verify the card is still on the discard pile
-                    const cardStillExists = game.discardPile.some(c => c.rank === passedDiscard.rank && c.suit === passedDiscard.suit);
-                    
-                    if (cardStillExists && game.playerBuys[thirdPlayer] > 0) {
-                        console.log(`%c🔄 v5.1.5: Human passed on ${passedDiscard.toString()} → Opening buy window for ${thirdName}`, 'color: #ffc107; font-weight: bold;');
-                        game.startBuyWindow(passedDiscard, passedDiscardBy);
-                        if (game.buyWindow.active && game.buyWindow.buyWindowPlayer > 0) {
-                            game.handleAIBuyWindow(game.buyWindow.buyWindowPlayer);
-                        }
-                    } else {
-                        console.log(`%c🔄 v5.1.5: Human passed but no eligible buyer (${thirdName} has ${game.playerBuys[thirdPlayer]} buys, card exists: ${cardStillExists})`, 'color: #9e9e9e;');
-                    }
-                }
             }
         }
 
@@ -11206,6 +11195,26 @@
             
             // 🔄 v5.1.2: Render the discarded card FIRST
             game.updateUI();
+            
+            // 🔄 v5.1.5: If human passed on an AI's discard (drew from deck instead),
+            // trigger the third player's buy window NOW, after the human has finished their turn.
+            // This was moved here from drawFromDeck to avoid UI re-renders during card selection.
+            if (game.pendingPassedDiscard) {
+                const { card: passedCard, discardedBy } = game.pendingPassedDiscard;
+                game.pendingPassedDiscard = null;
+                
+                const thirdPlayer = (discardedBy === 1) ? 2 : 1;
+                const thirdName = thirdPlayer === 1 ? 'Habot' : 'Jabot';
+                const cardStillExists = game.discardPile.some(c => c.rank === passedCard.rank && c.suit === passedCard.suit);
+                
+                if (cardStillExists && game.playerBuys[thirdPlayer] > 0) {
+                    console.log(`%c🔄 v5.1.5: Human passed on ${passedCard.toString()} → Opening buy window for ${thirdName} (deferred)`, 'color: #ffc107; font-weight: bold;');
+                    game.startBuyWindow(passedCard, discardedBy);
+                    if (game.buyWindow.active && game.buyWindow.buyWindowPlayer > 0) {
+                        game.handleAIBuyWindow(game.buyWindow.buyWindowPlayer);
+                    }
+                }
+            }
             
             // 🔄 v5.1.4 FIX: After Human discards, advance to Habot's turn normally.
             // Habot (next in turn order) gets FIRST right to pick up the discard on their turn.
