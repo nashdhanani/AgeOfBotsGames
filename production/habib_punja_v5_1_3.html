@@ -4599,6 +4599,7 @@
                 this.turnCounter = 0;
                 this.buyWindow = { active: false, card: null, discardingPlayer: -1, buyWindowPlayer: -1, expiresAt: 0, timerInterval: null, pendingDeckDraw: null };
                 this.pendingPassedDiscard = null; // 🔄 v5.1.5: Deferred buy window after human passes on discard
+                this.lastBuyWindowCardId = null; // 🔄 v5.1.5: Track which card already had a buy window
                 this.lastAIDiscard = [null, null, null];
                 this.aiPersonality = { 1: 'rabbit', 2: 'tortoise' };
                 this.lastCardWarningShown = null;
@@ -7958,11 +7959,14 @@
                 this.buyWindow.pendingDeckDraw = null;
                 this.buyWindow.pendingNextPlayer = null; // ✅ NEW
 
-                // 🔄 v5.1.4 FIX: Clear lastDiscard after buy window resolves.
-                // This prevents handleDeckDraw from re-opening a duplicate buy window
-                // for a card that everyone already had a chance to buy.
-                this.lastDiscard = null;
-                this.lastDiscardByPlayer = -1;
+                // 🔄 v5.1.5 FIX: Don't clear lastDiscard unconditionally!
+                // The v5.1.4 fix cleared lastDiscard to prevent duplicate buy windows,
+                // but this also wiped out legitimate discard info needed by the NEXT
+                // player's handleDeckDraw. Instead, track which card already had a
+                // buy window so handleDeckDraw can skip duplicates without losing state.
+                if (this.buyWindow.card) {
+                    this.lastBuyWindowCardId = this.buyWindow.card.id;
+                }
 
                 if (this.buyWindow.timerInterval) {
                     clearTimeout(this.buyWindow.timerInterval);
@@ -8735,6 +8739,14 @@
                 console.log(`  lastDiscardByPlayer: ${this.lastDiscardByPlayer}`);
 
                 if (this.lastDiscard && this.lastDiscardByPlayer !== -1) {
+                    // 🔄 v5.1.5: Skip if this card already had a buy window
+                    if (this.lastBuyWindowCardId && this.lastDiscard.id === this.lastBuyWindowCardId) {
+                        console.log(`  ⏭️ v5.1.5: ${this.lastDiscard.toString()} already had a buy window — skipping duplicate`);
+                        this.drawDeckCardForAI(ai, statusId);
+                        this.continueAITurnAfterDraw(ai, statusId);
+                        return;
+                    }
+                    
                     const buyWindowPlayer = (this.lastDiscardByPlayer + 2) % 3;
                     console.log(`  buyWindowPlayer would be: ${buyWindowPlayer} (${['Human', 'Habot', 'Jabot'][buyWindowPlayer]})`);
 
@@ -9193,6 +9205,7 @@
 
                 this.lastDiscard = this.discardPile[this.discardPile.length - 1];
                 this.lastDiscardByPlayer = ai;
+                this.lastBuyWindowCardId = null; // 🔄 v5.1.5: New discard — reset buy window tracking
                 // 🎯 v4.0.7: REMOVED aiJustPublished[ai] = false from here
                 // Flag now resets at START of NEXT turn, not end of THIS turn
                 // This prevents extending on same turn as publishing
@@ -9858,6 +9871,7 @@
                 this.lastCardWarningShown = null;
                 this.buyWindow = { active: false, card: null, discardingPlayer: -1, buyWindowPlayer: -1, expiresAt: 0, timerInterval: null, pendingDeckDraw: null };
                 this.pendingPassedDiscard = null; // 🔄 v5.1.5: Deferred buy window
+                this.lastBuyWindowCardId = null; // 🔄 v5.1.5: Track buy window card
 
                 // 🏗️ v4.6 FIX: Initialize staged construction when jumping to Hands 6-7
                 if (handNum >= 6) {
@@ -11200,6 +11214,7 @@
             game.selectedCards = [];
             game.lastDiscard = card;
             game.lastDiscardByPlayer = 0;
+            game.lastBuyWindowCardId = null; // 🔄 v5.1.5: New discard — reset buy window tracking
             game.justPublished = false;
             
             if (game.playerHands[0].length === 0) { game.updateUI(); setTimeout(() => { game.endHand(0) }, 500); return }
