@@ -7864,11 +7864,11 @@
                     // Human player - check if anyone has published
                     const anyonePublished = this.publishedSequences.some(seq => seq.length > 0);
                     if (anyonePublished) {
-                        duration = 4000; // Post-publish: 4 seconds (faster gameplay)
-                        console.log(`%c⚡ v5.1.3: Post-publish mode - shorter buy window (4s)`, 'color: #4ade80; font-weight: bold;');
+                        duration = 6000; // Post-publish: 6 seconds (was 4s — too fast for reaction)
+                        console.log(`%c⚡ v5.1.3: Post-publish mode - buy window (6s)`, 'color: #4ade80; font-weight: bold;');
                     } else {
-                        duration = 8000; // Pre-publish: 8 seconds (accessibility)
-                        console.log(`%c♿ v5.1.3: Pre-publish mode - accessibility buy window (8s)`, 'color: #3b82f6; font-weight: bold;');
+                        duration = 10000; // Pre-publish: 10 seconds (was 8s — accessibility)
+                        console.log(`%c♿ v5.1.3: Pre-publish mode - accessibility buy window (10s)`, 'color: #3b82f6; font-weight: bold;');
                     }
                 }
                 console.log(`%c⏱️ v5.1.3: Buy window duration: ${duration / 1000}s (${buyWindowPlayer === 0 ? 'Human' : 'AI'})`, 'color: #ffc107; font-weight: bold;');
