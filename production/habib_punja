@@ -8749,9 +8749,9 @@
                             this.continueAITurnAfterDraw(ai, statusId);
                             return;
                         }
-                        this.startBuyWindow(this.lastDiscard, this.lastDiscardByPlayer);
                         this.buyWindow.pendingDeckDraw = { ai, statusId };
-                        if (buyWindowPlayer > 0) this.handleAIBuyWindow(buyWindowPlayer);
+                        this.startBuyWindow(this.lastDiscard, this.lastDiscardByPlayer);
+                        if (this.buyWindow.active && this.buyWindow.buyWindowPlayer > 0) this.handleAIBuyWindow(this.buyWindow.buyWindowPlayer);
                         return;
                     }
                 }
@@ -9705,7 +9705,14 @@
                     // This happens when rank already exists in a ladder (duplicate rank rejection).
                     console.log(`%c  ❌ v5.1.5: Cannot add ${card.toString()} to any ${forceType} sequence - returning to hand`, 'color:#e74c3c;font-weight:bold');
                     this.playerHands[0].splice(cardIdx, 0, card);  // Put card back at original position
-                    showToast(`Cannot add ${card.toString()} — rank already exists in that ladder`, 'warning', 2500);
+                    showInfoModal(
+                        'Cannot Extend',
+                        `${card.toString()} cannot be added to that ${forceType} — a card of the same rank already exists in the sequence.`,
+                        'Got it!',
+                        '🚫',
+                        true,
+                        3000
+                    );
                 }
 
                 this.selectedCards = [];
