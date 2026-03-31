@@ -4366,7 +4366,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3j', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3k', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -8381,42 +8381,15 @@
                         }
                     }
                     
-                    // 🔄 v5.1.1: MERCY RULE - At turn 120, force helpful discards if not published
+                    // 🔄 v5.1.5 FIX: Mercy rule only changes DISCARD priority.
+                    // AI still draws, still tries to publish, still builds sequences.
+                    // The mercy flag is checked later when choosing what to discard.
+                    let mercyMode = false;
                     if (this.turnCounter >= 120 && this.publishedSequences[ai].length === 0) {
                         console.log(`%c🏳️ v5.1.1: MERCY RULE CHECK for ${aiName}`, 'color: #e74c3c; font-weight: bold;');
-                        const mercyCard = this.executeMercyRule(ai);
-                        if (mercyCard) {
-                            // Force discard this card instead of worst card
-                            const idx = this.playerHands[ai].findIndex(c => c.id === mercyCard.id);
-                            if (idx > -1) {
-                                this.playerHands[ai].splice(idx, 1);
-                                this.discardPile.push(mercyCard);
-                                this.trackDiscardedCard(mercyCard);
-                                this.discardPileAccessible = true;
-                                this.lastAIDiscard[ai] = mercyCard;
-                                this.lastDiscard = mercyCard;
-                                this.lastDiscardByPlayer = ai;
-                                this.setAIStatus(statusId, `🏳️ Mercy: ${mercyCard.toString()}`);
-                                
-                                // Trigger banter about mercy
-                                eventBus.emit('mercy_discard', { player: ai, name: aiName, card: mercyCard.toString() });
-                                
-                                this.updateUI();
-                                
-                                // 🔄 v5.1.5 FIX: Mercy discard follows same priority as normal discard.
-                                // Next player in turn order gets free pickup rights.
-                                // No buy window fires here - it will trigger naturally if the next
-                                // player passes (draws from deck instead of taking the mercy card).
-                                const nextPlayer = (ai + 1) % this.players;
-                                console.log(`%c▶️ v5.1.5: Mercy discard by ${aiName} → Player ${nextPlayer} (${['Human', 'Habot', 'Jabot'][nextPlayer]}) gets free pickup`, 'color: #4a90e2; font-weight: bold;');
-                                this.currentPlayer = nextPlayer;
-                                this.gamePhase = 'draw';
-                                this.updateUI();
-                                if (this.currentPlayer !== 0) this.aiTurn();
-                                return;
-                            }
-                        }
+                        mercyMode = true;
                     }
+                    this.aiMercyMode = mercyMode; // Store for continueAITurnAfterDraw
 
                     // PATCH 2: Check hand size - if 13+ cards, AI is bloated.
                     // 🔄 v5.1.5 FIX: Don't force deck draw! Let AI still evaluate the discard pile
@@ -9179,7 +9152,21 @@
                     return;
                 }
                 if (this.playerHands[ai].length > 0) {
-                    const worst = this.findWorstCard(ai);
+                    // 🔄 v5.1.5: Mercy mode changes discard priority only
+                    let worst;
+                    if (this.aiMercyMode) {
+                        const mercyCard = this.executeMercyRule(ai);
+                        if (mercyCard) {
+                            worst = mercyCard;
+                            console.log(`%c🏳️ v5.1.5: Mercy discard: ${worst.toString()} (helps human extend)`, 'color: #e74c3c; font-weight: bold;');
+                            this.setAIStatus(statusId, `🏳️ Mercy: ${worst.toString()}`);
+                            eventBus.emit('mercy_discard', { player: ai, name: aiName, card: worst.toString() });
+                        } else {
+                            worst = this.findWorstCard(ai);
+                        }
+                    } else {
+                        worst = this.findWorstCard(ai);
+                    }
                     const idx = this.playerHands[ai].findIndex(c => c.id === worst.id);
                     if (idx > -1) {
                         this.playerHands[ai].splice(idx, 1);
