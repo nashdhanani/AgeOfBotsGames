@@ -4367,7 +4367,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3o', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3p', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -4502,8 +4502,9 @@
                     // 🔄 v5.1.5: Add Pass button next to Buy
                     const declineBtn = document.createElement('button');
                     declineBtn.id = 'declineBtn';
+                    declineBtn.className = 'btn';
                     declineBtn.innerHTML = `❌ Pass`;
-                    declineBtn.style.cssText = 'background: linear-gradient(135deg, #dc3545, #c82333); color: white; border: 3px solid #8b0000; padding: 12px 24px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; margin-left: 8px; min-width: 100px;';
+                    declineBtn.style.cssText = 'background: linear-gradient(180deg, #ef4444, #dc2626) !important; color: white !important; border: 3px solid #991b1b !important; cursor: pointer !important; opacity: 1 !important;';
                     declineBtn.addEventListener('click', () => {
                         if (game && game.buyWindow.active && game.buyWindow.buyWindowPlayer === 0) {
                             console.log(`%c🚫 Human DECLINED buy`, 'color: #dc3545; font-weight: bold;');
