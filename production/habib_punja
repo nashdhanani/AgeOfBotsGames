@@ -4366,7 +4366,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3l', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3m', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -8475,9 +8475,14 @@
                         if (personality === 'rabbit') threshold -= 1;
                         else if (personality === 'tortoise') threshold += 1; // Only +1 instead of +2
                     } else {
-                        if (personality === 'rabbit') threshold -= 2;
+                        if (personality === 'rabbit') threshold -= 1;
                         else if (personality === 'tortoise') threshold += 2;
                     }
+                    
+                    // 🔄 v5.1.5 FIX: Minimum threshold floor of 5.
+                    // Without this, rabbit personality + near-completion can drop threshold to 2,
+                    // causing AI to take EVERY discard and blocking all human buy opportunities.
+                    threshold = Math.max(threshold, 5);
                     
                     const forceBuy = discardCard && this.shouldAllowBuy(ai, discardCard);
                     let shouldTake = forceBuy || (discardCard && discardScore >= threshold);
@@ -9222,6 +9227,12 @@
                     
                     // Next player gets free pickup - advance to their turn directly
                     console.log(`%c▶️ v5.1.5: ${ai === 1 ? 'Habot' : 'Jabot'} discarded → Player ${nextPlayer} (${['Human', 'Habot', 'Jabot'][nextPlayer]}) is next (free pickup rights)`, 'color: #4a90e2; font-weight: bold;');
+                    
+                    // 🔄 v5.1.5 FIX: AI just discarded a card — pile MUST be accessible.
+                    // This prevents stale discardPileAccessible=false from a previous take.
+                    if (this.discardPile.length > 0) {
+                        this.discardPileAccessible = true;
+                    }
                     
                     setTimeout(() => { document.getElementById(`${statusId}-status`).classList.remove('active') }, 2000);
                     this.currentPlayer = nextPlayer;
