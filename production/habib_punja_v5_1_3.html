@@ -4366,7 +4366,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3m', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3n', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -4483,6 +4483,10 @@
             // Remove all state classes
             buyBtn.classList.remove('buy-human', 'buy-ai', 'buy-inactive');
             
+            // Remove Decline button if it exists
+            const existingDecline = document.getElementById('declineBtn');
+            if (existingDecline) existingDecline.remove();
+            
             // Get current timer text if visible
             const timerText = timerEl && timerEl.style.display !== 'none' ? timerEl.outerHTML : '';
             
@@ -4491,8 +4495,21 @@
                 case 'human':
                     buyBtn.classList.add('buy-human');
                     buyBtn.disabled = false;
-                    buyBtn.innerHTML = `👆 BUY! ${timerText}`;
+                    buyBtn.innerHTML = `✅ BUY`;
                     console.log(`%c🟢 Buy button: GREEN (Human can buy)`, 'color: #3ddc84; font-weight: bold;');
+                    
+                    // 🔄 v5.1.5: Add Decline button next to Buy
+                    const declineBtn = document.createElement('button');
+                    declineBtn.id = 'declineBtn';
+                    declineBtn.innerHTML = `❌ Pass`;
+                    declineBtn.style.cssText = 'background: linear-gradient(135deg, #dc3545, #c82333); color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 900; font-size: 1rem; cursor: pointer; margin-left: 8px;';
+                    declineBtn.addEventListener('click', () => {
+                        if (game && game.buyWindow.active && game.buyWindow.buyWindowPlayer === 0) {
+                            console.log(`%c🚫 Human DECLINED buy`, 'color: #dc3545; font-weight: bold;');
+                            game.closeBuyWindow('expired');
+                        }
+                    });
+                    buyBtn.parentNode.insertBefore(declineBtn, buyBtn.nextSibling);
                     break;
                 case 'ai':
                     buyBtn.classList.add('buy-ai');
@@ -7884,9 +7901,9 @@
                 this.buyWindow.card = card;
                 this.buyWindow.discardingPlayer = discardingPlayer;
                 this.buyWindow.buyWindowPlayer = buyWindowPlayer;
-                this.buyWindow.expiresAt = Date.now() + duration; // ✅ FIX 3: Variable duration
+                this.buyWindow.expiresAt = buyWindowPlayer === 0 ? Infinity : Date.now() + duration; // 🔄 v5.1.5: No timer for Human — Buy or Decline
 
-                console.log(`%c🔔 Buy window opened for ${playerNames[buyWindowPlayer]} (${card.toString()}) - ${duration / 1000}s`, 'color: #ffc107; font-weight: bold;');
+                console.log(`%c🔔 Buy window opened for ${playerNames[buyWindowPlayer]} (${card.toString()}) - ${buyWindowPlayer === 0 ? 'no timer (Buy/Decline)' : duration / 1000 + 's'}`, 'color: #ffc107; font-weight: bold;');
                 
                 // 🌸 v5.1.0: Emit buy window opened event (for player buy opportunities)
                 if (buyWindowPlayer === 0) {
@@ -8116,22 +8133,27 @@
 
             updateBuyTimer() {
                 if (!this.buyWindow.active) return;
+                const isHuman = this.buyWindow.buyWindowPlayer === 0;
+                
+                // 🔄 v5.1.5: Human has no timer — waits for Buy or Decline
+                if (isHuman) {
+                    const buyBtn = document.getElementById('buyBtn');
+                    if (buyBtn) {
+                        buyBtn.innerHTML = `✅ BUY`;
+                    }
+                    return; // No recurring timer for Human
+                }
+                
                 const remaining = Math.ceil((this.buyWindow.expiresAt - Date.now()) / 1000);
                 if (remaining <= 0) { this.closeBuyWindow('expired'); return }
                 
                 const buyBtn = document.getElementById('buyBtn');
-                const isHuman = this.buyWindow.buyWindowPlayer === 0;
                 
                 // ♿ v5.1.2: Update button text with icon + timer for accessibility
                 if (buyBtn) {
-                    const timerColor = remaining <= 2 ? '#ff6b35' : (isHuman ? '#052e1a' : '#1f2937');
+                    const timerColor = remaining <= 2 ? '#ff6b35' : '#1f2937';
                     const timerSpan = `<span id="buyTimer" style="display:inline; color:${timerColor};">(${remaining}s)</span>`;
-                    
-                    if (isHuman) {
-                        buyBtn.innerHTML = `👆 BUY! ${timerSpan}`;
-                    } else {
-                        buyBtn.innerHTML = `⏳ AI... ${timerSpan}`;
-                    }
+                    buyBtn.innerHTML = `⏳ AI... ${timerSpan}`;
                 }
                 
                 this.buyWindow.timerInterval = setTimeout(() => this.updateBuyTimer(), 100);
