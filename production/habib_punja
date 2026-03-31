@@ -4366,7 +4366,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3k', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3l', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -5934,6 +5934,13 @@
 
                 // 🎯 v4.0.7: Use separateSequences to build 2D structure
                 const sequences = this.separateSequences(published, req);
+
+                // 🔄 v5.1.5 FIX: Validate that separateSequences actually produced sequences.
+                // If it returns 0 or fewer sequences than required, the publish failed.
+                if (!sequences || sequences.length === 0) {
+                    console.log(`%c❌ v5.1.5: separateSequences returned ${sequences ? sequences.length : 0} sequences — publish ABORTED`, 'color: #e74c3c; font-weight: bold;');
+                    return false;
+                }
 
                 // Remove published cards from hand
                 published.forEach(c => {
