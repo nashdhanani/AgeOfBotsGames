@@ -4367,7 +4367,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3y', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3z', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -5564,7 +5564,9 @@
                 const byRank = {};
                 hand.forEach(c => { if (!byRank[c.rank]) byRank[c.rank] = []; byRank[c.rank].push(c) });
                 const tripleRanks = Object.keys(byRank).filter(rank => byRank[rank].length >= 3);
-                if (tripleRanks.length < needTriples) return false;
+                // 🔄 v5.1.5y: Count total possible triples (a rank with 6 cards = 2 triples)
+                const totalPossibleTriples = tripleRanks.reduce((sum, rank) => sum + Math.floor(byRank[rank].length / 3), 0);
+                if (totalPossibleTriples < needTriples) return false;
                 const tryPublish = (tripleAssignments, triplesAssigned, usedIds, startRankIdx = 0) => {
                     if (triplesAssigned === needTriples) {
                         let laddersFound = 0; const usedForLadders = new Set(usedIds);
