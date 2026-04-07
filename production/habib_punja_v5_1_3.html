@@ -4367,7 +4367,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3w', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3x', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -5917,6 +5917,7 @@
                     }
                     triplesPublished++;
                 }
+                const ladderCardIds = new Set(); // 🔄 v5.1.5w: Track which cards are in ladders
                 while (laddersPublished < laddersNeeded) {
                     const availableHand = hand.filter(c => !usedCardIds.has(c.id));
                     const seqs = this.findSequences(availableHand);
@@ -5929,7 +5930,7 @@
                     });
                     const ladder = seqs.ladders[0];
                     published = published.concat(ladder);
-                    ladder.forEach(c => usedCardIds.add(c.id));
+                    ladder.forEach(c => { usedCardIds.add(c.id); ladderCardIds.add(c.id); });
                     laddersPublished++;
                 }
                 // 🔄 v5.1.5w: LADDER ENDPOINT TRIMMING
@@ -5944,15 +5945,10 @@
                     while (trimmed && triplesPublished < triplesNeeded) {
                         trimmed = false;
                         
-                        // Collect all cards currently in published ladders
-                        const publishedLadderCards = published.filter(c => {
-                            // A card is in a ladder if it's NOT part of a triple (not same rank as 2+ other published cards)
-                            const sameRankInPublished = published.filter(p => p.rank === c.rank && p.id !== c.id);
-                            // If 2+ others share rank, it's likely a triple member — skip
-                            return sameRankInPublished.length < 2;
-                        });
+                        // Use tracked ladderCardIds to identify ladder cards in published
+                        const publishedLadderCards = published.filter(c => ladderCardIds.has(c.id));
                         
-                        // Group published cards into their ladder sequences by suit
+                        // Group by suit to find each ladder
                         const laddersBySuit = {};
                         publishedLadderCards.forEach(c => {
                             if (!laddersBySuit[c.suit]) laddersBySuit[c.suit] = [];
@@ -5961,30 +5957,33 @@
                         
                         for (const suit of Object.keys(laddersBySuit)) {
                             const ladderCards = laddersBySuit[suit].sort((a, b) => a.getValue() - b.getValue());
-                            if (ladderCards.length <= 4) continue; // Can't trim below 4 cards
+                            if (ladderCards.length <= 4) continue; // Can't trim below minimum 4 cards
                             
-                            // Check both endpoints (low and high)
+                            console.log(`   🔍 v5.1.5w: Checking ${suit} ladder [${ladderCards.map(c => c.toString()).join('-')}] (${ladderCards.length} cards)`);
+                            
+                            // Check both endpoints (high end first — more likely to overlap with triples)
                             const endpoints = [
-                                { card: ladderCards[0], end: 'low' },
-                                { card: ladderCards[ladderCards.length - 1], end: 'high' }
+                                { card: ladderCards[ladderCards.length - 1], end: 'high' },
+                                { card: ladderCards[0], end: 'low' }
                             ];
                             
                             for (const { card: endCard, end } of endpoints) {
-                                // Count how many cards of this rank exist in hand (not yet used, plus this card)
-                                const sameRankInHand = hand.filter(c => 
+                                // Count: how many cards of this rank are unused in hand + this endpoint card
+                                const sameRankUnused = hand.filter(c => 
                                     c.rank === endCard.rank && !usedCardIds.has(c.id)
                                 );
-                                const sameRankTotal = sameRankInHand.length + 1; // +1 for the endpoint card itself
+                                const sameRankTotal = sameRankUnused.length + 1; // +1 for the endpoint card itself
                                 
                                 if (sameRankTotal >= 3) {
                                     console.log(`%c   ✂️ v5.1.5w: Trimming ${endCard.toString()} from ${end} end of ${suit} ladder — rank ${endCard.rank} has ${sameRankTotal} cards for triple`, 'color: #e67e22;');
                                     
-                                    // Remove endpoint card from published ladder
+                                    // Remove endpoint card from published
                                     const idx = published.findIndex(c => c.id === endCard.id);
                                     if (idx !== -1) published.splice(idx, 1);
                                     usedCardIds.delete(endCard.id);
+                                    ladderCardIds.delete(endCard.id);
                                     
-                                    // Now build a triple with this rank
+                                    // Build a triple: endpoint card + 2 unused same-rank cards from hand
                                     const tripleCards = [endCard];
                                     const available = hand.filter(c => 
                                         c.rank === endCard.rank && !usedCardIds.has(c.id) && c.id !== endCard.id
@@ -6002,10 +6001,11 @@
                                         console.log(`%c   ✅ v5.1.5w: Created triple from trimmed card: ${tripleCards.map(c => c.toString()).join(', ')}`, 'color: #27ae60; font-weight: bold;');
                                         break;
                                     } else {
-                                        // Failed — put it back
+                                        // Restore
                                         console.log(`%c   ❌ v5.1.5w: Not enough cards for triple — restoring ${endCard.toString()} to ladder`, 'color: #e74c3c;');
                                         published.push(endCard);
                                         usedCardIds.add(endCard.id);
+                                        ladderCardIds.add(endCard.id);
                                         tripleCards.forEach(c => { if (c.id !== endCard.id) usedCardIds.delete(c.id); });
                                     }
                                 }
