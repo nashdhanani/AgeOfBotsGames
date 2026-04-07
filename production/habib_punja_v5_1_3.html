@@ -4367,7 +4367,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3x', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3y', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -5579,18 +5579,21 @@
                     }
                     for (let rankIdx = startRankIdx; rankIdx < tripleRanks.length; rankIdx++) {
                         const rank = tripleRanks[rankIdx];
-                        const cards = byRank[rank];
+                        const cards = byRank[rank].filter(c => !usedIds.has(c.id)); // 🔄 v5.1.5x: Filter already-used cards
                         if (cards.length >= 4) {
                             for (let i = 0; i < cards.length - 2; i++) {
                                 for (let j = i + 1; j < cards.length - 1; j++) {
                                     for (let k = j + 1; k < cards.length; k++) {
                                         const newUsed = new Set(usedIds);
                                         newUsed.add(cards[i].id); newUsed.add(cards[j].id); newUsed.add(cards[k].id);
-                                        if (tryPublish(tripleAssignments, triplesAssigned + 1, newUsed, rankIdx + 1)) return true;
+                                        // 🔄 v5.1.5x: If this rank still has 3+ unused cards, stay at same rankIdx
+                                        const remainingOfRank = byRank[rank].filter(c => !newUsed.has(c.id)).length;
+                                        const nextIdx = remainingOfRank >= 3 ? rankIdx : rankIdx + 1;
+                                        if (tryPublish(tripleAssignments, triplesAssigned + 1, newUsed, nextIdx)) return true;
                                     }
                                 }
                             }
-                        } else {
+                        } else if (cards.length >= 3) {
                             const newUsed = new Set(usedIds);
                             cards.slice(0, 3).forEach(c => newUsed.add(c.id));
                             if (tryPublish(tripleAssignments, triplesAssigned + 1, newUsed, rankIdx + 1)) return true;
