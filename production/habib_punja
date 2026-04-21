@@ -4367,7 +4367,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.5z2', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.5z3', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -5567,17 +5567,29 @@
                 // 🔄 v5.1.5y: Count total possible triples (a rank with 6 cards = 2 triples)
                 const totalPossibleTriples = tripleRanks.reduce((sum, rank) => sum + Math.floor(byRank[rank].length / 3), 0);
                 if (totalPossibleTriples < needTriples) return false;
+
+                // ── Ladder backtracking ──────────────────────────────────────
+                // Greedy first-ladder selection fails when Ace can form two
+                // different ladders (e.g. ♥A-2-3-4 AND ♥J-Q-K-A).
+                // Backtracking tries every combination until it finds one that
+                // satisfies all needLadders requirements with disjoint card sets.
+                const tryLadders = (usedIds, laddersFound) => {
+                    if (laddersFound === needLadders) return true;
+                    const remaining = hand.filter(c => !usedIds.has(c.id));
+                    const testSeqs = this.findSequences(remaining);
+                    for (const ladder of testSeqs.ladders) {
+                        // Build candidate used set with this ladder's cards added
+                        const nextUsed = new Set(usedIds);
+                        ladder.forEach(c => nextUsed.add(c.id));
+                        if (tryLadders(nextUsed, laddersFound + 1)) return true;
+                    }
+                    return false;
+                };
+
                 const tryPublish = (tripleAssignments, triplesAssigned, usedIds, startRankIdx = 0) => {
                     if (triplesAssigned === needTriples) {
-                        let laddersFound = 0; const usedForLadders = new Set(usedIds);
-                        for (let i = 0; i < needLadders; i++) {
-                            const remaining = hand.filter(c => !usedForLadders.has(c.id));
-                            const testSeqs = this.findSequences(remaining);
-                            if (testSeqs.ladders.length === 0) break;
-                            testSeqs.ladders[0].forEach(c => usedForLadders.add(c.id));
-                            laddersFound++;
-                        }
-                        return laddersFound >= needLadders;
+                        // All triples assigned — now find ladders via backtracking
+                        return tryLadders(usedIds, 0);
                     }
                     for (let rankIdx = startRankIdx; rankIdx < tripleRanks.length; rankIdx++) {
                         const rank = tripleRanks[rankIdx];
