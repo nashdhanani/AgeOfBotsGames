@@ -4367,7 +4367,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.3z', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.1.5z2', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -5794,21 +5794,31 @@
                     if (lockedTriples.length >= triplesNeeded && lockedLadders.length >= laddersNeeded) {
                         console.log(`      ✅ All requirements met! Publishing locked sequences`);
 
-                        // Build published array from locked sequences
-                        const published = [];
+                        // 🐛 FIX: Use locked sequences directly as the 2D structure.
+                        // Previously called separateSequences() on the flat published array,
+                        // which could misassign cards when multiple ladders shared ranks,
+                        // causing the hand-removal loop to find fewer matches than expected.
+                        // Locked sequences are already correctly structured — use them as-is.
+                        const sequences = [];
                         for (let i = 0; i < triplesNeeded; i++) {
-                            published.push(...lockedTriples[i].cards);
+                            sequences.push([...lockedTriples[i].cards]);
                         }
                         for (let i = 0; i < laddersNeeded; i++) {
-                            published.push(...lockedLadders[i].cards);
+                            // Sort ladder cards by value for clean display
+                            const ladder = [...lockedLadders[i].cards].sort((a, b) => a.getValue() - b.getValue());
+                            sequences.push(ladder);
                         }
 
-                        // Separate into 2D structure
-                        const sequences = this.separateSequences(published, req);
-
-                        // Remove published cards from hand
-                        published.forEach(c => {
-                            const idx = this.playerHands[pIdx].findIndex(card => card.id === c.id);
+                        // Build flat list of all cards to remove — use rank+suit matching
+                        // as a fallback in case object references differ (e.g. after reshuffle)
+                        const allPublishedCards = sequences.flat();
+                        allPublishedCards.forEach(c => {
+                            // Try ID match first (exact object)
+                            let idx = this.playerHands[pIdx].findIndex(card => card.id === c.id);
+                            // Fallback: rank+suit match if ID not found (handles reshuffle edge case)
+                            if (idx === -1) {
+                                idx = this.playerHands[pIdx].findIndex(card => card.rank === c.rank && card.suit === c.suit);
+                            }
                             if (idx > -1) this.playerHands[pIdx].splice(idx, 1);
                         });
 
@@ -5816,7 +5826,8 @@
                         this.publishedSequences[pIdx] = sequences;
                         this.aiJustPublished[pIdx] = true;
 
-                        console.log(`      ✅ v4.6: Published ${sequences.length} sequences from locked cards`);
+                        console.log(`      ✅ v4.6: Published ${sequences.length} sequences (${allPublishedCards.length} cards removed from hand)`);
+                        console.log(`      Hand size: ${this.playerHands[pIdx].length} cards remaining`);
                         return true;
                     } else {
                         console.log(`      ❌ Not all requirements locked yet - continue building`);
@@ -9714,6 +9725,12 @@
                 viewGameBtn.addEventListener('click', () => {
                     modal.remove();
                     console.log('%c👀 Viewing completed game', 'color: #6c757d; font-weight: bold;');
+                    // 🐛 FIX: Refresh scores and UI after modal closes
+                    // endHand() updated playerScores but DOM needs a repaint
+                    if (game) {
+                        game.updateLeaderboard();
+                        game.updateUI();
+                    }
                 });
 
                 btnContainer.appendChild(playAgainBtn);
