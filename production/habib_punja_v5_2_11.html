@@ -2,11 +2,30 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 5.2.11 - Production Baseline Edition (no pointless choices)
+  Version: 5.2.12 - Production Baseline Edition (endgame discard safety)
   Release Date: August 29, 2026
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025-2026 AgeOfBotsGames LLC. All rights reserved.
+
+  🎮 VERSION 5.2.12 - PRODUCTION BASELINE (ENDGAME DISCARD SAFETY)
+
+  🐛 CRASH: currentHand is incremented to 8 before the "> 7" check that ends
+     the game, and is never brought back. Every later updateUI() read
+     handReqs[8] and threw on .short. Clicking View Game on the final screen
+     crashed the render. The header also read "Hand 8" during hand 7's
+     scoring. updateUI now handles the game-over state and shows "Complete".
+
+  🐛 AI: dead-sequence cards were discarded on sight. A card being dead to the
+     AI says nothing about what it does for an opponent one card from going
+     out — in one game Habot discarded a 3 that its own evaluation had already
+     flagged as extending Jabot's published ladder, while Jabot held a single
+     card. Jabot took it, extended, and won on the spot.
+
+     Dead cards that would extend a published sequence for a player holding
+     three or fewer cards are now withheld, and if every dead card is
+     dangerous the AI falls through to normal discard scoring rather than
+     handing over the most useful one.
 
   🎮 VERSION 5.2.11 - PRODUCTION BASELINE (NO POINTLESS CHOICES)
 
@@ -4799,7 +4818,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.2.11 reload', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.2.12 reload', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -5874,6 +5893,8 @@
             }
 
             getPublishProgress() {
+                // 🔧 v5.2.12: no progress to report once the game is over
+                if (this.currentHand > 7) return null;
                 const req = this.handReqs[this.currentHand].seqs;
                 const needTriples = req.filter(s => s === 'triple').length;
                 const needLadders = req.filter(s => s === 'ladder').length;
@@ -6158,6 +6179,9 @@
             canPublish(pIdx) {
                 // 🔧 v5.1.6: delegates to the shared solver — the button can no
                 // longer promise something the assignment can't deliver.
+                // 🔧 v5.2.12: nothing is publishable once the game is over, and
+                // handReqs[8] does not exist.
+                if (this.currentHand > 7) return false;
                 const hand = this.playerHands[pIdx];
                 const req = this.handReqs[this.currentHand].seqs;
                 return this.solvePublishAssignment(hand, req) !== null;
@@ -7538,6 +7562,25 @@
                 return val;
             }
 
+            // 🔧 v5.2.12: would discarding this card let an opponent who is close
+            // to going out extend a published sequence? Only considers opponents
+            // with 3 or fewer cards left — before that, feeding them costs tempo
+            // but does not lose the hand outright.
+            wouldGiftEndgame(pIdx, card) {
+                for (let opp = 0; opp < this.players; opp++) {
+                    if (opp === pIdx) continue;
+                    if (this.playerHands[opp].length > 3) continue;
+                    if (!this.publishedSequences[opp] || this.publishedSequences[opp].length === 0) continue;
+                    for (const seq of this.publishedSequences[opp]) {
+                        if (this.canAddToPublishedSequence(card, seq)) {
+                            console.log(`%c      ⚠️ v5.2.12: ${card.toString()} would extend a published sequence for a player holding ${this.playerHands[opp].length} card(s)`, 'color: #e74c3c;');
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
             findWorstCard(pIdx) {
                 let hand = this.playerHands[pIdx];  // 🐛 v4.0.7: Changed to 'let' to allow reassignment
 
@@ -7545,10 +7588,23 @@
                 const deadCards = hand.filter(c => c.deadSequence === true);
                 if (deadCards.length > 0) {
                     console.log(`%c🔄 v5.1.1: Found ${deadCards.length} DEAD sequence cards - prioritizing discard`, 'color: #e74c3c; font-weight: bold;');
-                    // Return the highest value dead card
                     deadCards.sort((a, b) => this.cardValue(b.rank) - this.cardValue(a.rank));
-                    console.log(`      → Discarding dead card: ${deadCards[0].toString()}`);
-                    return deadCards[0];
+
+                    // 🔧 v5.2.12: don't hand the game away. A card being dead to US
+                    // says nothing about what it does for an opponent who is one
+                    // card from going out. Filter dead cards that would extend a
+                    // published sequence belonging to a player in the endgame.
+                    const safeDead = deadCards.filter(c => !this.wouldGiftEndgame(pIdx, c));
+                    if (safeDead.length > 0) {
+                        if (safeDead.length < deadCards.length) {
+                            console.log(`%c      🛡️ v5.2.12: withheld ${deadCards.length - safeDead.length} dead card(s) that would feed a player near going out`, 'color: #f39c12; font-weight: bold;');
+                        }
+                        console.log(`      → Discarding dead card: ${safeDead[0].toString()}`);
+                        return safeDead[0];
+                    }
+                    // Every dead card is dangerous — fall through to normal scoring
+                    // rather than blindly discarding the most helpful one.
+                    console.log(`%c      🛡️ v5.2.12: every dead card would feed a near-winner — using normal discard scoring instead`, 'color: #f39c12; font-weight: bold;');
                 }
                 
                 // 🔄 v5.1.5 PHASE 1: PENALTY AWARENESS (Strategy Guide)
@@ -10719,16 +10775,32 @@
             }
 
             updateUI() {
-                const req = this.handReqs[this.currentHand];
-                document.getElementById('currentHand').textContent = this.currentHand;
+                // 🔧 v5.2.12: currentHand is incremented to 8 before the "> 7"
+                // check that ends the game, and never comes back. Any updateUI()
+                // after that read handReqs[8] and threw on .short — which is what
+                // crashed the View Game button on the final screen.
+                const gameOver = this.currentHand > 7;
+                const req = this.handReqs[this.currentHand] || this.handReqs[7];
+                document.getElementById('currentHand').textContent = gameOver ? '7' : this.currentHand;
                 // 🎯 v4.6: Use abbreviated name for compact header
-                document.getElementById('handRequirements').textContent = req.short || req.name;
+                document.getElementById('handRequirements').textContent = gameOver ? 'Complete' : (req.short || req.name);
                 // 🎯 v4.6: Show turn counter in header
                 document.getElementById('turnCounter').textContent = this.turnCounter;
                 // v5.2.0: keep the mercy badge and skip-buy option in step with state
                 if (typeof updateMercyBadge === 'function') updateMercyBadge(this);
                 if (typeof updateNoBuyVisibility === 'function') updateNoBuyVisibility(this);
                 const progress = this.getPublishProgress();
+                // 🔧 v5.2.12: game over — nothing to report, and every field below
+                // would read off undefined.
+                if (!progress) {
+                    const doneEl = document.getElementById('detailedRequirements');
+                    if (doneEl) {
+                        doneEl.textContent = 'Game complete';
+                        doneEl.style.color = '#ffed4e';
+                        doneEl.classList.remove('ready');
+                    }
+                    return;
+                }
                 let progressParts = [];
                 if (progress.needTriples > 0) progressParts.push(`${progress.hasTriples}/${progress.needTriples} triples`);
                 if (progress.needLadders > 0) progressParts.push(`${progress.hasLadders}/${progress.needLadders} ladders`);
