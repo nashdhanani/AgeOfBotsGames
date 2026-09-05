@@ -2,11 +2,40 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 5.2.13 - Production Baseline Edition (single-gate publish & extension)
+  Version: 5.2.14 - Production Baseline Edition (AI telemetry)
   Release Date: September 5, 2026
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025-2026 AgeOfBotsGames LLC. All rights reserved.
+
+  🎮 VERSION 5.2.14 - PRODUCTION BASELINE (AI TELEMETRY)
+
+  Instrumentation-only release. No gameplay logic changed; v5.2.13's fixes are
+  untouched. The point is to make Habot's and Jabot's play measurable before
+  the v3 personality weights get tuned.
+
+  📊 NEW: per-hand telemetry. One compact line per AI turn (turn, hand size,
+     draw source, publish state, card dropped and why, extensions so far, buys
+     left), and a plain-text table at the end of every hand covering turns
+     taken, draw-source split, buys used, publish turn, hand size at publish,
+     cards played, which publish path fired (solver / reserved / urgent /
+     manual), ladder lengths, penalty points shed, extensions split by own
+     versus others' sequences, dead discards, and final penalty.
+
+     These are exactly the quantities the v3 weight vector is defined over:
+     tempo (publish turn, hand size at publish), liquidity (extensions, split
+     by target), ladderLength, penaltyShed, and denial (draw-source split).
+     Plain text rather than console.table so a hand copies cleanly out of
+     DevTools.
+
+  🔇 CHANGED: two render-loop statements are now gated behind a flag - the
+     v4.6 ladder de-duplication line and the buy-button colour line. In a
+     single hand-7 log they accounted for roughly 240 of the lines, none of
+     them from a decision point, which made everything else unreadable.
+     Nothing was deleted: hpVerbose(true) restores them.
+
+  🔧 CONSOLE: hpVerbose(true|false) toggles the render logs. hpDump()
+     reprints every hand table collected in the session.
 
   🎮 VERSION 5.2.13 - PRODUCTION BASELINE (SINGLE-GATE PUBLISH & EXTENSION)
 
@@ -4175,8 +4204,9 @@
         // 🔧 v5.2.13: the file name no longer tracks the build (v5.2.12 and
         // v5.2.13 were both written over habib_punja_v5_2_11.html to avoid
         // rewriting every reference), so the console prefix lies. This does not.
-        const BUILD = 'v5.2.13';
+        const BUILD = 'v5.2.14';
         console.log('%c🏷️ Habib Punja ' + BUILD, 'font-weight:bold;font-size:14px;color:#27ae60');
+        console.log('%c   hpVerbose(true) restores per-frame render logs · hpDump() reprints hand tables', 'color:#64748b;font-size:11px');
 
         // ============================================================================
         // 🎮 HABIB PUNJA v3.0 - THE CLEAN ARCHITECTURE EDITION
@@ -4199,6 +4229,146 @@
         const DEBUG_MODE = urlParams.get('debug') === 'true';
 
         // Enhanced console logging that respects debug mode
+
+        // ============================================================================
+        // 📊 TELEMETRY v5.2.14 - AI PLAY-QUALITY INSTRUMENTATION
+        // ============================================================================
+        // Collects the per-hand metrics that map onto the personality weights
+        // planned for v3 (tempo, liquidity, denial, ladderLength, penaltyShed):
+        // how fast each bot publishes, what it spends to do it, how much it sheds
+        // by extension afterwards, and what it is still holding when the hand ends.
+        //
+        // Output is one compact line per AI turn plus a plain-text table per hand.
+        // Plain text rather than console.table so it copies cleanly out of DevTools.
+        //
+        // Console commands:
+        //   hpVerbose(true)  - restore the per-frame render logs (off by default)
+        //   hpDump()         - reprint every hand's table collected this session
+        // ============================================================================
+        const HP_NAMES = ['You', 'Habot', 'Jabot'];
+
+        // 🔇 v5.2.14: two statements accounted for most of the console volume -
+        // the ladder de-duplication line and the buy-button colour line, both fired
+        // from the render loop rather than from any decision. Nothing is deleted;
+        // they are gated so a hand's log stays readable. hpVerbose(true) restores them.
+        let HP_VERBOSE = false;
+        const hpNoisy = (...args) => { if (HP_VERBOSE) console.log(...args); };
+        window.hpVerbose = (on = true) => {
+            HP_VERBOSE = !!on;
+            console.log(`%c🔊 v5.2.14: verbose render logging ${HP_VERBOSE ? 'ON' : 'OFF'}`, 'color:#8b5cf6;font-weight:bold');
+        };
+
+        const Telemetry = {
+            hand: null,
+            history: [],
+
+            blank() {
+                return {
+                    turns: 0, drawDeck: 0, drawDiscard: 0, buys: 0,
+                    publishTurn: null, handAtPublish: null, cardsOut: 0,
+                    path: null, ladderLens: [], penaltyShed: 0,
+                    extOwn: 0, extOpp: 0, deadDiscards: 0, fedOpponent: 0,
+                    lastDraw: '-', finalPenalty: null, won: false
+                };
+            },
+
+            startHand(n, reqLabel) {
+                this.hand = { n, req: reqLabel || '', p: [this.blank(), this.blank(), this.blank()] };
+                console.log(`%c\n📊 ═══ TELEMETRY: HAND ${n} ${reqLabel || ''} ═══`, 'color:#8b5cf6;font-weight:bold;font-size:13px');
+            },
+
+            turn(ai) { if (this.hand) this.hand.p[ai].turns++; },
+            draw(ai, src) {
+                if (!this.hand) return;
+                const s = this.hand.p[ai];
+                s.lastDraw = src;
+                if (src === 'deck') s.drawDeck++; else s.drawDiscard++;
+            },
+            buy(ai) { if (this.hand) this.hand.p[ai].buys++; },
+
+            extend(ai, targetPlayer) {
+                if (!this.hand) return;
+                if (ai === targetPlayer) this.hand.p[ai].extOwn++;
+                else this.hand.p[ai].extOpp++;
+            },
+
+            publish(ai, turn, handBefore, sequences, path) {
+                if (!this.hand) return;
+                const s = this.hand.p[ai];
+                s.publishTurn = turn;
+                s.handAtPublish = handBefore;
+                s.path = path;
+                const flat = sequences.flat();
+                s.cardsOut = flat.length;
+                s.penaltyShed = flat.reduce((a, c) => a + c.getPenaltyValue(), 0);
+                s.ladderLens = sequences
+                    .filter(q => q.length >= 4 && !q.every(c => c.rank === q[0].rank))
+                    .map(q => q.length);
+                console.log(`%c📊 PUBLISH  ${HP_NAMES[ai]} @T${turn} │ hand ${handBefore} → ${handBefore - flat.length} │ ${flat.length} cards out │ ${s.penaltyShed}pts shed │ path:${path}`,
+                    'color:#27ae60;font-weight:bold');
+            },
+
+            // One line per AI turn. Everything needed to read tempo and selectivity
+            // at a glance without unfolding the decision tree.
+            turnLine(ai, turn, handSize, card, reason, buysLeft) {
+                if (!this.hand) return;
+                const s = this.hand.p[ai];
+                if (reason === 'dead') s.deadDiscards++;
+                const pub = s.publishTurn === null ? 'unpub' : `pub@${s.publishTurn}`;
+                console.log(
+                    `%c📊 T${String(turn).padStart(3)} ${HP_NAMES[ai].padEnd(5)} │ ${String(handSize).padStart(2)}c │ ${s.lastDraw.padEnd(7)} │ ${pub.padEnd(7)} │ drop ${card.toString().padEnd(4)} ${(reason || '').padEnd(8)} │ ext ${s.extOwn + s.extOpp} │ buys ${buysLeft}`,
+                    'color:#64748b');
+            },
+
+            fed(ai) { if (this.hand) this.hand.p[ai].fedOpponent++; },
+
+            endHand(winner, penalties, game) {
+                if (!this.hand) return;
+                for (let i = 0; i < 3; i++) {
+                    this.hand.p[i].finalPenalty = (i === winner) ? 0 : (penalties[i] || 0);
+                    this.hand.p[i].won = (i === winner);
+                }
+                this.hand.winner = winner;
+                this.hand.scores = game ? [...game.playerScores] : null;
+                this.history.push(this.hand);
+                this.report(this.hand);
+            },
+
+            row(label, vals, pad = 10) {
+                return '  ' + String(label).padEnd(18) + vals.map(v => String(v === null || v === undefined ? '-' : v).padStart(pad)).join('');
+            },
+
+            report(h) {
+                const P = h.p, L = [];
+                L.push(`\n═══ HAND ${h.n} ${h.req} — TELEMETRY ${'═'.repeat(26)}`);
+                L.push('  ' + ''.padEnd(18) + ['You', 'Habot', 'Jabot'].map(n => n.padStart(10)).join(''));
+                L.push(this.row('turns taken', P.map(p => p.turns)));
+                L.push(this.row('draw: deck', P.map(p => p.drawDeck)));
+                L.push(this.row('draw: discard', P.map(p => p.drawDiscard)));
+                L.push(this.row('buys used', P.map(p => p.buys)));
+                L.push(this.row('published on turn', P.map(p => p.publishTurn === null ? 'NEVER' : 'T' + p.publishTurn)));
+                L.push(this.row('  hand at publish', P.map(p => p.handAtPublish)));
+                L.push(this.row('  cards played', P.map(p => p.cardsOut || '-')));
+                L.push(this.row('  publish path', P.map(p => p.path || '-')));
+                L.push(this.row('  ladder lengths', P.map(p => p.ladderLens.length ? p.ladderLens.join('/') : '-')));
+                L.push(this.row('  penalty shed', P.map(p => p.penaltyShed || '-')));
+                L.push(this.row('extensions', P.map(p => p.extOwn + p.extOpp)));
+                L.push(this.row('  onto own', P.map(p => p.extOwn)));
+                L.push(this.row('  onto others', P.map(p => p.extOpp)));
+                L.push(this.row('dead discards', P.map(p => p.deadDiscards)));
+                L.push(this.row('FINAL PENALTY', P.map(p => p.finalPenalty)));
+                if (h.scores) L.push(this.row('running total', h.scores));
+                L.push(`  WINNER: ${HP_NAMES[h.winner]}`);
+                L.push('═'.repeat(56));
+                console.log('%c' + L.join('\n'), 'color:#8b5cf6;font-family:monospace');
+            }
+        };
+
+        window.hpDump = () => {
+            if (!Telemetry.history.length) { console.log('No completed hands yet.'); return; }
+            Telemetry.history.forEach(h => Telemetry.report(h));
+        };
+
         const debugLog = {
             info: (...args) => { if (DEBUG_MODE) console.log(...args); },
             warn: (...args) => { if (DEBUG_MODE) console.warn(...args); },
@@ -4903,7 +5073,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.2.13 reload', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.2.12 reload', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -5033,7 +5203,7 @@
                     buyBtn.classList.add('buy-human');
                     buyBtn.disabled = false;
                     buyBtn.innerHTML = `✅ Buy`;
-                    console.log(`%c🟢 Buy button: GREEN (Human can buy)`, 'color: #3ddc84; font-weight: bold;');
+                    hpNoisy(`%c🟢 Buy button: GREEN (Human can buy)`, 'color: #3ddc84; font-weight: bold;');
                     
                     // 🔄 v5.1.5: Add Pass button next to Buy
                     const declineBtn = document.createElement('button');
@@ -5053,14 +5223,14 @@
                     buyBtn.classList.add('buy-ai');
                     buyBtn.disabled = true;
                     buyBtn.innerHTML = `⏳ AI... ${timerText}`;
-                    console.log(`%c🟡 Buy button: YELLOW (AI buy window)`, 'color: #f59e0b; font-weight: bold;');
+                    hpNoisy(`%c🟡 Buy button: YELLOW (AI buy window)`, 'color: #f59e0b; font-weight: bold;');
                     break;
                 case 'inactive':
                 default:
                     buyBtn.classList.add('buy-inactive');
                     buyBtn.disabled = true;
                     buyBtn.innerHTML = `✗ Buy <span id="buyTimer" style="display:none;"></span>`;
-                    console.log(`%c🔴 Buy button: RED (No buy window)`, 'color: #ef4444; font-weight: bold;');
+                    hpNoisy(`%c🔴 Buy button: RED (No buy window)`, 'color: #ef4444; font-weight: bold;');
                     break;
             }
         }
@@ -5155,6 +5325,7 @@
                 this.lastDiscard = null; this.justPublished = false;
                 this.lastDiscardByPlayer = -1; this.aiJustPublished = [false, false, false];
                 this.turnCounter = 0;
+                this._discardReason = [null, null, null];   // 📊 v5.2.14
                 this.buyWindow = { active: false, card: null, discardingPlayer: -1, buyWindowPlayer: -1, expiresAt: 0, timerInterval: null, pendingDeckDraw: null };
                 this.pendingPassedDiscard = null; // 🔄 v5.1.5: Deferred buy window after human passes on discard
                 this.lastBuyWindowCardId = null; // 🔄 v5.1.5: Track which card already had a buy window
@@ -5780,6 +5951,9 @@
             }
 
             deal() {
+                // 📊 v5.2.14
+                Telemetry.startHand(this.currentHand, this.handReqs[this.currentHand] ? this.handReqs[this.currentHand].short : '');
+
                 // 🎯 v2.5.0: Reset last card alerts for new hand
                 this.lastCardAlertShown = [false, false, false];
 
@@ -6095,7 +6269,7 @@
                     }
                 });
 
-                console.log(`%c🎯 v4.6: De-duplicated ${ladders.length} ladders → ${uniquePatterns.size} unique patterns`, 'color:#3b82f6;font-weight:bold');
+                hpNoisy(`%c🎯 v4.6: De-duplicated ${ladders.length} ladders → ${uniquePatterns.size} unique patterns`, 'color:#3b82f6;font-weight:bold');
                 return Array.from(uniquePatterns.values());
             }
 
@@ -6581,6 +6755,8 @@
 
                 this.publishedSequences[pIdx] = sequences;
 
+                Telemetry.publish(pIdx, this.turnCounter, hand.length + sequences.flat().length, sequences,
+                    opts.urgent ? 'urgent' : (needTriples > 0 && needLadders > 0 ? 'reserved' : 'solver'));   // 📊 v5.2.14
                 console.log(`%c🎯 v5.2.13: Published ${sequences.length} sequence(s) for Player ${pIdx}`, 'color: #27ae60; font-weight: bold;');
                 sequences.forEach((seq, i) => {
                     console.log(`  Sequence ${i + 1}: ${seq.map(c => c.toString()).join(' ')}`);
@@ -7575,6 +7751,7 @@
                             console.log(`%c      🛡️ v5.2.12: withheld ${deadCards.length - safeDead.length} dead card(s) that would feed a player near going out`, 'color: #f39c12; font-weight: bold;');
                         }
                         console.log(`      → Discarding dead card: ${safeDead[0].toString()}`);
+                        this._discardReason[pIdx] = 'dead';   // 📊 v5.2.14
                         return safeDead[0];
                     }
                     // Every dead card is dangerous — fall through to normal scoring
@@ -7606,6 +7783,7 @@
                         // Sort by penalty value descending (Ace=20, then K/Q/J=15)
                         unprotectedHighPenalty.sort((a, b) => b.getPenaltyValue() - a.getPenaltyValue());
                         console.log(`%c💣 v5.1.5: ${aiName} penalty awareness - shedding ${unprotectedHighPenalty[0].toString()} (${unprotectedHighPenalty[0].getPenaltyValue()}pts, risk: ${(riskFactor * 100).toFixed(0)}%)`, 'color: #e74c3c; font-weight: bold;');
+                        this._discardReason[pIdx] = 'penalty';   // 📊 v5.2.14
                         return unprotectedHighPenalty[0];
                     }
                 }
@@ -9065,6 +9243,7 @@
                                 this.playerHands[aiPlayer].push(penalty);
                             }
                             this.playerBuys[aiPlayer]--;
+                            Telemetry.buy(aiPlayer);   // 📊 v5.2.14
                             showBuyToast(aiName, card);
                             this.updateUI();
                             
@@ -9123,6 +9302,7 @@
                 const statusId = ai === 1 ? 'habot' : 'jabot';
 
                 console.log(`%c🤖 ${aiName} starting turn`, 'color: #3498db; font-weight: bold;');
+                Telemetry.turn(ai);   // 📊 v5.2.14
                 
                 // 🌸 v5.1.0: Emit AI turn started event (with turn counter for special events)
                 eventBus.emit('ai_turn_started', { player: ai, name: aiName, turn: this.turnCounter });
@@ -9453,6 +9633,7 @@
                         } else {
                             const drawnCard = this.discardPile.pop();
                             this.playerHands[ai].push(drawnCard);
+                            Telemetry.draw(ai, 'discard');   // 📊 v5.2.14
                             this.discardPileAccessible = false; // 🔒 v4.1.3: Lock vault after taking card
 
                             // ✅ FIX 2: Show specific toast when AI takes card during buy window
@@ -9489,6 +9670,7 @@
                         console.log(`     shouldTake: ${shouldTake}`);
 
                         console.log(`%c  ${aiName} drawing from deck...`, 'color: #3498db;');
+                        Telemetry.draw(ai, 'deck');   // 📊 v5.2.14
                         this.setAIStatus(statusId, `Drawing from deck...`);
                         this.handleDeckDraw(ai, statusId);
                         return;
@@ -9781,6 +9963,7 @@
                         const cardToDrop = this.playerHands[ai].find(c => c.rank === worstPairRank);
                         const dropIndex = this.playerHands[ai].indexOf(cardToDrop);
                         this.playerHands[ai].splice(dropIndex, 1);
+                        Telemetry.turnLine(ai, this.turnCounter, this.playerHands[ai].length, cardToDrop, 'excess-pair', this.playerBuys[ai]);   // 📊 v5.2.14
                         this.discardPile.push(cardToDrop);
                         this.discardPileAccessible = true; // 🔒 v4.1.3: Unlock vault
 
@@ -9960,6 +10143,9 @@
                     const idx = this.playerHands[ai].findIndex(c => c.id === worst.id);
                     if (idx > -1) {
                         this.playerHands[ai].splice(idx, 1);
+                        Telemetry.turnLine(ai, this.turnCounter, this.playerHands[ai].length, worst,
+                            this._discardReason[ai] || 'worst', this.playerBuys[ai]);   // 📊 v5.2.14
+                        this._discardReason[ai] = null;
                         this.discardPile.push(worst);
                         this.trackDiscardedCard(worst); // 🔄 v5.1.1: Track in matrix
                         this.discardPileAccessible = true; // 🔒 v4.1.3: Unlock vault
@@ -10164,6 +10350,7 @@
                                     
                                     this.playerHands[aiIdx].splice(i, 1);
                                     extendedSequence = true;
+                                    Telemetry.extend(aiIdx, p);   // 📊 v5.2.14
                                     console.log(`  ✅ v4.6: Extended ${['You', 'Habot', 'Jabot'][p]}'s ladder sequence ${seqIdx + 1} with ${card.toString()}`);
                                     
                                     const aiName = aiIdx === 1 ? 'Habot' : 'Jabot';
@@ -10199,6 +10386,8 @@
                     this.playerScores[i] += score;
                 }
                 
+                Telemetry.endHand(winner, handPenalties, this);   // 📊 v5.2.14
+
                 // 🌸 v5.1.0: Emit hand won event
                 eventBus.emit('hand_won', { winner, name: winnerName, hand: this.currentHand });
                 
@@ -11432,6 +11621,7 @@
 
             game.publishedSequences[0] = sequences;
 
+            Telemetry.publish(0, game.turnCounter, game.playerHands[0].length + sequences.flat().length, sequences, 'manual');   // 📊 v5.2.14
             console.log(`%c🎯 v4.6: Published ${sequences.length} sequences with smart-assigned cards`, 'color: #27ae60; font-weight: bold;');
             sequences.forEach((seq, i) => {
                 console.log(`  Sequence ${i + 1}: ${seq.map(c => c.toString() + '(' + c.id.substring(0, 4) + ')').join(' ')}`);
