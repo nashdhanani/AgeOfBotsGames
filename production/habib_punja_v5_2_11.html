@@ -2,11 +2,90 @@
 <html lang="en">
 <!--
   Habib Punja - Strategic AI Card Game
-  Version: 5.2.12 - Production Baseline Edition (endgame discard safety)
-  Release Date: August 29, 2026
+  Version: 5.2.13 - Production Baseline Edition (single-gate publish & extension)
+  Release Date: September 5, 2026
   Developer: AgeOfBotsGames LLC
   Website: https://ageofbotsgames.com
   Copyright © 2025-2026 AgeOfBotsGames LLC. All rights reserved.
+
+  🎮 VERSION 5.2.13 - PRODUCTION BASELINE (SINGLE-GATE PUBLISH & EXTENSION)
+
+  Theme: two decisions in this game had two implementations each, and in both
+  cases the second implementation was the one that never called the shared
+  validator. Both are now single-gate.
+
+  🐛 LADDER: Habot extended its own 7♦-8♦-9♦-10♦-J♦-Q♦-K♦-A♦ ladder with a
+     SECOND A♦, published as A♦-A♦ on the table. The extension applier
+     reimplemented canCardExtendLadder() inline and got the wrap case wrong:
+     `cardVal === 1 && maxVal === 13` accepts an Ace onto any ladder ending in
+     a King — including one whose King is already followed by an Ace. The
+     shared validator had the correct guard (`if (cardVal === 1) return false`)
+     the whole time; the Ace never reached it. Diagnostic tell: every other
+     candidate logged a FIX 1 line, the Ace logged none.
+
+     The applier now calls canCardExtendLadder() and nothing else. Added a
+     duplicate-rank guard inside the validator, and assertLadderValid() as a
+     post-condition on every ladder mutation, so a corruption is loud at the
+     point of failure instead of ten turns later.
+
+  🐛 AI: Jabot sat at 14-15 cards from turn 80 to turn 90, re-running a
+     publish that failed identically every time, three times per turn.
+
+     canPublish() delegates to solvePublishAssignment() (backtracking).
+     autoPublish() ran its own greedy triples-first builder. They disagree
+     whenever a triple candidate is also a ladder connector. Jabot held
+     6♠ 6♠ 6♥ 6♦ alongside a 3♠-4♠-5♠-6♠-7♠ run: greedy spent BOTH black sixes
+     on the triple, leaving a gap at six and no ladder. The solver takes
+     6♠ 6♥ 6♦ and keeps the second 6♠ for the ladder. So canPublish() said YES,
+     autoPublish() said NO, and PATCH 3/PATCH 4 kept asking forever.
+
+     This is exactly the defect v5.1.6 fixed for separateSequences(); it was
+     never applied to autoPublish(). It is now: the greedy generic path (243
+     lines) is gone and autoPublish() delegates to the solver.
+
+  ✨ AI: strategic triple selection preserved via reservation. On mixed
+     triple+ladder hands (2, 5, 6) the solver runs first, its ladder cards are
+     RESERVED — proven rather than guessed, which is where v4.7's
+     getProtectedLadderCards() went wrong — and pickTriplesStrategically()
+     then chooses triples from the free pool, keeping the opponent-rank and
+     depleted-rank preferences the greedy builder had. Cannot fail: the free
+     pool always contains the solver's own triples. Ladders are grown LAST, so
+     a growing ladder can no longer swallow a card a triple needs.
+
+  ✨ AI: opts.urgent. When an opponent has published and holds three or fewer
+     cards (opponentNearOut()), autoPublish() takes the first legal assignment
+     and skips strategic re-picking. Getting cards on the table beats
+     optimizing them.
+
+  🐛 AI: PATCH 2's hand-size guard was in the wrong function. `blockBuying`
+     gated only the in-turn take, which is net zero (one card in, one card out
+     at end of turn) and never caused bloat. The actual bloat path is the
+     out-of-turn buy in aiConsiderBuy(), which adds the bought card AND a
+     penalty card — and shouldAllowBuy() had no hand-size guard at all. So the
+     rule did nothing except force a bloated AI to draw at random, which is
+     what kept it bloated. The >= 13 guard now lives in shouldAllowBuy(); the
+     take-block is deleted, since wouldDiscardImmediately() already does the
+     useful half.
+
+  🧹 REMOVED: getProtectedLadderCards() and the v5.1.5w ladder-endpoint
+     trimming. Both existed only to stop the greedy builder stealing ladder
+     cards; the solver's backtracking makes them structurally unnecessary.
+     separateSequences() is now unreachable but retained pending review.
+
+  🔧 BUILD: the file name no longer tracks the build — v5.2.12 and v5.2.13
+     were both written over habib_punja_v5_2_11.html to avoid rewriting every
+     reference, so the console's file prefix lies. A BUILD banner now logs the
+     real version at boot.
+
+  ✅ VERIFIED: 18 harness tests over the extracted solver and validator,
+     including Jabot's actual turn-81 hand (returns triple 6♠ 6♥ 6♦ + ladder
+     3♠ 4♠ 5♠ 6♠), confirmation that greedy's pick leaves zero ladders, the
+     Ace guard in both directions (rejects the duplicate, still accepts a
+     genuine K-A wrap), and 3,000 random hands x 3 requirement sets producing
+     205 assignments, all structurally legal.
+
+  ⚠️ UNTESTED: anything requiring the DOM. The reservation layer, the urgent
+     path and the buy-guard move have not yet run a live turn.
 
   🎮 VERSION 5.2.12 - PRODUCTION BASELINE (ENDGAME DISCARD SAFETY)
 
@@ -4093,6 +4172,12 @@
 
 
     <script>
+        // 🔧 v5.2.13: the file name no longer tracks the build (v5.2.12 and
+        // v5.2.13 were both written over habib_punja_v5_2_11.html to avoid
+        // rewriting every reference), so the console prefix lies. This does not.
+        const BUILD = 'v5.2.13';
+        console.log('%c🏷️ Habib Punja ' + BUILD, 'font-weight:bold;font-size:14px;color:#27ae60');
+
         // ============================================================================
         // 🎮 HABIB PUNJA v3.0 - THE CLEAN ARCHITECTURE EDITION
         // ============================================================================
@@ -4818,7 +4903,7 @@
         // ============================================================================
         // GAME METADATA & BRANDING
         // ============================================================================
-        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.2.12 reload', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
+        console.log('%c🎮 HABIB PUNJA: STRATEGIC 7-HAND WAR v5.2.13 reload', 'color: #ff0000; font-size: 20px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3)');
         console.log('%c🌸 Lotus Mind: EventBus + BubbleManager + BanterEngine', 'color: #9b59b6; font-weight: bold;');
         console.log('%c🎬 YouTube Playables Ready | 4 Characters: 🐇 Habot | 🐢 Jabot | 🧘 MuBot | 🃏 Joko', 'color: #ffd700; font-weight: bold;');
         console.log('%c🚫 Depleted Rank Tracking | 🛡️ Ladder Protection | 📝 Grammar Fix', 'color: #3498db; font-size: 12px;');
@@ -5468,27 +5553,10 @@
                 return runs;
             }
             
-            getProtectedLadderCards(hand, pIdx) {
-                const requirements = this.getHandRequirements();
-                const protectedIds = new Set();
-                
-                // Only protect if this hand requires ladders
-                if (!requirements.needsLadder) return protectedIds;
-                
-                const runs = this.findConsecutiveRuns(hand);
-                
-                // Protect cards in runs of 4+ (strong ladder potential)
-                for (const run of runs) {
-                    if (run.length >= 4) {
-                        for (const card of run.cards) {
-                            protectedIds.add(card.id);
-                            console.log(`%c🛡️ v4.7: Protecting ${card.toString()} - part of ${run.length}-card ladder`, 'color: #3498db; font-weight: bold;');
-                        }
-                    }
-                }
-                
-                return protectedIds;
-            }
+            // 🔧 v5.2.13: getProtectedLadderCards() removed. It guessed which
+            // cards a ladder might need so the greedy builder wouldn't steal them;
+            // the solver now proves it. Its last call site went with the greedy path.
+
             
             // Check if a card can extend any published sequence (for stealth card evaluation)
             canCardExtendAnyPublished(card) {
@@ -6047,7 +6115,7 @@
             // separateSequences() asks it for the answer. They cannot diverge.
             //
             // Returns: array of sequences (2D) or null if no legal assignment.
-            solvePublishAssignment(cards, requirements) {
+            solvePublishAssignment(cards, requirements, opts = {}) {
                 if (!cards || cards.length === 0) return null;
                 const needTriples = requirements.filter(s => s === 'triple').length;
                 const needLadders = requirements.filter(s => s === 'ladder').length;
@@ -6115,6 +6183,11 @@
 
                 const solution = assignTriples(0, new Set(), [], 0);
                 if (!solution) return null;
+
+                // 🔧 v5.2.13: structured mode returns the raw assignment with
+                // UNGROWN ladders, so autoPublish() can re-pick triples from the
+                // unreserved cards and grow the ladders afterwards.
+                if (opts.structured) return solution;
 
                 // ── Grow ladders with leftover cards ──────────────────────
                 // The search finds minimum 4-card ladders. v5.1.5 published
@@ -6371,7 +6444,7 @@
                 return sequences;
             }
 
-            autoPublish(pIdx) {
+            autoPublish(pIdx, opts = {}) {
                 // 🛡️ FIX 6: CRITICAL - Block republishing!
                 if (this.publishedSequences[pIdx].length > 0) {
                     console.log(`⏭️ FIX 6: Player ${pIdx} already has ${this.publishedSequences[pIdx].length} published sequences - blocking republish`);
@@ -6437,249 +6510,144 @@
                     }
                 }
 
+                // 🔧 v5.2.13: delegate to the shared solver. The greedy
+                // triple-first builder that lived here disagreed with
+                // canPublish() on any hand where a triple candidate was also a
+                // ladder connector (6♠ 6♠ 6♥ 6♦ alongside a 4♠-5♠-6♠-7♠ run):
+                // it spent BOTH black sixes on the triple, then found no ladder.
+                // canPublish() said YES, autoPublish() said NO, and PATCH 3/4
+                // re-asked three times a turn forever. This is the v5.1.6 fix,
+                // finally applied here.
+                //
+                // Deleted with it: the v4.7 protectedIds machinery and the
+                // v5.1.5w ladder-endpoint trimming. Both existed only to stop
+                // the greedy builder stealing ladder cards. The solver's
+                // backtracking makes them structurally unnecessary.
                 const req = this.handReqs[this.currentHand].seqs;
                 const hand = this.playerHands[pIdx];
-                const opponentRanks = new Set();
+                const needTriples = req.filter(s => s === 'triple').length;
+                const needLadders = req.filter(s => s === 'ladder').length;
 
-                const opponentSuits = new Set();
-                for (let i = 0; i < this.players; i++) {
-                    if (i !== pIdx) {
-                        this.getPublishedRanks(i).forEach(r => opponentRanks.add(r));
-                        this.getPublishedSuits(i).forEach(s => opponentSuits.add(s));
-                    }
-                }
-                
-                // 🛡️ v4.7: Get protected ladder cards BEFORE selecting triples
-                const laddersNeeded = req.filter(s => s === 'ladder').length;
-                let protectedIds = new Set();
-                if (laddersNeeded > 0) {
-                    protectedIds = this.getProtectedLadderCards(hand, pIdx);
-                    console.log(`%c🛡️ v4.7: autoPublish protecting ${protectedIds.size} ladder cards`, 'color: #3498db; font-weight: bold;');
-                }
-                
-                // 🚫 v4.7: Get depleted ranks
-                const depletedRanks = this.getDepletedRanks();
-                
-                let published = [];
-                const usedCardIds = new Set();
-                let triplesPublished = 0;
-                let laddersPublished = 0;
-                const triplesNeeded = req.filter(s => s === 'triple').length;
-                
-                while (triplesPublished < triplesNeeded) {
-                    // 🛡️ v4.7: Exclude protected ladder cards AND depleted ranks from triple candidates
-                    const availableHand = hand.filter(c => 
-                        !usedCardIds.has(c.id) && 
-                        !protectedIds.has(c.id) &&
-                        !depletedRanks.includes(c.rank)
-                    );
-                    
-                    // 🐛 v4.7 DEBUG: Log filtering results
-                    console.log(`%c🔍 v4.7 DEBUG: Building triple - hand has ${hand.length} cards`, 'color: #9b59b6;');
-                    console.log(`   Protected IDs: [${Array.from(protectedIds).join(', ')}]`);
-                    console.log(`   Available after filtering: ${availableHand.length} cards`);
-                    hand.forEach(c => {
-                        const isProtected = protectedIds.has(c.id);
-                        const isUsed = usedCardIds.has(c.id);
-                        if (isProtected) {
-                            console.log(`   🛡️ ${c.toString()} (id:${c.id}) - PROTECTED, excluded from triple`);
-                        }
-                    });
-                    
-                    const byRank = {};
-                    availableHand.forEach(c => { if (!byRank[c.rank]) byRank[c.rank] = []; byRank[c.rank].push(c) });
-                    
-                    // 🐛 v4.7 DEBUG: Show what ranks are available for triples
-                    Object.keys(byRank).forEach(rank => {
-                        console.log(`   Rank ${rank}: ${byRank[rank].length} cards - ${byRank[rank].map(c => c.toString()).join(', ')}`);
-                    });
-                    
-                    const ranks = Object.keys(byRank).filter(rank => byRank[rank].length >= 3).sort((a, b) => {
-                        const aOverlap = opponentRanks.has(a) ? 1 : 0;
-                        const bOverlap = opponentRanks.has(b) ? 1 : 0;
-                        if (aOverlap !== bOverlap) return aOverlap - bOverlap;
-                        return parseInt(a === 'A' ? 1 : a === 'J' ? 11 : a === 'Q' ? 12 : a === 'K' ? 13 : a) -
-                            parseInt(b === 'A' ? 1 : b === 'J' ? 11 : b === 'Q' ? 12 : b === 'K' ? 13 : b);
-                    });
-                    
-                    console.log(`   Ranks with 3+ cards: [${ranks.join(', ')}]`);
-                    
-                    // 🛡️ v4.7: If no valid triples found with protection, try without protection (fallback)
-                    if (ranks.length === 0 && protectedIds.size > 0) {
-                        console.log(`%c⚠️ v4.7: No triples without protected cards - trying with all cards`, 'color: #f39c12; font-weight: bold;');
-                        const fallbackHand = hand.filter(c => !usedCardIds.has(c.id) && !depletedRanks.includes(c.rank));
-                        const fallbackByRank = {};
-                        fallbackHand.forEach(c => { if (!fallbackByRank[c.rank]) fallbackByRank[c.rank] = []; fallbackByRank[c.rank].push(c) });
-                        const fallbackRanks = Object.keys(fallbackByRank).filter(rank => fallbackByRank[rank].length >= 3);
-                        if (fallbackRanks.length > 0) {
-                            const rank = fallbackRanks[0];
-                            const cards = fallbackByRank[rank];
-                            console.log(`%c   ⚠️ FALLBACK: Using ${cards.slice(0, 3).map(c => c.toString()).join(', ')} for triple`, 'color: #f39c12;');
-                            published = published.concat(cards.slice(0, 3));
-                            cards.slice(0, 3).forEach(c => usedCardIds.add(c.id));
-                            triplesPublished++;
-                            continue;
-                        }
-                    }
-                    
-                    if (ranks.length === 0) break;
-                    const rank = ranks[0];
-                    const cards = byRank[rank];
-                    console.log(`%c   ✅ Using ${cards.slice(0, 3).map(c => c.toString()).join(', ')} for triple (from ${cards.length} available)`, 'color: #27ae60;');
-                    if (cards.length >= 4) {
-                        published = published.concat(cards.slice(0, 3));
-                        cards.slice(0, 3).forEach(c => usedCardIds.add(c.id));
-                    } else {
-                        published = published.concat(cards.slice(0, 3));
-                        cards.slice(0, 3).forEach(c => usedCardIds.add(c.id));
-                    }
-                    triplesPublished++;
-                }
-                const ladderCardIds = new Set(); // 🔄 v5.1.5w: Track which cards are in ladders
-                while (laddersPublished < laddersNeeded) {
-                    const availableHand = hand.filter(c => !usedCardIds.has(c.id));
-                    const seqs = this.findSequences(availableHand);
-                    if (seqs.ladders.length === 0) break;
-                    seqs.ladders.sort((a, b) => {
-                        const aOverlap = opponentSuits.has(a[0].suit) ? 1 : 0;
-                        const bOverlap = opponentSuits.has(b[0].suit) ? 1 : 0;
-                        if (aOverlap !== bOverlap) return aOverlap - bOverlap;
-                        return a[0].getValue() - b[0].getValue();
-                    });
-                    const ladder = seqs.ladders[0];
-                    published = published.concat(ladder);
-                    ladder.forEach(c => { usedCardIds.add(c.id); ladderCardIds.add(c.id); });
-                    laddersPublished++;
-                }
-                // 🔄 v5.1.5w: LADDER ENDPOINT TRIMMING
-                // If triples requirement isn't met, check if ladder endpoints could complete triples.
-                // Example: Hand has 6 Jacks + ♥6-♥7-♥8-♥9-♥10. Algorithm builds ladder as ♥6-♥7-♥8-♥9-♥10-♥J
-                // (consuming ♥J), leaving only 5 Jacks — not enough for 2 triples.
-                // Fix: trim ♥J from ladder end (still valid 5-card ladder), freeing it for the triple.
-                if (triplesPublished < triplesNeeded && laddersPublished >= laddersNeeded) {
-                    console.log(`%c🔄 v5.1.5w: Triples short (${triplesPublished}/${triplesNeeded}) — checking ladder endpoints for trimmable cards`, 'color: #e67e22; font-weight: bold;');
-                    
-                    let trimmed = true;
-                    while (trimmed && triplesPublished < triplesNeeded) {
-                        trimmed = false;
-                        
-                        // Use tracked ladderCardIds to identify ladder cards in published
-                        const publishedLadderCards = published.filter(c => ladderCardIds.has(c.id));
-                        
-                        // Group by suit to find each ladder
-                        const laddersBySuit = {};
-                        publishedLadderCards.forEach(c => {
-                            if (!laddersBySuit[c.suit]) laddersBySuit[c.suit] = [];
-                            laddersBySuit[c.suit].push(c);
-                        });
-                        
-                        for (const suit of Object.keys(laddersBySuit)) {
-                            const ladderCards = laddersBySuit[suit].sort((a, b) => a.getValue() - b.getValue());
-                            if (ladderCards.length <= 4) continue; // Can't trim below minimum 4 cards
-                            
-                            console.log(`   🔍 v5.1.5w: Checking ${suit} ladder [${ladderCards.map(c => c.toString()).join('-')}] (${ladderCards.length} cards)`);
-                            
-                            // Check both endpoints (high end first — more likely to overlap with triples)
-                            const endpoints = [
-                                { card: ladderCards[ladderCards.length - 1], end: 'high' },
-                                { card: ladderCards[0], end: 'low' }
-                            ];
-                            
-                            for (const { card: endCard, end } of endpoints) {
-                                // Count: how many cards of this rank are unused in hand + this endpoint card
-                                const sameRankUnused = hand.filter(c => 
-                                    c.rank === endCard.rank && !usedCardIds.has(c.id)
-                                );
-                                const sameRankTotal = sameRankUnused.length + 1; // +1 for the endpoint card itself
-                                
-                                if (sameRankTotal >= 3) {
-                                    console.log(`%c   ✂️ v5.1.5w: Trimming ${endCard.toString()} from ${end} end of ${suit} ladder — rank ${endCard.rank} has ${sameRankTotal} cards for triple`, 'color: #e67e22;');
-                                    
-                                    // Remove endpoint card from published
-                                    const idx = published.findIndex(c => c.id === endCard.id);
-                                    if (idx !== -1) published.splice(idx, 1);
-                                    usedCardIds.delete(endCard.id);
-                                    ladderCardIds.delete(endCard.id);
-                                    
-                                    // Build a triple: endpoint card + 2 unused same-rank cards from hand
-                                    const tripleCards = [endCard];
-                                    const available = hand.filter(c => 
-                                        c.rank === endCard.rank && !usedCardIds.has(c.id) && c.id !== endCard.id
-                                    );
-                                    for (let t = 0; t < 2 && t < available.length; t++) {
-                                        tripleCards.push(available[t]);
-                                        usedCardIds.add(available[t].id);
-                                    }
-                                    usedCardIds.add(endCard.id);
-                                    
-                                    if (tripleCards.length >= 3) {
-                                        published.push(...tripleCards);
-                                        triplesPublished++;
-                                        trimmed = true;
-                                        console.log(`%c   ✅ v5.1.5w: Created triple from trimmed card: ${tripleCards.map(c => c.toString()).join(', ')}`, 'color: #27ae60; font-weight: bold;');
-                                        break;
-                                    } else {
-                                        // Restore
-                                        console.log(`%c   ❌ v5.1.5w: Not enough cards for triple — restoring ${endCard.toString()} to ladder`, 'color: #e74c3c;');
-                                        published.push(endCard);
-                                        usedCardIds.add(endCard.id);
-                                        ladderCardIds.add(endCard.id);
-                                        tripleCards.forEach(c => { if (c.id !== endCard.id) usedCardIds.delete(c.id); });
-                                    }
-                                }
-                            }
-                            if (trimmed) break;
-                        }
-                    }
-                }
-                if (triplesPublished < triplesNeeded || laddersPublished < laddersNeeded) return false;
-
-                // 🐛 v4.7 DEBUG: Log what's in published before separateSequences
-                console.log(`%c🔍 v4.7 DEBUG: Published array before separateSequences:`, 'color: #9b59b6; font-weight: bold;');
-                console.log(`   Total cards: ${published.length}`);
-                console.log(`   Cards: ${published.map(c => `${c.toString()}(${c.id})`).join(', ')}`);
-                
-                // Group by rank to see if there's overlap
-                const debugByRank = {};
-                published.forEach(c => {
-                    if (!debugByRank[c.rank]) debugByRank[c.rank] = [];
-                    debugByRank[c.rank].push(c.toString());
-                });
-                Object.entries(debugByRank).forEach(([rank, cards]) => {
-                    if (cards.length >= 3) {
-                        console.log(`   ⚠️ Rank ${rank} has ${cards.length} cards: ${cards.join(', ')}`);
-                    }
-                });
-
-                // 🎯 v4.0.7: Use separateSequences to build 2D structure
-                const sequences = this.separateSequences(published, req);
-
-                // 🔄 v5.1.5 FIX: Validate that separateSequences actually produced sequences.
-                // If it returns 0 or fewer sequences than required, the publish failed.
-                if (!sequences || sequences.length === 0) {
-                    console.log(`%c❌ v5.1.5: separateSequences returned ${sequences ? sequences.length : 0} sequences — publish ABORTED`, 'color: #e74c3c; font-weight: bold;');
+                const solution = this.solvePublishAssignment(hand, req, { structured: true });
+                if (!solution) {
+                    console.log(`%c   ❌ v5.2.13: no legal publish assignment for player ${pIdx}`, 'color: #e74c3c;');
                     return false;
                 }
 
+                let triples = solution.triples;
+
+                // 🔧 v5.2.13: mixed triple+ladder hands only (2, 5, 6).
+                // The solver's ladder cards are RESERVED — proven, not guessed,
+                // which is where v4.7's getProtectedLadderCards went wrong — and
+                // the strategic picker then chooses triples from what is left.
+                // This cannot fail: the free pool always contains the solver's
+                // own triples, so the worst case is re-picking them.
+                if (opts.urgent) {
+                    console.log(`%c   ⏩ v5.2.13: urgent publish — opponent near out, skipping strategic pick`, 'color: #e67e22; font-weight: bold;');
+                } else if (needTriples > 0 && needLadders > 0) {
+                    const reserved = new Set(solution.ladders.flat().map(c => c.id));
+                    const free = hand.filter(c => !reserved.has(c.id));
+                    console.log(`%c   🛡️ v5.2.13: reserved ${reserved.size} proven ladder card(s), ${free.length} free for triples`, 'color: #3498db;');
+
+                    const picked = this.pickTriplesStrategically(free, needTriples, pIdx);
+                    if (picked && picked.length === needTriples) {
+                        triples = picked;
+                    } else {
+                        console.log(`%c   ↩️ v5.2.13: strategic pick came up short — keeping solver triples`, 'color: #f39c12;');
+                    }
+                }
+
+                // Grow ladders LAST, against whatever the triples left behind.
+                // Settling triples first also stops a growing ladder from
+                // swallowing a card a triple needs.
+                const usedIds = new Set();
+                triples.forEach(t => t.forEach(c => usedIds.add(c.id)));
+                solution.ladders.forEach(l => l.forEach(c => usedIds.add(c.id)));
+                const sequences = triples.concat(
+                    solution.ladders.map(l => this.growLadder(l, hand, usedIds))
+                );
+
+                sequences.forEach(seq => {
+                    if (seq.length >= 4 && !seq.every(c => c.rank === seq[0].rank)) {
+                        this.assertLadderValid(seq, `publish for player ${pIdx}`);
+                    }
+                });
+
                 // Remove published cards from hand
-                published.forEach(c => {
+                sequences.flat().forEach(c => {
                     const idx = this.playerHands[pIdx].findIndex(card => card.id === c.id);
                     if (idx > -1) this.playerHands[pIdx].splice(idx, 1);
                 });
 
-                // 🎯 v4.0.7: Store as 2D array!
                 this.publishedSequences[pIdx] = sequences;
 
-                console.log(`%c🎯 v4.0.7: Published ${sequences.length} separate sequences for Player ${pIdx}`, 'color: #27ae60; font-weight: bold;');
+                console.log(`%c🎯 v5.2.13: Published ${sequences.length} sequence(s) for Player ${pIdx}`, 'color: #27ae60; font-weight: bold;');
                 sequences.forEach((seq, i) => {
                     console.log(`  Sequence ${i + 1}: ${seq.map(c => c.toString()).join(' ')}`);
                 });
 
-                // ← ADD THESE TWO LINES HERE:
                 this.renderAIHands();
                 this.renderPublished();
 
                 return true;
+            }
+
+            // 🔧 v5.2.13: strategic triple selection from the cards the solver
+            // did NOT reserve for ladders. Carries forward the one thing the old
+            // greedy builder did better than the solver — preferring ranks the
+            // opponents are not visibly collecting, and skipping depleted ranks.
+            // Returns null if it cannot fill the quota; caller falls back to the
+            // solver's own triples, which are always legal.
+            pickTriplesStrategically(free, count, pIdx) {
+                const opponentRanks = new Set();
+                for (let i = 0; i < this.players; i++) {
+                    if (i !== pIdx) this.getPublishedRanks(i).forEach(r => opponentRanks.add(r));
+                }
+                const depletedRanks = this.getDepletedRanks();
+
+                const picked = [];
+                const usedIds = new Set();
+
+                for (let n = 0; n < count; n++) {
+                    const avail = free.filter(c => !usedIds.has(c.id));
+                    const byRank = {};
+                    avail.forEach(c => { if (!byRank[c.rank]) byRank[c.rank] = []; byRank[c.rank].push(c); });
+
+                    const candidates = Object.keys(byRank)
+                        .filter(rank => byRank[rank].length >= 3 && !depletedRanks.includes(rank))
+                        .sort((a, b) => {
+                            const aOverlap = opponentRanks.has(a) ? 1 : 0;
+                            const bOverlap = opponentRanks.has(b) ? 1 : 0;
+                            if (aOverlap !== bOverlap) return aOverlap - bOverlap;
+                            return byRank[b].length - byRank[a].length;
+                        });
+
+                    if (candidates.length === 0) return null;
+
+                    const cards = byRank[candidates[0]].slice(0, 3);
+                    cards.forEach(c => usedIds.add(c.id));
+                    picked.push(cards);
+                    console.log(`%c   ✅ v5.2.13: strategic triple ${cards.map(c => c.toString()).join(', ')}`, 'color: #27ae60;');
+                }
+                return picked;
+            }
+
+            // 🔧 v5.2.13: post-condition on every ladder mutation. Turns a
+            // silent corruption into a loud one at the point of failure instead
+            // of ten turns later.
+            assertLadderValid(seq, where) {
+                const vals = seq.map(c => c.getValue());
+                if (new Set(vals).size !== vals.length) {
+                    console.error(`🚨 v5.2.13: CORRUPT LADDER after ${where}: [${seq.map(c => c.toString()).join('-')}]`);
+                    return false;
+                }
+                return true;
+            }
+
+            // 🔧 v5.2.13: an opponent has published and is at 3 cards or fewer.
+            opponentNearOut(ai) {
+                return this.publishedSequences.some((seq, idx) =>
+                    idx !== ai && seq.length > 0 && this.playerHands[idx].length <= 3);
             }
 
             // ✅ FIX 1: Explicit LOW and HIGH end ladder extension support
@@ -6689,6 +6657,13 @@
                 const maxVal = sorted[sorted.length - 1];
 
                 console.log(`  🔍 FIX 1: Checking if ${cardVal} can extend ladder [${sorted.join(',')}]`);
+
+                // 🔧 v5.2.13: a ladder is a run — no duplicate ranks at either
+                // end, ever. Belt-and-braces now that every caller routes here.
+                if (sorted.includes(cardVal)) {
+                    console.log(`  🛑 v5.2.13: rank ${cardVal} already in ladder — rejected`);
+                    return false;
+                }
 
                 // Check for wrap-around ladder (A-K-Q-J)
                 const hasAce = sorted.includes(1);
@@ -8366,6 +8341,16 @@
             shouldAllowBuy(ai, discardCard) {
                 const buysRemaining = this.playerBuys[ai];
                 if (buysRemaining === 0) return false;
+
+                // 🔧 v5.2.13: the bloat guard belongs HERE. An out-of-turn buy is
+                // the only path that grows a hand (bought card + penalty card).
+                // PATCH 2 had it on the in-turn take, which is net zero and only
+                // forced a bloated AI to draw at random — the very thing keeping
+                // it bloated.
+                if (this.playerHands[ai].length >= 13) {
+                    console.log(`%c🚫 v5.2.13: ${ai === 1 ? 'Habot' : 'Jabot'} at ${this.playerHands[ai].length} cards — buy blocked (bloat)`, 'color: #e74c3c; font-weight: bold;');
+                    return false;
+                }
                 
                 // 🐛 v4.7 FIX: Don't buy if AI can already publish!
                 // Buying increases hand size and delays publishing
@@ -9222,7 +9207,7 @@
                     // PATCH 3: Try to auto-publish at turn start if hand is large
                     if (currentHandSize >= 12 && this.publishedSequences[ai].length === 0) {
                         console.log(`%c🚨 PATCH 3: ${aiName} has ${currentHandSize} cards and hasn't published - forcing publish check`, 'color: #e74c3c; font-weight: bold;');
-                        const published = this.autoPublish(ai);
+                        const published = this.autoPublish(ai, { urgent: this.opponentNearOut(ai) });
                         if (published) {
                             console.log(`%c✅ PATCH 3: ${aiName} published!`, 'color: #27ae60; font-weight: bold;');
                             this.aiJustPublished[ai] = true; // 🐛 v4.1.5: Set flag to block extensions this turn
@@ -9437,36 +9422,15 @@
                         }
                     }
 
-                    // 🔄 v5.1.5: If hand is bloated (13+), only take discard if it extends a published sequence
-                    // AND the AI has already published (so it can actually play the extension).
-                    // An AI that hasn't published yet CANNOT extend anyone's sequences, so taking
-                    // extension cards when bloated just passes them to opponents on discard.
-                    if (shouldTake && blockBuying && this.discardPile.length > 0) {
-                        const topCard = this.discardPile[this.discardPile.length - 1];
-                        const aiHasPublishedAlready = this.publishedSequences[ai].length > 0;
-                        const aiCanExtend = aiHasPublishedAlready && !this.aiJustPublished[ai];
-                        
-                        if (!aiCanExtend) {
-                            // AI hasn't published or just published this turn - can't extend anything
-                            console.log(`%c  🛑 v5.1.5: PATCH 2 blocking take - ${aiName} has ${currentHandSize} cards and hasn't published yet (can't extend)`, 'color: #e74c3c; font-weight: bold;');
-                            shouldTake = false;
-                        } else {
-                            // AI can extend - but only allow if card actually extends a sequence
-                            let extendsPublished = false;
-                            for (let p = 0; p < this.players; p++) {
-                                if (this.publishedSequences[p].length > 0 && this.couldExtendSequence(topCard, p)) {
-                                    extendsPublished = true;
-                                    break;
-                                }
-                            }
-                            if (!extendsPublished) {
-                                console.log(`%c  🛑 v5.1.5: PATCH 2 blocking take - ${aiName} has ${currentHandSize} cards, ${topCard.toString()} doesn't extend any sequence`, 'color: #e74c3c; font-weight: bold;');
-                                shouldTake = false;
-                            } else {
-                                console.log(`%c  ✅ v5.1.5: PATCH 2 allowing take - ${aiName} published & ${topCard.toString()} extends a sequence (can play it to shed cards)`, 'color: #27ae60; font-weight: bold;');
-                            }
-                        }
-                    }
+                    // 🔧 v5.2.13: PATCH 2's take-block removed. Taking the top
+                    // discard on your own turn is net zero (one card in, one card
+                    // out at end of turn) — it never caused the bloat it was
+                    // blamed for. The real bloat path is the out-of-turn buy in
+                    // aiConsiderBuy(), which now carries the >= 13 guard inside
+                    // shouldAllowBuy(). The useful half of this check — don't take
+                    // a card you'd immediately discard — is already done below by
+                    // wouldDiscardImmediately(). `blockBuying` is retained above
+                    // purely as a diagnostic log line.
 
                     if (shouldTake && this.discardPile.length > 0) {
                         const discardTop = this.discardPile[this.discardPile.length - 1];
@@ -9757,7 +9721,7 @@
                 const currentHandSize = this.playerHands[ai].length;
                 if (currentHandSize >= 13 && this.publishedSequences[ai].length === 0 && this.canPublish(ai)) {
                     console.log(`%c🚨 PATCH 4: ${aiName} has ${currentHandSize} cards - FORCING publish!`, 'color: #e74c3c; font-weight: bold;');
-                    const publishSuccess = this.autoPublish(ai);
+                    const publishSuccess = this.autoPublish(ai, { urgent: this.opponentNearOut(ai) });
                     if (publishSuccess) {
                         this.aiJustPublished[ai] = true;
                         this.setAIStatus(statusId, `Published!`);
@@ -9889,7 +9853,7 @@
 
                     if (shouldPublish) {
                         console.log(`%c  🎉 ${aiName} attempting to publish!`, 'color: #28a745; font-weight: bold;');
-                        const publishSuccess = this.autoPublish(ai);
+                        const publishSuccess = this.autoPublish(ai, { urgent: opponentDanger });
                         console.log(`     publishSuccess: ${publishSuccess}`);
 
                         if (publishSuccess) {
@@ -10168,22 +10132,15 @@
 
                                 console.log(`  🔍 v5.1.5: Checking ${card.toString()} against sequence ${seqIdx + 1} [${seqValues.join(',')}]`);
 
-                                // Check standard low/high extension
-                                let canExtend = false;
-                                if (cardVal === minVal - 1 || cardVal === maxVal + 1) {
-                                    canExtend = true;
-                                }
-                                // Check ace-high wrap (Ace after King)
-                                if (cardVal === 1 && maxVal === 13) {
-                                    canExtend = true;
-                                }
-                                // Check extending low end of ace-high ladder
-                                if (seqValues.includes(1) && seqValues.includes(13)) {
-                                    const nonAceValues = seqValues.filter(v => v !== 1).sort((a, b) => a - b);
-                                    if (nonAceValues.length > 0 && cardVal === nonAceValues[0] - 1) {
-                                        canExtend = true;
-                                    }
-                                }
+                                // 🔧 v5.2.13: SINGLE GATE. This block used to
+                                // reimplement canCardExtendLadder() inline, and got the
+                                // wrap case wrong: `cardVal === 1 && maxVal === 13`
+                                // accepted an Ace onto a ladder that ALREADY ended in an
+                                // Ace, producing 7♦-8♦-9♦-10♦-J♦-Q♦-K♦-A♦-A♦. The shared
+                                // validator had the correct guard all along; the Ace
+                                // simply never reached it. Nothing may accept a ladder
+                                // extension except canCardExtendLadder().
+                                const canExtend = this.canCardExtendLadder(cardVal, seqValues);
 
                                 if (canExtend) {
                                     this.publishedSequences[p][seqIdx].push(card);
@@ -10203,6 +10160,7 @@
                                         return aVal - bVal;
                                     });
                                     console.log(`  🔄 v5.1.5: Sorted ladder after extension: ${extSeq.map(c => c.toString()).join('-')}`);
+                                    this.assertLadderValid(extSeq, `extension with ${card.toString()}`);
                                     
                                     this.playerHands[aiIdx].splice(i, 1);
                                     extendedSequence = true;
